@@ -1,7 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>blqw</RootNamespace>
   </PropertyGroup>
-
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="Define\Base\**" />
+    <EmbeddedResource Remove="Define\Base\**" />
+    <None Remove="Define\Base\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Define\IConvertor.cs" />
+    <Content Include="Services\ConvertContext.cs" />
+    <Content Include="Services\ConvertResult.cs" />
+    <Content Include="Services\ConvertException.cs" />
+    <Content Include="Define\Genericity\ConvertResult.cs" />
+    <Content Include="Define\Genericity\IConvertor.cs" />
+    <Content Include="Services\Startup.cs" />
+    <Content Include="Convertors\Base\BaseConvertor.cs" />
+    <Content Include="Services\Helper\StringResourceHelper.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
+  </ItemGroup>
 </Project>
