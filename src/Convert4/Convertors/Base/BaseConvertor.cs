@@ -32,14 +32,19 @@ namespace blqw.Convertors
 
         ConvertResult IConvertor.ChangeType(ConvertContext context, object input)
         {
+            context.Exception = null;
             if (input == null)
             {
                 if (this is IFromNull<T> conv)
                 {
                     var result = conv.FromNull(context);
+                    if (context.Exception != null)
+                    {
+                        return context.Exception;
+                    }
                     return new ConvertResult<T>(result);
                 }
-                return ConvertResult<T>.Error("`null`", "无法转换为", TypeFriendlyName);
+                return context.Exception = new InvalidCastException(SR.GetString($"`null`{"无法转换为"} {TypeFriendlyName:!}"));
             }
             else if (input is IConvertible v0)
             {
@@ -49,9 +54,13 @@ namespace blqw.Convertors
                         if (this is IFromNull<T> conv)
                         {
                             var result = conv.FromDBNull(context);
+                            if (context.Exception != null)
+                            {
+                                return context.Exception;
+                            }
                             return new ConvertResult<T>(result);
                         }
-                        return ConvertResult<T>.Error("`DBNull`", "无法转换为", TypeFriendlyName);
+                        return context.Exception = new InvalidCastException(SR.GetString($"`DBNull`{"无法转换为"} {TypeFriendlyName:!}"));
                     case TypeCode.Boolean:
                         return ChangeTypeImpl(context, v0.ToBoolean(context.GetCultureInfo()));
                     case TypeCode.Byte:
@@ -150,20 +159,33 @@ namespace blqw.Convertors
 
         ConvertResult ChangeTypeImpl<TInput>(ConvertContext context, TInput input)
         {
-            if (this is IFrom<T, TInput> conv)
+            try
             {
-                return new ConvertResult(conv.From(context, input));
-            }
-            if (input is IObjectReference refObj)
-            {
-                var newObj = refObj.GetRealObject(new StreamingContext(StreamingContextStates.Clone, context));
-                if (!ReferenceEquals(newObj, refObj))
+
+                if (this is IFrom<T, TInput> conv)
                 {
-                    return ((IConvertor)this).ChangeType(context, newObj);
+                    var result = conv.From(context, input);
+                    if (context.Exception != null)
+                    {
+                        return context.Exception;
+                    }
+                    return new ConvertResult(result);
+                }
+                if (input is IObjectReference refObj)
+                {
+                    var newObj = refObj.GetRealObject(new StreamingContext(StreamingContextStates.Clone, context));
+                    if (!ReferenceEquals(newObj, refObj))
+                    {
+                        return ((IConvertor)this).ChangeType(context, newObj);
+                    }
                 }
             }
+            catch (Exception e)
+            {
+                return context.Exception = e;
+            }
 
-            return ConvertResult<T>.Error(input.GetType().GetFriendlyName(), "无法转换为", TypeFriendlyName);
+            return context.Error(input, TypeFriendlyName);
         }
 
         /// <summary>
@@ -195,6 +217,8 @@ namespace blqw.Convertors
         /// </summary>
         /// <param name="outputType">子转换器输出类型</param>
         /// <returns></returns>
-        public abstract IConvertor GetConvertor(Type outputType);
+        public virtual IConvertor GetConvertor(Type outputType) => throw new NotImplementedException(SR.GetString("无法获取子转换器"));
+
+        public virtual uint Priority { get; } = 0;
     }
 }

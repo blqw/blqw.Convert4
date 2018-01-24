@@ -1,11 +1,9 @@
-using System.Collections.Generic;
-using System.Security.Cryptography.X509Certificates;
+using blqw.Convertors;
 using System.Linq;
 using blqw.Services;
 using System;
 using Microsoft.Extensions.DependencyInjection;
-using System.Collections.ObjectModel;
-using blqw.Define;
+using System.Reflection;
 
 namespace blqw
 {
@@ -28,12 +26,10 @@ namespace blqw
         /// <param name="services"></param>
         public static void ConfigureServices(IServiceCollection services)
         {
-            AppDomain.CurrentDomain
-                     .GetAssemblies()
-                     .SelectMany(TypeExtensions.SafeGetTypes)
-                     .Where(x => x.IsClass && x.Instantiable() && typeof(IConvertor).IsAssignableFrom(x))
-                     .ForEach(x => services.AddSingleton(typeof(IConvertor), x));
-            services.AddSingleton<IConvertorSelector>(provider => new ConvertorSelector(provider));
+            var types = Assembly.GetAssembly(typeof(Convert4)).SafeGetTypes();
+            types.Where(x => x.IsClass && x.Instantiable() && typeof(IConvertor).IsAssignableFrom(x))
+                 .ForEach(x => services.AddSingleton(typeof(IConvertor), x));
+            services.AddSingleton(typeof(IConvertorSelector), typeof(ConvertorSelector));
         }
 
         /// <summary>

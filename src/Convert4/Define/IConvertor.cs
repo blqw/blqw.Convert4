@@ -13,6 +13,11 @@ namespace blqw
         Type OutputType { get; }
 
         /// <summary>
+        /// 优先级
+        /// </summary>
+        uint Priority { get; }
+
+        /// <summary>
         /// 返回指定类型的对象，其值等效于指定对象。
         /// </summary>
         /// <param name="context"> 上下文 </param>

@@ -197,6 +197,6 @@ namespace blqw.Services
 
         public static bool Instantiable(this Type x) =>
             x.IsValueType
-            || (x.IsClass && !x.IsAbstract && !x.IsGenericTypeDefinition && x.GetConstructors(BindingFlags.Public).Length > 0);
+            || (x.IsClass && !x.IsAbstract && !x.IsGenericTypeDefinition && x.GetConstructors().Length > 0);
     }
 }
