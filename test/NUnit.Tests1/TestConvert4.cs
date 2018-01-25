@@ -18,5 +18,12 @@ namespace NUnit.Tests1
             Assert.AreEqual(i, 1);
         }
 
+        [Test]
+        public void To2()
+        {
+            var i = "1".To<long>();
+            Assert.AreEqual(i, 1);
+        }
+
     }
 }

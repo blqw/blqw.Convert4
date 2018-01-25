@@ -10,13 +10,13 @@ namespace blqw.Convertors
         private ConvertResult<T> _result;
         private ConvertResult _result2;
 
-        private FailConvertor(Exception exception) => _result2 = _result = exception;
+        private FailConvertor() { }
 
 
 
         public ConvertResult<T> ChangeType(ConvertContext context, object input) => _result;
 
-        public IConvertor<T1> GetConvertor<T1>() => new FailConvertor<T1>(_result.Exception);
+        public IConvertor<T1> GetConvertor<T1>() => new FailConvertor<T1>() { _result = _result2, _result2 = _result2 };
 
         public Type OutputType => typeof(T);
 
@@ -30,7 +30,7 @@ namespace blqw.Convertors
                                              .Invoke(this, Array.Empty<object>());
 
         public static implicit operator FailConvertor<T>(Exception ex) =>
-            ex == null ? null : new FailConvertor<T>(ex);
+            ex == null ? null : new FailConvertor<T>() { _result = ex, _result2 = ex };
 
 
 

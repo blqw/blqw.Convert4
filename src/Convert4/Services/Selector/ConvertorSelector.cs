@@ -27,7 +27,7 @@ namespace blqw
             {
                 return conv;
             }
-            throw new NotImplementedException();
+            return null;
         }
     }
 }

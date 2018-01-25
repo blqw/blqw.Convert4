@@ -19,7 +19,7 @@
     <Content Include="Define\IConvertor.cs" />
     <Content Include="Services\ConvertContext.cs" />
     <Content Include="Services\ConvertResult.cs" />
-    <Content Include="Services\ConvertException.cs" />
+    <Content Include="Services\ConvertError.cs" />
     <Content Include="Services\ConvertResultT.cs" />
     <Content Include="Define\Genericity\IConvertor.cs" />
     <Content Include="Services\Startup.cs" />

@@ -25,6 +25,15 @@ namespace blqw
             _convertorSelector = _serviceProvider.GetRequiredService<IConvertorSelector>();
         }
 
+        public ConvertResult<T> ChangeType<T>(ConvertContext context, object input)
+        {
+            var conv = context.GetConvertor<T>();
+            if(conv == null)
+            {
+                return new EntryPointNotFoundException(SR.GetString("转换器未找到"));
+            }
+            return conv.ChangeType(context, input);
+        }
         public IConvertor<T> GetConvertor<T>() => _convertorSelector.Get<T>(this);
 
         public object GetService(Type serviceType) => null;

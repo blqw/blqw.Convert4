@@ -12,14 +12,14 @@ namespace blqw
         {
             Success = true;
             OutputValue = value;
-            Exception = null;
+            Error = null;
         }
 
-        internal ConvertResult(bool success, object value, ConvertException ex)
+        internal ConvertResult(bool success, object value, ConvertError ex)
         {
             Success = success;
             OutputValue = value;
-            Exception = ex;
+            Error = ex;
         }
 
 
@@ -37,7 +37,7 @@ namespace blqw
         /// 如果失败,则返回异常
         /// </summary>
         /// <returns></returns>
-        public ConvertException Exception { get; }
+        public ConvertError Error { get; }
 
         public static implicit operator ConvertResult(Exception exception)
         {
@@ -46,7 +46,7 @@ namespace blqw
                 throw new ArgumentNullException(nameof(exception));
             }
 
-            var e = new ConvertException();
+            var e = new ConvertError();
             e.Exceptions.Add(exception);
             return new ConvertResult(false, null, e);
         }
