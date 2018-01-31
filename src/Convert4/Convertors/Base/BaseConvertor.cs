@@ -14,11 +14,13 @@ namespace blqw.Convertors
     /// <typeparam name="T">输出类型</typeparam>
     public abstract class BaseConvertor<T> : IConvertor<T>
     {
+        protected virtual T CreateOutput() =>
+            Activator.CreateInstance<T>();
 
         /// <summary>
         /// 输出类型
         /// </summary>
-        public Type OutputType { get; } = typeof(T);
+        public virtual Type OutputType { get; } = typeof(T);
 
         /// <summary>
         /// <seealso cref="OutputType"/>.FullName

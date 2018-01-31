@@ -16,7 +16,7 @@ namespace blqw
         {
             using (var context = new ConvertContext())
             {
-                var result = context.ChangeType<T>(context, input);
+                var result = context.ChangeType<T>(input);
                 return result.Success ? result.OutputValue : defaultValue;
             }
         }
@@ -31,7 +31,7 @@ namespace blqw
         {
             using (var context = new ConvertContext())
             {
-                var result = context.ChangeType<T>(context, input);
+                var result = context.ChangeType<T>(input);
                 result.ThrowIfExceptional();
                 return result.OutputValue;
             }

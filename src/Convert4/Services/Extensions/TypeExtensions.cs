@@ -12,6 +12,11 @@ namespace blqw.Services
 {
     public static class TypeExtensions
     {
+        /// <summary>
+        /// 获取类型标记
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
         public static TypeMark GetTypeMark(this object obj)
         {
             if (obj is IConvertible v0)
@@ -38,10 +43,21 @@ namespace blqw.Services
             else if (obj is StringDictionary) return TypeMark.StringDictionary;
             return TypeMark.Object;
         }
-
+        /// <summary>
+        /// 获取真实对象
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="mark"></param>
+        /// <returns></returns>
         public static object GetRealObject(this object obj, out TypeMark mark) =>
             GetRealObject(obj, null, out mark);
-
+        /// <summary>
+        /// 获取真实对象
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="context"></param>
+        /// <param name="mark"></param>
+        /// <returns></returns>
         public static object GetRealObject(this object obj, IServiceProvider context, out TypeMark mark)
         {
             if (obj is IConvertible v0)
@@ -171,10 +187,17 @@ namespace blqw.Services
             mark = TypeMark.Object;
             return obj;
         }
-
+        /// <summary>
+        /// 获取类型的友好名称
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public static string GetFriendlyName(this Type type) => type.FullName;
-
-
+        /// <summary>
+        /// 安全的获取程序集中可以被导出的类型
+        /// </summary>
+        /// <param name="assembly"></param>
+        /// <returns></returns>
         public static IEnumerable<Type> SafeGetTypes(this Assembly assembly)
         {
             if (assembly == null)
@@ -194,9 +217,96 @@ namespace blqw.Services
                 return Type.EmptyTypes;
             }
         }
+        /// <summary>
+        /// 判断类型是否可被实例化
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static bool Instantiable(this Type type) =>
+            type.IsValueType
+            || (type.IsClass && !type.IsAbstract && !type.IsGenericTypeDefinition && type.GetConstructors().Length > 0);
 
-        public static bool Instantiable(this Type x) =>
-            x.IsValueType
-            || (x.IsClass && !x.IsAbstract && !x.IsGenericTypeDefinition && x.GetConstructors().Length > 0);
+        /// <summary>
+        /// 获取当前类型根据指定泛型定义类型约束导出的泛型参数
+        /// </summary>
+        /// <param name="type"> 测试类型 </param>
+        /// <param name="defineType"> 泛型定义类型 </param>
+        /// <param name="inherit"> 是否检测被测试类型的父类和接口 </param>
+        /// <returns></returns>
+        public static Type[] GetGenericArguments(this Type type, Type defineType, bool inherit = true)
+        {
+            if (defineType.IsAssignableFrom(type)) //2个类本身存在继承关系
+            {
+                return type.GetGenericArguments();
+            }
+            if (defineType.IsGenericType == false)
+            {
+                return null; //否则如果definer不是泛型类,则不存在兼容的可能性
+            }
+            if (defineType.IsGenericTypeDefinition == false)
+            {
+                defineType = defineType.GetGenericTypeDefinition(); //获取定义类型的泛型定义
+            }
+            if (type.IsGenericType)
+            {
+                if (type.IsGenericTypeDefinition)
+                {
+                    return null; //tester是泛型定义类型,无法兼容
+                }
+                //获取2个类的泛型参数
+                var arg1 = ((TypeInfo)defineType).GenericTypeParameters;
+                var arg2 = type.GetGenericArguments();
+                //判断2个类型的泛型参数个数
+                if (arg1.Length == arg2.Length)
+                {
+                    //判断definer 应用 tester泛型参数 后的继承关系
+                    if (defineType.MakeGenericType(arg2).IsAssignableFrom(type))
+                    {
+                        return arg2;
+                    }
+                }
+            }
+            if (inherit == false)
+            {
+                return null;
+            }
+            //测试tester的父类是否被definer兼容
+            var baseType = type.BaseType;
+            while ((baseType != typeof(object)) && (baseType != null))
+            {
+                var result = GetGenericArguments(baseType, defineType, false);
+                if (result != null)
+                {
+                    return result;
+                }
+                baseType = baseType.BaseType;
+            }
+            //测试tester的接口是否被definer兼容
+            foreach (var @interface in type.GetInterfaces())
+            {
+                var result = GetGenericArguments(@interface, defineType, false);
+                if (result != null)
+                {
+                    return result;
+                }
+            }
+            return null;
+
+        }
+
+        /// <summary>
+        /// 枚举所有父类
+        /// </summary>
+        /// <param name="type"> </param>
+        /// <returns> </returns>
+        public static IEnumerable<Type> EnumerateBaseTypes(this Type type)
+        {
+            var baseType = type.BaseType ?? typeof(object);
+            while (baseType != typeof(object))
+            {
+                yield return baseType;
+                baseType = baseType.BaseType ?? typeof(object);
+            }
+        }
     }
 }

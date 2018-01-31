@@ -15,5 +15,30 @@ namespace blqw.Services
         public static StreamingContextStates GetStreamingContextStates(this IServiceProvider context) =>
             context?.GetService(typeof(StreamingContextStates)) is StreamingContextStates v ? v : StreamingContextStates.All;
 
+        public static StringSplitOptions GetStringSplitOptions(this IServiceProvider context) =>
+            context?.GetService(typeof(StringSplitOptions)) is StringSplitOptions v ? v : StringSplitOptions.None;
+
+        public static object GetStringSeparator(this IServiceProvider context)
+        {
+            var service = (NamedService)context?.GetService(typeof(NamedService));
+            if (service == null)
+            {
+                return null;
+            }
+            var separator = service["StringSeparator"];
+            switch (separator)
+            {
+                case char[] r:
+                    return r;
+                case char r:
+                    return new char[] { r };
+                case string r:
+                    return new string[] { r };
+                case string[] r:
+                    return r;
+                default:
+                    return null;
+            }
+        }
     }
 }

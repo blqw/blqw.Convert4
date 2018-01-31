@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -25,15 +26,28 @@ namespace blqw
             _convertorSelector = _serviceProvider.GetRequiredService<IConvertorSelector>();
         }
 
-        public ConvertResult<T> ChangeType<T>(ConvertContext context, object input)
+        public ConvertResult<T> ChangeType<T>(object input)
         {
-            var conv = context.GetConvertor<T>();
-            if(conv == null)
+            var outputType = typeof(T);
+            if (outputType != null)
+            {
+                if (outputType.IsGenericTypeDefinition)
+                {
+                    return new ArgumentOutOfRangeException(SR.GetString($"{"无法为"}{"泛型定义类型"}`{outputType.GetFriendlyName():!}`{"提供转换器"}"));
+                }
+                if (outputType.IsAbstract && outputType.IsSealed)
+                {
+                    return new ArgumentOutOfRangeException(SR.GetString($"{"无法为"}{"静态类型"}`{outputType.GetFriendlyName():!}`{"提供转换器"}"));
+                }
+            }
+            var conv = GetConvertor<T>();
+            if (conv == null)
             {
                 return new EntryPointNotFoundException(SR.GetString("转换器未找到"));
             }
-            return conv.ChangeType(context, input);
+            return conv.ChangeType(this, input);
         }
+
         public IConvertor<T> GetConvertor<T>() => _convertorSelector.Get<T>(this);
 
         public object GetService(Type serviceType) => null;
