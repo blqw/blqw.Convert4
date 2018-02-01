@@ -399,6 +399,8 @@ namespace blqw.Services
                                 return "ulong";
                             case "Guid":
                                 return "Guid";
+                            case "Void":
+                                return "void";
                             default:
                                 name = t.Name;
                                 break;
