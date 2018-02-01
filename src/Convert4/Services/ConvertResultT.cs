@@ -40,12 +40,13 @@ namespace blqw
         /// 如果失败,则返回异常
         /// </summary>
         /// <returns></returns>
-        public ConvertError Error { get; }
+        public ConvertError Error { get;  }
         /// <summary>
         /// 如果有异常则抛出异常
         /// </summary>
         /// <exception cref="AggregateException"> 发生一个或多个转换错误问题 </exception>
         public void ThrowIfExceptional() => Error?.TryThrow();
+
 
         public static implicit operator ConvertResult(ConvertResult<T> value) => new ConvertResult(value.Success, value.OutputValue, value.Error);
         public static implicit operator ConvertResult<T>(ConvertResult value) => new ConvertResult<T>(value.Success, (T)(value.OutputValue ?? default(T)), value.Error);

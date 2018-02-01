@@ -20,12 +20,12 @@ namespace blqw.Services
 
         public static object GetStringSeparator(this IServiceProvider context)
         {
-            var service = (NamedService)context?.GetService(typeof(NamedService));
-            if (service == null)
+            var provider = (NamedService)context?.GetService(typeof(NamedService));
+            if (provider == null)
             {
                 return null;
             }
-            var separator = service["StringSeparator"];
+            var separator = provider.GetService("StringSeparator");
             switch (separator)
             {
                 case char[] r:

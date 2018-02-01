@@ -1,3 +1,4 @@
+using System.Linq;
 using System;
 using System.Collections.Generic;
 
@@ -17,26 +18,20 @@ namespace blqw
         /// 初始化异常
         /// </summary>
         /// <param name="message">异常消息</param>
-        public ConvertError(string message) => Message = message;
-
-        private string _message;
+        public ConvertError(string message)
+        {
+            if (!string.IsNullOrWhiteSpace(message))
+            {
+                Exceptions.Add(new InvalidCastException(message));
+            }
+        }
 
         /// <summary>
         /// 异常消息
         /// </summary>
         /// <returns>返回用户设置的message值,如果没有指定,则返回第一个Exception的Message</returns>
-        public string Message
-        {
-            get
-            {
-                if (string.IsNullOrWhiteSpace(_message) && Exceptions.Count > 0)
-                {
-                    return Exceptions[Exceptions.Count - 1].Message;
-                }
-                return _message;
-            }
-            set => _message = value;
-        }
+        public string Message =>
+            Exceptions.LastOrDefault()?.Message;
 
         /// <summary>
         /// 异常集合
@@ -48,15 +43,11 @@ namespace blqw
         {
             get
             {
-                if(Exceptions.Count == 0)
+                if (Exceptions.Count == 0)
                 {
-                    if (string.IsNullOrWhiteSpace(_message))
-                    {
-                        return null;
-                    }
-                    return new InvalidCastException(_message);
+                    return null;
                 }
-                if(Exceptions.Count == 1)
+                if (Exceptions.Count == 1)
                 {
                     return Exceptions[0];
                 }
@@ -72,5 +63,27 @@ namespace blqw
                 throw ex;
             }
         }
+
+        public static Exception operator +(Exception ex, ConvertError error)
+        {
+            if (ex == null || error?.Exceptions == null)
+            {
+                return ex ?? error?.Exception;
+            }
+
+            if (error.Exceptions.Count == 0)
+            {
+                return ex;
+            }
+            if (error.Exceptions.Count == 1)
+            {
+                return new AggregateException(ex.Message ?? error.Message, new Exception[] { ex, error.Exceptions[0] });
+            }
+            var errors = new Exception[error.Exceptions.Count + 1];
+            error.Exceptions.CopyTo(errors, 0);
+            errors[error.Exceptions.Count] = ex;
+            return new AggregateException(ex.Message, errors.Reverse());
+        }
+
     }
 }

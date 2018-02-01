@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data;
 using System.Text;
-
+using System.Collections.Concurrent;
 
 namespace blqw.Services
 {
@@ -187,12 +187,7 @@ namespace blqw.Services
             mark = TypeMark.Object;
             return obj;
         }
-        /// <summary>
-        /// 获取类型的友好名称
-        /// </summary>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        public static string GetFriendlyName(this Type type) => type.FullName;
+
         /// <summary>
         /// 安全的获取程序集中可以被导出的类型
         /// </summary>
@@ -307,6 +302,132 @@ namespace blqw.Services
                 yield return baseType;
                 baseType = baseType.BaseType ?? typeof(object);
             }
+        }
+
+
+        /// <summary>
+        /// 类型名称缓存
+        /// </summary>
+        private static readonly ConcurrentDictionary<Type, string> _typeNames = new ConcurrentDictionary<Type, string>();
+        private static readonly Type System_IValueTupleInternal_Type = Type.GetType("System.IValueTupleInternal", false, false);
+
+        /// <summary>
+        /// 获取类型名称的友好展现形式
+        /// </summary>
+        public static string GetFriendlyName(this Type type)
+        {
+            if (type == null)
+            {
+                return "`null`";
+            }
+
+            return _typeNames.GetOrAdd(type, t =>
+            {
+                var t2 = Nullable.GetUnderlyingType(t);
+                if (t2 != null)
+                {
+                    return GetFriendlyName(t2) + "?";
+                }
+                if (!t.IsGenericType)
+                {
+                    return GetSimpleName(t);
+                }
+                string[] generic;
+                if (t.IsGenericTypeDefinition) //泛型定义
+                {
+                    var args = t.GetGenericArguments();
+                    generic = new string[args.Length];
+                }
+                else
+                {
+                    var infos = t.GetGenericArguments();
+                    generic = new string[infos.Length];
+                    for (var i = 0; i < infos.Length; i++)
+                    {
+                        generic[i] = GetFriendlyName(infos[i]);
+                    }
+
+                    //这个表示元组类型
+                    if ((System_IValueTupleInternal_Type?.IsAssignableFrom(t) ?? false))
+                    {
+                        return "(" + string.Join(", ", generic) + ")";
+                    }
+                }
+                return GetSimpleName(t) + "<" + string.Join(", ", generic) + ">";
+            });
+        }
+
+        private static string GetSimpleName(this Type t)
+        {
+            string name;
+            if (t.ReflectedType == null)
+            {
+                switch (t.Namespace)
+                {
+                    case "System":
+                        switch (t.Name)
+                        {
+                            case "Boolean":
+                                return "bool";
+                            case "Byte":
+                                return "byte";
+                            case "Char":
+                                return "char";
+                            case "Decimal":
+                                return "decimal";
+                            case "Double":
+                                return "double";
+                            case "Int16":
+                                return "short";
+                            case "Int32":
+                                return "int";
+                            case "Int64":
+                                return "long";
+                            case "SByte":
+                                return "sbyte";
+                            case "Single":
+                                return "float";
+                            case "String":
+                                return "string";
+                            case "Object":
+                                return "object";
+                            case "UInt16":
+                                return "ushort";
+                            case "UInt32":
+                                return "uint";
+                            case "UInt64":
+                                return "ulong";
+                            case "Guid":
+                                return "Guid";
+                            default:
+                                name = t.Name;
+                                break;
+                        }
+                        break;
+                    case null:
+                    case "System.Collections":
+                    case "System.Collections.Generic":
+                    case "System.Data":
+                    case "System.Text":
+                    case "System.IO":
+                    case "System.Collections.Specialized":
+                        name = t.Name;
+                        break;
+                    default:
+                        name = $"{t.Namespace}.{t.Name}";
+                        break;
+                }
+            }
+            else
+            {
+                name = $"{GetSimpleName(t.ReflectedType)}.{t.Name}";
+            }
+            var index = name.LastIndexOf('`');
+            if (index > -1)
+            {
+                name = name.Remove(index);
+            }
+            return name;
         }
     }
 }

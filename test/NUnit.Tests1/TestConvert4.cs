@@ -1,4 +1,5 @@
-﻿using blqw;
+﻿using System.Collections;
+using blqw;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -70,5 +71,30 @@ namespace NUnit.Tests1
             Assert.AreEqual(list[3], 4);
         }
 
+        [Test]
+        public void 自定义转换参数()
+        {
+            var list = "1;2;3;4".To<List<int>>(new Hashtable()
+            {
+                ["StringSeparator"] = ";"
+            });
+            Assert.AreEqual(list?.Count, 4);
+            Assert.AreEqual(list[0], 1);
+            Assert.AreEqual(list[1], 2);
+            Assert.AreEqual(list[2], 3);
+            Assert.AreEqual(list[3], 4);
+        }
+
+
+        [Test]
+        public void 测试友好类名()
+        {
+            Assert.AreEqual(typeof(int).To<string>(), "int");
+            Assert.AreEqual(typeof(char?).To<string>(), "char?");
+            Assert.AreEqual(typeof(List<ICollection>).To<string>(), "List<ICollection>");
+            Assert.AreEqual(typeof(Dictionary<List<long?>, Tuple<string, DateTime, Guid>>).To<string>(), "Dictionary<List<long?>, Tuple<string, DateTime, Guid>>");
+            Assert.AreEqual(typeof((int, long)).To<string>(), "(int, long)");
+
+        }
     }
 }

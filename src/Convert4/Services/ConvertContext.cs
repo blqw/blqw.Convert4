@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using blqw.Services;
+using System.Collections;
 
 namespace blqw
 {
@@ -11,20 +12,43 @@ namespace blqw
     /// </summary>
     public class ConvertContext : IServiceProvider, IDisposable
     {
-        private readonly ServiceProvider _serviceProvider;
+        private readonly IServiceProvider _serviceProvider;
         private readonly IServiceScope _serviceScope;
         private readonly IConvertorSelector _convertorSelector;
 
-        public ConvertContext() : this(null)
+        /// <summary>
+        /// 使用自定义服务与 <seealso cref="Startup.ServiceProvider"/>组合 创建上下文并提供服务提供程序
+        /// </summary>
+        public ConvertContext(IDictionary services)
+            : this(new NamedService(services))
         {
         }
 
-        public ConvertContext(ServiceProvider serviceProvider)
+        /// <summary>
+        /// 使用 <seealso cref="Startup.ServiceProvider"/> 创建上下文并提供服务提供程序
+        /// </summary>
+        public ConvertContext()
+            : this((IServiceProvider)null)
         {
-            _serviceProvider = serviceProvider ?? Startup.ServiceProvider;
+        }
+
+        /// <summary>
+        /// 创建上下文并提供服务提供程序
+        /// </summary>
+        /// <param name="serviceProvider"> 服务提供程序<para />
+        /// 当 <paramref name="serviceProvider"/> 为 <see cref="null"/> 时, 使用 <seealso cref="Startup.ServiceProvider"/> <para/>
+        /// 当 <paramref name="serviceProvider"/> 为 <seealso cref="ServiceWrapper"/> 时, 不做处理 <para/>
+        /// 否则组合 <paramref name="serviceProvider"/> 和 <seealso cref="Startup.ServiceProvider"/>
+        /// </param>
+        public ConvertContext(IServiceProvider serviceProvider)
+        {
+            _serviceProvider = serviceProvider == null
+                                ? (IServiceProvider)Startup.ServiceProvider
+                                : serviceProvider as ServiceWrapper ?? new ServiceWrapper(serviceProvider, Startup.ServiceProvider);
             _serviceScope = _serviceProvider.CreateScope();
             _convertorSelector = _serviceProvider.GetRequiredService<IConvertorSelector>();
         }
+
 
         public ConvertResult<T> ChangeType<T>(object input)
         {
@@ -50,16 +74,13 @@ namespace blqw
 
         public IConvertor<T> GetConvertor<T>() => _convertorSelector.Get<T>(this);
 
-        public object GetService(Type serviceType) => null;
+        public object GetService(Type serviceType) => _serviceProvider.GetService(serviceType);
 
-        public T GetService<T>() => (T)GetService(typeof(T));
+        public T GetService<T>() => _serviceProvider.GetService<T>();
 
         public void Dispose() => _serviceScope?.Dispose();
 
         public Exception Exception { get; set; }
-
-        public Exception Error(params string[] messages) =>
-            Exception = new InvalidCastException(SR.Concat(this.GetCultureInfo(), messages));
 
         public Exception Error(string message) =>
             Exception = new InvalidCastException(SR.Concat(this.GetCultureInfo(), message));
@@ -76,7 +97,7 @@ namespace blqw
             {
                 return Exception = new InvalidCastException(SR.GetString(this.GetCultureInfo(), $"`{value.GetType().GetFriendlyName():!}` {"无法转换为"} {outputTypeName:!}"));
             }
-            return Exception = new InvalidCastException(SR.GetString(this.GetCultureInfo(), $"`{value.GetType().GetFriendlyName():!}` {"值"}: {"无法转换为"}; {outputTypeName:!}"));
+            return Exception = new InvalidCastException(SR.GetString(this.GetCultureInfo(), $"{"值"}:`{value.ToString():!}`({value.GetType().GetFriendlyName():!}) {"无法转换为"}; {outputTypeName:!}"));
         }
     }
 }

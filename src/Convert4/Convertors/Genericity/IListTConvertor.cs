@@ -36,7 +36,7 @@ namespace blqw.Convertors
                     var result = context.ChangeType<TValue>(item);
                     if (!result.Success)
                     {
-                        context.Exception = result.Error.Exception;
+                        context.Exception = context.Error(input, TypeFriendlyName) + result.Error;
                         return null;
                     }
                     list.Add(result.OutputValue);
