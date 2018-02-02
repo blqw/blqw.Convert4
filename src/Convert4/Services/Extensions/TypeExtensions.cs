@@ -328,6 +328,18 @@ namespace blqw.Services
                 {
                     return GetFriendlyName(t2) + "?";
                 }
+                if (t.IsPointer)
+                {
+                    return GetFriendlyName(t.GetElementType()) + "*";
+                }
+                if (t.IsByRef)
+                {
+                    return GetFriendlyName(t.GetElementType()) + "&";
+                }
+                if (t.IsArray)
+                {
+                    return GetFriendlyName(t.GetElementType()) + "[]";
+                }
                 if (!t.IsGenericType)
                 {
                     return GetSimpleName(t);

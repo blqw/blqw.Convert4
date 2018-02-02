@@ -97,6 +97,9 @@ namespace NUnit.Tests1
             Assert.AreEqual(typeof(void).To<string>(), "void");
             Assert.AreEqual(typeof(Dictionary<List<long?>, Tuple<string, DateTime, Guid, (TimeSpan, int)>>).To<string>(),
                 "Dictionary<List<long?>, Tuple<string, DateTime, Guid, (TimeSpan, int)>>");
+            Assert.AreEqual(typeof(int*).To<string>(), "int*");
+            Assert.AreEqual(typeof(int).MakeByRefType().To<string>(), "int&");
+            Assert.AreEqual(typeof(int[]).To<string>(), "int[]");
         }
     }
 }
