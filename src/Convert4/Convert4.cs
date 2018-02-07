@@ -2,9 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Runtime.Serialization;
 
 namespace blqw
 {
+    /// <summary>
+    /// 超级转换器v4
+    /// </summary>
     public static class Convert4
     {
         /// <summary>
@@ -44,14 +48,21 @@ namespace blqw
         /// <typeparam name="T"> 要返回的对象类型的泛型 </typeparam>
         /// <param name="input"> 需要转换类型的对象 </param>
         /// <param name="defaultValue"> 转换失败时返回的默认值 </param>
-        public static T To<T>(this object input, IDictionary services)
+        public static T To<T>(this object input, ConvertSettings settings)
         {
-            using (var context = new ConvertContext(services))
+            using (var context = new ConvertContext(settings))
             {
                 var result = context.ChangeType<T>(input);
                 result.ThrowIfExceptional();
                 return result.OutputValue;
             }
         }
+
+        /// <summary>
+        /// 获取一个 <see cref="IFormatterConverter"> 类型的简单转换器
+        /// </summary>
+        /// <returns></returns>
+        public static IFormatterConverter GetFormatterConverter() =>
+            throw new NotImplementedException(); //TODO:未实现
     }
 }

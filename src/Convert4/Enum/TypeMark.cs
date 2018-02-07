@@ -4,6 +4,7 @@ using System.Text;
 
 namespace blqw
 {
+    [Serializable]
     public enum TypeMark
     {
         Empty = 0,

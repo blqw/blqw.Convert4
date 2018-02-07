@@ -1,3 +1,5 @@
+using System.Net.Http.Headers;
+using System.Runtime.InteropServices.ComTypes;
 using System.Runtime.Serialization;
 using blqw.Services;
 using System;
@@ -5,6 +7,7 @@ using System.Globalization;
 using System.Data;
 using System.Collections.Specialized;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace blqw.Convertors
 {
@@ -14,6 +17,76 @@ namespace blqw.Convertors
     /// <typeparam name="T">输出类型</typeparam>
     public abstract class BaseConvertor<T> : IConvertor<T>
     {
+        protected interface IInvoker
+        {
+            T ChangeTypeImpl(IConvertor<T> conv, ConvertContext context, object input);
+            Type InputType { get; }
+        }
+        class Invoker<TInput> : IInvoker
+        {
+
+            T IInvoker.ChangeTypeImpl(IConvertor<T> conv, ConvertContext context, object input)
+                => ((IFrom<T, TInput>)conv).From(context, (TInput)input);
+
+            public Type InputType => typeof(TInput);
+        }
+
+        readonly Dictionary<Type, IInvoker> Invokers;
+        readonly List<IInvoker> InterfaceInvokers;
+
+        public BaseConvertor()
+        {
+            Invokers = new Dictionary<Type, IInvoker>();
+            InterfaceInvokers = new List<IInvoker>();
+            foreach (var intf in GetType().GetInterfaces())
+            {
+                if (intf.IsConstructedGenericType && intf.GetGenericTypeDefinition() == typeof(IFrom<,>))
+                {
+                    var args = intf.GetGenericArguments();
+                    if (args[0] == typeof(T))
+                    {
+                        var invoker = (IInvoker)Activator.CreateInstance(typeof(Invoker<>).MakeGenericType(args));
+                        Invokers.Add(invoker.InputType, invoker);
+                        if (invoker.InputType.IsInterface)
+                        {
+                            InterfaceInvokers.Add(invoker);
+                        }
+                    }
+                }
+            }
+        }
+
+        protected IInvoker GetInvoker(Type type)
+        {
+            if (Invokers.TryGetValue(type, out var invoker0))
+            {
+                return invoker0;
+            }
+            if (!type.IsInterface)
+            {
+                foreach (var baseType in type.EnumerateBaseTypes())
+                {
+                    if (Invokers.TryGetValue(baseType, out var invoker))
+                    {
+                        return invoker;
+                    }
+                }
+            }
+            var intfs = type.GetInterfaces();
+            foreach (var invoker in InterfaceInvokers)
+            {
+                foreach (var intf in intfs)
+                {
+                    if (invoker.InputType.IsAssignableFrom(intf))
+                    {
+                        return invoker;
+                    }
+                }
+            }
+            return null;
+        }
+
+
         protected virtual T CreateOutput() =>
             Activator.CreateInstance<T>();
 
@@ -48,7 +121,18 @@ namespace blqw.Convertors
                 }
                 return context.Exception = new InvalidCastException(SR.GetString($"`null`{"无法转换为"} {TypeFriendlyName:!}"));
             }
-            else if (input is IConvertible v0)
+
+            var invoker = GetInvoker(input.GetType());
+            if (invoker != null)
+            {
+                var result = invoker.ChangeTypeImpl(this, context, input);
+                if (context.Exception == null)
+                {
+                    return new ConvertResult(result);
+                }
+            }
+
+            if (input is IConvertible v0)
             {
                 switch (v0.GetTypeCode())
                 {
@@ -97,50 +181,50 @@ namespace blqw.Convertors
                         break;
                 }
             }
-            else if (input is Guid v1)
-            {
-                return ChangeTypeImpl(context, v1);
-            }
-            else if (input is TimeSpan v2)
-            {
-                return ChangeTypeImpl(context, v2);
-            }
-            else if (input is Uri v3)
-            {
-                return ChangeTypeImpl(context, v3);
-            }
-            else if (input is Type v4)
-            {
-                return ChangeTypeImpl(context, v4);
-            }
-            else if (input is IntPtr v5)
-            {
-                return ChangeTypeImpl(context, v5);
-            }
-            else if (input is UIntPtr v6)
-            {
-                return ChangeTypeImpl(context, v6);
-            }
-            else if (input is DataRow v7)
-            {
-                return ChangeTypeImpl(context, v7);
-            }
-            else if (input is DataTable v8)
-            {
-                return ChangeTypeImpl(context, v8);
-            }
-            else if (input is NameObjectCollectionBase v9)
-            {
-                return ChangeTypeImpl(context, v9);
-            }
-            else if (input is StringDictionary v10)
-            {
-                return ChangeTypeImpl(context, v1);
-            }
-            else if (input is Array v11)
-            {
-                return ChangeTypeImpl(context, v11);
-            }
+            //else if (input is Guid v1)
+            //{
+            //    return ChangeTypeImpl(context, v1);
+            //}
+            //else if (input is TimeSpan v2)
+            //{
+            //    return ChangeTypeImpl(context, v2);
+            //}
+            //else if (input is Uri v3)
+            //{
+            //    return ChangeTypeImpl(context, v3);
+            //}
+            //else if (input is Type v4)
+            //{
+            //    return ChangeTypeImpl(context, v4);
+            //}
+            //else if (input is IntPtr v5)
+            //{
+            //    return ChangeTypeImpl(context, v5);
+            //}
+            //else if (input is UIntPtr v6)
+            //{
+            //    return ChangeTypeImpl(context, v6);
+            //}
+            //else if (input is DataRow v7)
+            //{
+            //    return ChangeTypeImpl(context, v7);
+            //}
+            //else if (input is DataTable v8)
+            //{
+            //    return ChangeTypeImpl(context, v8);
+            //}
+            //else if (input is NameObjectCollectionBase v9)
+            //{
+            //    return ChangeTypeImpl(context, v9);
+            //}
+            //else if (input is StringDictionary v10)
+            //{
+            //    return ChangeTypeImpl(context, v1);
+            //}
+            //else if (input is Array v11)
+            //{
+            //    return ChangeTypeImpl(context, v11);
+            //}
 
             if (input is IDictionary v12)
             {

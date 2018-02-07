@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Globalization;
 
 namespace NUnit.Tests1
 {
@@ -74,15 +75,35 @@ namespace NUnit.Tests1
         [Test]
         public void 自定义转换参数()
         {
-            var list = "1;2;3;4".To<List<int>>(new Hashtable()
-            {
-                ["StringSeparator"] = ";"
-            });
+            var list = "1;2;3;4".To<List<int>>(new ConvertSettings().AddService("StringSeparator", ";"));
             Assert.AreEqual(list?.Count, 4);
             Assert.AreEqual(list[0], 1);
             Assert.AreEqual(list[1], 2);
             Assert.AreEqual(list[2], 3);
             Assert.AreEqual(list[3], 4);
+        }
+
+        [Test]
+        public void 自定义格式化参数()
+        {
+            var format = "yyyyMMddHHmmssffffff";
+            var enUS = CultureInfo.CreateSpecificCulture("en-US");
+            var urPK = CultureInfo.CreateSpecificCulture("ur-PK");
+            var time = DateTime.Now;
+
+            var formatResult = time.ToString(format);
+            var enUSResult = time.ToString(enUS);
+            var urPKResult = time.ToString(urPK);
+
+            var formatTest = time.To<string>(new ConvertSettings().AddFormat<DateTime>(format));
+            var enUSTest = time.To<string>(new ConvertSettings().AddService(enUS));
+            var urPKTest = time.To<string>(new ConvertSettings().AddServiceForType<DateTime>(urPK));
+            var urPKTest2 = time.To<string>(new ConvertSettings().AddServiceForType<int>(urPK));
+
+            Assert.AreEqual(formatTest, formatResult);
+            Assert.AreEqual(enUSTest, enUSResult);
+            Assert.AreEqual(urPKTest, urPKResult);
+            Assert.AreNotEqual(urPKTest2, urPKResult);
         }
 
 
@@ -101,5 +122,6 @@ namespace NUnit.Tests1
             Assert.AreEqual(typeof(int).MakeByRefType().To<string>(), "int&");
             Assert.AreEqual(typeof(int[]).To<string>(), "int[]");
         }
+
     }
 }

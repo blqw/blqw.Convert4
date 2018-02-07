@@ -212,6 +212,7 @@ namespace blqw.Services
                 return Type.EmptyTypes;
             }
         }
+
         /// <summary>
         /// 判断类型是否可被实例化
         /// </summary>
@@ -296,7 +297,7 @@ namespace blqw.Services
         /// <returns> </returns>
         public static IEnumerable<Type> EnumerateBaseTypes(this Type type)
         {
-            var baseType = type.BaseType ?? typeof(object);
+            var baseType = type?.BaseType ?? typeof(object);
             while (baseType != typeof(object))
             {
                 yield return baseType;

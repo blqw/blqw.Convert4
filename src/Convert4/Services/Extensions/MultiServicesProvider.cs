@@ -6,14 +6,14 @@ using System.Text;
 
 namespace blqw.Services
 {
-    class ServiceWrapper : IServiceProvider
+    class MultiServicesProvider : IServiceProvider
     {
         private readonly IServiceProvider[] _serviceProviders;
 
-        public ServiceWrapper(params IServiceProvider[] serviceProviders) =>
+        public MultiServicesProvider(params IServiceProvider[] serviceProviders) =>
             _serviceProviders = serviceProviders ?? throw new ArgumentNullException(nameof(serviceProviders));
 
         public object GetService(Type serviceType) =>
-            _serviceProviders.Select(x => x.GetService(serviceType)).Where(x => x != null).FirstOrDefault();
+            _serviceProviders.Select(x => x.GetService(serviceType)).FirstOrDefault(x => x != null);
     }
 }

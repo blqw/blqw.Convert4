@@ -25,7 +25,7 @@ namespace blqw.Convertors
             public TList From(ConvertContext context, string input)
             {
                 var list = CreateOutput();
-                var separator = context.GetStringSeparator();
+                var separator = context.GetStringSeparators();
 
                 var arr = separator is string[] s
                             ? input.Split(s, context.GetStringSplitOptions())

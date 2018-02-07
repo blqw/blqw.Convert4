@@ -7,17 +7,23 @@ using System.Reflection;
 
 namespace blqw
 {
+    /// <summary>
+    /// 启动器, 用于注入和获取服务
+    /// <para></para> 可由 https://github.com/blqw/blqw.Startup 启动, 也可以独立执行
+    /// </summary>
     static class Startup
     {
         /// <summary>
-        /// 注入的转换器
+        /// 注入的服务提供程序
         /// </summary>
         private static ServiceProvider _serviceProvider;
         /// <summary>
-        /// 非注入的转换器
+        /// 非注入的服务提供程序
         /// </summary>
         private static ServiceProvider _internalProvider;
-
+        /// <summary>
+        /// 服务提供程序更新事件
+        /// </summary>
         private static event EventHandler<ServiceProvider> _changed;
 
         /// <summary>
@@ -33,7 +39,7 @@ namespace blqw
         }
 
         /// <summary>
-        /// 获取转换器
+        /// 服务提供程序, 优先获取注入的服务转换器, 如果没有注入则获取内部实现的服务提供程序
         /// </summary>
         public static ServiceProvider ServiceProvider
         {
@@ -44,6 +50,7 @@ namespace blqw
                     return _serviceProvider;
                 }
 
+                //获取服务提供程序时, 如果没有注入服务, 则创建标准服务提供程序
                 if (_internalProvider == null)
                 {
                     var services = new ServiceCollection();

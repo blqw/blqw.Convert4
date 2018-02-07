@@ -16,19 +16,12 @@ namespace blqw
         private readonly IServiceScope _serviceScope;
         private readonly IConvertorSelector _convertorSelector;
 
-        /// <summary>
-        /// 使用自定义服务与 <seealso cref="Startup.ServiceProvider"/>组合 创建上下文并提供服务提供程序
-        /// </summary>
-        public ConvertContext(IDictionary services)
-            : this(new NamedService(services))
-        {
-        }
 
         /// <summary>
         /// 使用 <seealso cref="Startup.ServiceProvider"/> 创建上下文并提供服务提供程序
         /// </summary>
         public ConvertContext()
-            : this((IServiceProvider)null)
+            : this(null)
         {
         }
 
@@ -37,14 +30,14 @@ namespace blqw
         /// </summary>
         /// <param name="serviceProvider"> 服务提供程序<para />
         /// 当 <paramref name="serviceProvider"/> 为 <see cref="null"/> 时, 使用 <seealso cref="Startup.ServiceProvider"/> <para/>
-        /// 当 <paramref name="serviceProvider"/> 为 <seealso cref="ServiceWrapper"/> 时, 不做处理 <para/>
+        /// 当 <paramref name="serviceProvider"/> 为 <seealso cref="MultiServicesProvider"/> 时, 不做处理 <para/>
         /// 否则组合 <paramref name="serviceProvider"/> 和 <seealso cref="Startup.ServiceProvider"/>
         /// </param>
         public ConvertContext(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider == null
                                 ? (IServiceProvider)Startup.ServiceProvider
-                                : serviceProvider as ServiceWrapper ?? new ServiceWrapper(serviceProvider, Startup.ServiceProvider);
+                                : serviceProvider as MultiServicesProvider ?? new MultiServicesProvider(serviceProvider, Startup.ServiceProvider);
             _serviceScope = _serviceProvider.CreateScope();
             _convertorSelector = _serviceProvider.GetRequiredService<IConvertorSelector>();
         }
