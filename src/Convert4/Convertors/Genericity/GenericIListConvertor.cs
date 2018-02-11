@@ -1,17 +1,20 @@
-﻿using blqw.Services;
+﻿using blqw.ConvertServices;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace blqw.Convertors
 {
-    sealed class IListTConvertor : BaseConvertor<IList<object>>
+    sealed class GenericIListConvertor : BaseConvertor<IList<object>>
     {
         public override Type OutputType => typeof(IList<>);
 
         public override IConvertor GetConvertor(Type outputType)
         {
             var genericArgs = outputType.GetGenericArguments(typeof(IList<>));
+            if (genericArgs == null)
+            {
+                return (IConvertor)Activator.CreateInstance(typeof(InnerConvertor<,>).MakeGenericType(new Type[] { typeof(List<object>), typeof(object) }));
+            }
             var args = new Type[genericArgs.Length + 1];
             args[0] = outputType;
             genericArgs.CopyTo(args, 1);
@@ -22,9 +25,10 @@ namespace blqw.Convertors
             where TList : class, IList<TValue>
         {
             static readonly char[] _separator = new[] { ',' };
+
             public TList From(ConvertContext context, string input)
             {
-                var list = CreateOutput();
+                var list = OutputType.IsInterface ? new List<TValue>() : (IList<TValue>)CreateOutputInstance(OutputType);
                 var separator = context.GetStringSeparators();
 
                 var arr = separator is string[] s
@@ -36,13 +40,13 @@ namespace blqw.Convertors
                     var result = context.ChangeType<TValue>(item);
                     if (!result.Success)
                     {
-                        context.Exception = context.Error(input, TypeFriendlyName) + result.Error;
+                        context.Exception = context.InvalidCastException(input, TypeFriendlyName) + result.Error;
                         return null;
                     }
                     list.Add(result.OutputValue);
                 }
 
-                return list;
+                return (TList)list;
             }
         }
 

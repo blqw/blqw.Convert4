@@ -1,9 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace blqw
 {
+    /// <summary>
+    /// 处理 <seealso cref="IConvertible"/> 类型的转换接口
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public interface IFromConvertible<T>
         : IFrom<T, bool>
         , IFrom<T, char>

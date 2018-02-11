@@ -18,9 +18,9 @@
   <ItemGroup>
     <Content Include="Define\IConvertor.cs" />
     <Content Include="Services\ConvertContext.cs" />
-    <Content Include="Services\ConvertResult.cs" />
-    <Content Include="Services\ConvertError.cs" />
-    <Content Include="Services\ConvertResultT.cs" />
+    <Content Include="Args\ConvertResult.cs" />
+    <Content Include="Args\ConvertError.cs" />
+    <Content Include="Args\ConvertResultT.cs" />
     <Content Include="Define\Genericity\IConvertor.cs" />
     <Content Include="Services\Startup.cs" />
     <Content Include="Convertors\Base\BaseConvertor.cs" />

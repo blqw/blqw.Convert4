@@ -1,12 +1,8 @@
-﻿using System.Linq;
-using System.Runtime.Serialization.Json;
-using System.Runtime.Serialization;
-using blqw.Services;
+﻿using blqw.ConvertServices;
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
+using System.Net;
 using System.Text;
 
 namespace blqw.Convertors
@@ -19,13 +15,15 @@ namespace blqw.Convertors
         IFrom<string, DataTable>,
         IFrom<string, Uri>,
         IFrom<string, StringBuilder>,
+        IFrom<string, IPAddress>,
         IFrom<string, object>,
         IFrom<string, IFormattable>,
         IFrom<string, IConvertible>,
         IFrom<string, IDataReader>,
         IFrom<string, IDataRecord>,
         IFrom<string, IEnumerator>,
-        IFrom<string, IEnumerable>
+        IFrom<string, IEnumerable>,
+        IFromNull<string>
     {
         public string From(ConvertContext context, Type input) =>
             input.GetFriendlyName();
@@ -37,10 +35,10 @@ namespace blqw.Convertors
             input?.ToString(context.GetFormatProvider(input?.GetType()));
 
         public string From(ConvertContext context, IFormattable input) =>
-            input?.ToString(context.GetFormat(input), context.GetFormatProvider(input?.GetType()));
+            input?.ToString(context.GetFormat(input.GetType()), context.GetFormatProvider(input?.GetType()));
 
         public string From(ConvertContext context, byte[] input) =>
-            (context.GetEncoding() ?? Encoding.UTF8).GetString(input);
+            context.GetEncoding().GetString(input);
         public string From(ConvertContext context, bool input) => input ? "true" : "false";
 
         private string ToString(ConvertContext context, object input) =>
@@ -77,7 +75,7 @@ namespace blqw.Convertors
             var s = context.ChangeType<string>(input.Current);
             if (!s.Success)
             {
-                context.Exception = context.Error(input, TypeFriendlyName) + s.Error;
+                context.Exception = context.InvalidCastException(input, TypeFriendlyName) + s.Error;
                 return null;
             }
             var separator = context.GetStringSeparator() ?? ",";
@@ -88,12 +86,14 @@ namespace blqw.Convertors
                 s = context.ChangeType<string>(input.Current);
                 if (!s.Success)
                 {
-                    context.Exception = context.Error(input, TypeFriendlyName) + s.Error;
+                    context.Exception = context.InvalidCastException(input, TypeFriendlyName) + s.Error;
                     return null;
                 }
             } while (input.MoveNext());
 
             return sb.ToString() ;
         }
+
+        public string From(ConvertContext context, IPAddress input) => input.ToString();
     }
 }

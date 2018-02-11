@@ -1,4 +1,3 @@
-using System.Linq;
 using System;
 
 namespace blqw
@@ -18,7 +17,12 @@ namespace blqw
             OutputValue = value;
             Error = null;
         }
-
+        /// <summary>
+        /// 转换成功
+        /// </summary>
+        /// <param name="success">是否成功</param>
+        /// <param name="value">返回值</param>
+        /// <param name="ex">错误对象</param>
         private ConvertResult(bool success, T value, ConvertError ex)
         {
             Success = success;
@@ -40,17 +44,16 @@ namespace blqw
         /// 如果失败,则返回异常
         /// </summary>
         /// <returns></returns>
-        public ConvertError Error { get;  }
+        public ConvertError Error { get; }
         /// <summary>
         /// 如果有异常则抛出异常
         /// </summary>
         /// <exception cref="AggregateException"> 发生一个或多个转换错误问题 </exception>
         public void ThrowIfExceptional() => Error?.TryThrow();
 
-
+        #region 隐式转换
         public static implicit operator ConvertResult(ConvertResult<T> value) => new ConvertResult(value.Success, value.OutputValue, value.Error);
-        public static implicit operator ConvertResult<T>(ConvertResult value) => new ConvertResult<T>(value.Success, (T)(value.OutputValue ?? default(T)), value.Error);
-
+        public static implicit operator ConvertResult<T>(ConvertResult value) => new ConvertResult<T>(value.Success, value.OutputValue is T t ? t : default, value.Error);
         public static implicit operator ConvertResult<T>(Exception exception)
         {
             if (exception == null)
@@ -59,7 +62,8 @@ namespace blqw
             }
             var e = new ConvertError();
             e.Exceptions.Add(exception);
-            return new ConvertResult(false, null, e);
+            return new ConvertResult<T>(false, default, e);
         }
+        #endregion
     }
 }

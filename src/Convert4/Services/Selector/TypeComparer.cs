@@ -3,9 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Runtime.Serialization;
-using System.Text;
 
-namespace blqw.Services
+namespace blqw.ConvertServices
 {
     /// <summary>
     /// 类型比较器
@@ -13,9 +12,13 @@ namespace blqw.Services
     internal sealed class TypeComparer : IComparer<Type>
     {
         /// <summary>
+        /// 单例
+        /// </summary>
+        public static TypeComparer Instance = new TypeComparer();
+        /// <summary>
         /// 部分类型优先级调整
         /// </summary>
-        private static readonly Dictionary<Type, int> _Priorities = new Dictionary<Type, int>
+        private static readonly Dictionary<Type, int> _priorities = new Dictionary<Type, int>
         {
             [typeof(IObjectReference)] = 400,
             [typeof(IFormatProvider)] = 300,
@@ -41,23 +44,21 @@ namespace blqw.Services
         public int Compare(Type x, Type y) => GetPriority(x).CompareTo(GetPriority(y));
 
         /// <summary>
-        /// 获取类型的优先级
+        /// 获取指定类型的优先级
         /// </summary>
-        /// <param name="type"> </param>
+        /// <param name="type">指定类型</param>
         /// <returns> </returns>
         private static int GetPriority(Type type)
         {
             if (type == null)
             {
-                return 0;
+                return int.MinValue;
             }
             if (type.IsGenericType)
             {
                 type = type.GetGenericTypeDefinition() ?? type;
             }
-            return _Priorities.TryGetValue(type, out var i) ? i : 100;
+            return _priorities.TryGetValue(type, out var i) ? i : 100;
         }
-
-
     }
 }

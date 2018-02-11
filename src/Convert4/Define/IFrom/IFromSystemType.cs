@@ -1,9 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace blqw
 {
+    /// <summary>
+    /// 处理系统类型转换的接口
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public interface IFromSystemType<T>
         : IFrom<T, Guid>
         , IFrom<T, TimeSpan>

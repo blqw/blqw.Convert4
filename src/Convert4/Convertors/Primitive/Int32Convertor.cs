@@ -1,4 +1,4 @@
-﻿using blqw.Services;
+﻿using blqw.ConvertServices;
 using System;
 using System.Globalization;
 
@@ -17,7 +17,7 @@ namespace blqw.Convertors
         {
             if (input > 2147483647)
             {
-                context.Error("值超过限制");
+                context.InvalidCastException($"值超过限制");
                 return 0;
             }
             return (int)input;
@@ -27,7 +27,7 @@ namespace blqw.Convertors
         {
             if ((input < -2147483648) || (input > 2147483647))
             {
-                context.Error("值超过限制");
+                context.InvalidCastException($"值超过限制");
                 return 0;
             }
             return (int)input;
@@ -37,7 +37,7 @@ namespace blqw.Convertors
         {
             if (input > 2147483647)
             {
-                context.Error("值超过限制");
+                context.InvalidCastException($"值超过限制");
                 return 0;
             }
             return (int)input;
@@ -46,7 +46,7 @@ namespace blqw.Convertors
         {
             if ((input < -2147483648) || (input > 2147483647))
             {
-                context.Error("值超过限制");
+                context.InvalidCastException($"值超过限制");
                 return 0;
             }
             return (int)input;
@@ -55,7 +55,7 @@ namespace blqw.Convertors
         {
             if ((input < -2147483648) || (input > 2147483647))
             {
-                context.Error("值超过限制");
+                context.InvalidCastException($"值超过限制");
                 return 0;
             }
             return (int)input;
@@ -64,18 +64,22 @@ namespace blqw.Convertors
         {
             if ((input < -2147483648) || (input > 2147483647))
             {
-                context.Error("值超过限制");
+                context.InvalidCastException($"值超过限制");
                 return 0;
             }
             return (int)input;
         }
         public int From(ConvertContext context, DateTime input)
         {
-            context.Error(input, TypeFriendlyName);
+            context.InvalidCastException(input, TypeFriendlyName);
             return 0;
         }
         public int From(ConvertContext context, string input)
         {
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                return 0;
+            }
             if (int.TryParse(input, out var result))
             {
                 return result;
@@ -85,7 +89,7 @@ namespace blqw.Convertors
             {
                 return result;
             }
-            context.Error(input, TypeFriendlyName);
+            context.InvalidCastException(input, TypeFriendlyName);
             return 0;
         }
         public int From(ConvertContext context, object input) => input?.GetHashCode() ?? int.MinValue;

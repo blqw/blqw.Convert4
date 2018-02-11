@@ -1,9 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace blqw
 {
+    /// <summary>
+    /// 类型标记枚举
+    /// </summary>
     [Serializable]
     public enum TypeMark
     {

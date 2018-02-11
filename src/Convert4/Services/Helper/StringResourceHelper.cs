@@ -51,7 +51,7 @@ namespace blqw
         /// </summary>
         /// <param name="str">原始字符串</param>
         /// <returns></returns>
-        public static string GetFString(FormattableString str) =>
+        public static string GetString(FormattableString str) =>
             GetString(CultureInfo.CurrentCulture, str);
 
         /// <summary>
@@ -60,36 +60,55 @@ namespace blqw
         /// <param name="str">原始字符串</param>
         /// <returns></returns>
         public static string GetString(CultureInfo culture, FormattableString str)
-            => string.Format(new TranslationFormatter(culture), str.Format, str.GetArguments());
-
-        class TranslationFormatter : IFormatProvider, ICustomFormatter
         {
-            private CultureInfo culture;
-
-            public TranslationFormatter(CultureInfo culture) => this.culture = culture;
-
-            public string Format(string format, object arg, IFormatProvider formatProvider)
+            if (str.ArgumentCount == 0)
             {
-                if (format == "!")
+                if (string.IsNullOrWhiteSpace(str.Format))
                 {
-                    return arg?.ToString();
+                    return str.Format;
                 }
-                var culture = string.IsNullOrWhiteSpace(format) ? this.culture : CultureInfo.GetCultureInfo(format);
-                return GetString(culture, arg?.ToString());
+                return GetStringImpl(culture, str.Format);
             }
-
-            public object GetFormat(Type formatType) =>
-                formatType == typeof(ICustomFormatter) ? this : null;
+            return string.Format(new TranslationFormatter(culture), str.Format, str.GetArguments());
         }
 
-
         /// <summary>
-        /// 获取当前语言区域的字符串映射，如果没有找到返回str
+        /// 翻译文本组件
         /// </summary>
-        /// <param name="str">原始字符串</param>
-        /// <returns></returns>
-        public static string GetString(string str) =>
-            GetString(CultureInfo.CurrentCulture, str);
+        class TranslationFormatter : IFormatProvider, ICustomFormatter
+        {
+            /// <summary>
+            /// 区域信息
+            /// </summary>
+            private CultureInfo _culture;
+
+            /// <summary>
+            /// 初始化翻译文本
+            /// </summary>
+            /// <param name="culture">区域信息</param>
+            public TranslationFormatter(CultureInfo culture) => this._culture = culture;
+            /// <summary>
+            /// 翻译文本
+            /// </summary>
+            /// <param name="language">翻译语言</param>
+            /// <param name="text">待翻译的文本</param>
+            /// <param name="formatProvider"></param>
+            /// <returns></returns>
+            public string Format(string language, object text, IFormatProvider formatProvider)
+            {
+                if (language == "!")
+                {
+                    return text?.ToString();
+                }
+                var culture = string.IsNullOrWhiteSpace(language) ? _culture : CultureInfo.GetCultureInfo(language);
+                return GetStringImpl(culture, text?.ToString());
+            }
+            /// <summary>
+            /// 标准实现
+            /// </summary>
+            object IFormatProvider.GetFormat(Type formatType) =>
+                formatType == typeof(ICustomFormatter) ? this : null;
+        }
 
         /// <summary>
         /// 获取特定语言区域的字符串映射，如果没有找到返回str
@@ -97,7 +116,7 @@ namespace blqw
         /// <param name="culture">语言区域</param>
         /// <param name="str">原始字符串</param>
         /// <returns></returns>
-        public static string GetString(CultureInfo culture, string str) =>
+        private static string GetStringImpl(CultureInfo culture, string str) =>
             str != null && str != " " && (_languageMapper.TryGetValue(culture, out var map) && map.TryGetValue(str, out var str1)) ? str1 : str;
 
         /// <summary>
@@ -108,7 +127,6 @@ namespace blqw
         public static string Concat(params string[] strs) =>
             Concat(CultureInfo.CurrentCulture, strs);
 
-
         /// <summary>
         /// 获取特定语言区域的字符串映射，如果没有找到返回str
         /// </summary>
@@ -116,6 +134,6 @@ namespace blqw
         /// <param name="str">原始字符串</param>
         /// <returns></returns>
         public static string Concat(CultureInfo culture, params string[] strs) =>
-            strs == null ? null : strs.Length == 0 ? "" : string.Concat(strs.Select(x => GetString(culture, x)));
+            strs == null ? null : strs.Length == 0 ? "" : string.Concat(strs.Select(x => GetStringImpl(culture, x)));
     }
 }

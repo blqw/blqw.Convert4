@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿using System.Security.AccessControl;
+using blqw.ConvertServices;
+using System.Collections;
 using blqw;
 using NUnit.Framework;
 using System;
@@ -73,9 +75,45 @@ namespace NUnit.Tests1
         }
 
         [Test]
+        public void 接口转换测试()
+        {
+            var list1 = "1,2,3,4".To<IList<int>>();
+            Assert.AreEqual(list1?.Count, 4);
+            Assert.AreEqual(list1[0], 1);
+            Assert.AreEqual(list1[1], 2);
+            Assert.AreEqual(list1[2], 3);
+            Assert.AreEqual(list1[3], 4);
+
+            var list3 = "1,2,3,4".To<IEnumerable>().Cast<object>().ToList();
+            Assert.AreEqual(list3?.Count, 4);
+            Assert.AreEqual(list3[0], "1");
+            Assert.AreEqual(list3[1], "2");
+            Assert.AreEqual(list3[2], "3");
+            Assert.AreEqual(list3[3], "4");
+
+
+
+            var list2 = "1,2,3,4".To<IList>();
+            Assert.AreEqual(list2?.Count, 4);
+            Assert.AreEqual(list2[0], "1");
+            Assert.AreEqual(list2[1], "2");
+            Assert.AreEqual(list2[2], "3");
+            Assert.AreEqual(list2[3], "4");
+        }
+
+        [Test]
         public void 自定义转换参数()
         {
-            var list = "1;2;3;4".To<List<int>>(new ConvertSettings().AddService("StringSeparator", ";"));
+            var list = "1;2;3;;4".To<List<int>>(new ConvertSettings().AddStringSeparator(";"));
+            Assert.AreEqual(list?.Count, 5);
+            Assert.AreEqual(list[0], 1);
+            Assert.AreEqual(list[1], 2);
+            Assert.AreEqual(list[2], 3);
+            Assert.AreEqual(list[3], 0);
+            Assert.AreEqual(list[4], 4);
+            list = "1;2;3;;4".To<List<int>>(new ConvertSettings()
+                                                .AddStringSeparator(";")
+                                                .AddStringSplitOptions(StringSplitOptions.RemoveEmptyEntries));
             Assert.AreEqual(list?.Count, 4);
             Assert.AreEqual(list[0], 1);
             Assert.AreEqual(list[1], 2);
@@ -97,8 +135,8 @@ namespace NUnit.Tests1
 
             var formatTest = time.To<string>(new ConvertSettings().AddFormat<DateTime>(format));
             var enUSTest = time.To<string>(new ConvertSettings().AddService(enUS));
-            var urPKTest = time.To<string>(new ConvertSettings().AddServiceForType<DateTime>(urPK));
-            var urPKTest2 = time.To<string>(new ConvertSettings().AddServiceForType<int>(urPK));
+            var urPKTest = time.To<string>(new ConvertSettings().AddForType<DateTime>(urPK));
+            var urPKTest2 = time.To<string>(new ConvertSettings().AddForType<int>(urPK));
 
             Assert.AreEqual(formatTest, formatResult);
             Assert.AreEqual(enUSTest, enUSResult);
@@ -122,6 +160,8 @@ namespace NUnit.Tests1
             Assert.AreEqual(typeof(int).MakeByRefType().To<string>(), "int&");
             Assert.AreEqual(typeof(int[]).To<string>(), "int[]");
         }
+
+
 
     }
 }

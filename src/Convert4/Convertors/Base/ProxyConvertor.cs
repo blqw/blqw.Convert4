@@ -1,18 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace blqw.Convertors
 {
     /// <summary>
-    /// 泛型代理转换器
+    /// 代理转换器
     /// </summary>
-    internal sealed class GenericProxyConvertor<T> : BaseConvertor<T>, IConvertor
+    internal sealed class ProxyConvertor<T> : BaseConvertor<T>, IConvertor
     {
         private IConvertor _convertor;
 
-        public GenericProxyConvertor(IConvertor convertor)
-            => _convertor = convertor ?? throw new ArgumentNullException(nameof(convertor));
+        public ProxyConvertor(IConvertor convertor)
+            => _convertor = convertor ?? (FailConvertor<T>)new EntryPointNotFoundException(SR.GetString($"转换器未找到"));
 
         public override ConvertResult<T> ChangeType(ConvertContext context, object input)
             => _convertor.ChangeType(context, input);
@@ -22,5 +20,11 @@ namespace blqw.Convertors
 
         public override IConvertor GetConvertor(Type outputType)
             => _convertor.GetConvertor(outputType);
+
+        public override uint Priority => _convertor.Priority;
+
+        public override IConvertor<T1> GetConvertor<T1>() => (IConvertor<T1>)_convertor.GetConvertor(typeof(T1));
+
+
     }
 }

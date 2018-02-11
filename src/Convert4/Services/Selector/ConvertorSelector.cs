@@ -1,56 +1,121 @@
-﻿using System.Runtime.InteropServices.ComTypes;
-using System.Collections.Concurrent;
+﻿using blqw.Convertors;
+using blqw.ConvertServices;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
-using blqw.Services;
 using System.Linq;
 
 namespace blqw
 {
-    public sealed class ConvertorSelector : IConvertorSelector
+    /// <summary>
+    /// 转换器选择器
+    /// </summary>
+    public class ConvertorSelector : IConvertorSelector
     {
-        private readonly ConcurrentDictionary<Type, IConvertor> _convertors;
-        IConvertor _objectConvertor;
+        /// <summary>
+        /// 转换器字典
+        /// </summary>
+        private Dictionary<Type, IConvertor> _convertors;
+        /// <summary>
+        /// <seealso cref="IConvertor{object}"/> 转换器
+        /// </summary>
+        private readonly IConvertor _objectConvertor;
+        /// <summary>
+        /// 知否允许衍生新的转换器
+        /// </summary>
+        private readonly bool _spawnable;
 
-        public ConvertorSelector(IEnumerable<IConvertor> convertors)
+        /// <summary>
+        /// 初始化转换器选择器
+        /// </summary>
+        /// <param name="convertors">基础转换器</param>
+        /// <param name="spawnable">是否允许衍生新的转换器</param>
+        public ConvertorSelector(IEnumerable<IConvertor> convertors = null, IComparer<Type> typeComparer = null, bool spawnable = true)
         {
-            TypeComparer = new TypeComparer();
-            _convertors = new ConcurrentDictionary<Type, IConvertor>();
+            TypeComparer = typeComparer ?? ConvertServices.TypeComparer.Instance;
+            _convertors = new Dictionary<Type, IConvertor>();
             foreach (var convertor in convertors)
             {
-                _convertors.AddOrUpdate(convertor.OutputType, convertor, (t, c) => c.Priority < convertor.Priority ? convertor : c);
+                //同类型转换器只保留优先级最高的, 优先级相同保留顺序靠后的
+                if (_convertors.TryGetValue(convertor.OutputType, out var old) && old.Priority > convertor.Priority)
+                {
+                    continue;
+                }
+                _convertors[convertor.OutputType] = convertor;
             }
             _convertors.TryGetValue(typeof(object), out _objectConvertor);
+            _spawnable = spawnable;
         }
-
+        /// <summary>
+        /// 获取指定类型的转换器
+        /// </summary>
+        /// <typeparam name="T">指定类型</typeparam>
+        /// <param name="context">转换上下文</param>
+        /// <returns></returns>
         public IConvertor<T> Get<T>(ConvertContext context) =>
             (IConvertor<T>)Get(typeof(T), context);
 
+
+
+
+
+        /// <summary>
+        /// 获取指定类型的转换器
+        /// </summary>
+        /// <param name="outputType">指定类型</param>
+        /// <param name="context">转换上下文</param>
+        /// <returns></returns>
         public IConvertor Get(Type outputType, ConvertContext context)
         {
-            if (_convertors.TryGetValue(outputType, out var conv))
+            //优先使用注入的服务
+            var selector = context.GetService<IConvertorSelector>();
+            if (selector != this)
+            {
+                var conv0 = selector.Get(outputType, context);
+                if (conv0 != null)
+                {
+                    return conv0;
+                }
+            }
+
+
+            var convs = _convertors;
+            if (convs.TryGetValue(outputType, out var conv) || _spawnable == false)
             {
                 return conv;
             }
-
+            if (outputType.IsGenericTypeDefinition || outputType.IsAbstract && outputType.IsSealed)
+            {
+                return null;
+            }
             var ee = Match(outputType);
             while (ee.MoveNext())
             {
-                conv = ee.Current?.GetConvertor(outputType);
+                conv = ee.Current;
+                if (ee.Current != null && ee.Current.OutputType != outputType)
+                {
+                    conv = ee.Current.GetConvertor(outputType);
+                }
                 if (conv != null)
                 {
-                    _convertors.TryAdd(outputType, conv);
+                    if (conv.OutputType != outputType)
+                    {
+                        conv = (IConvertor)Activator.CreateInstance(typeof(ProxyConvertor<>).MakeGenericType(outputType), conv);
+                    }
+
+                    _convertors = new Dictionary<Type, IConvertor>(convs)
+                    {
+                        [outputType] = conv
+                    };
                     return conv;
                 }
             }
             return null;
         }
-
         /// <summary>
         /// 用于比较服务之间的优先级
         /// </summary>
         private IComparer<Type> TypeComparer { get; }
-
         /// <summary>
         /// 获取所有匹配类型的转换器
         /// </summary>
@@ -68,18 +133,19 @@ namespace blqw
             var baseTypes = outputType.EnumerateBaseTypes().Union(outputType.GetInterfaces());
             if (TypeComparer != null)
             {
+                //排序
                 baseTypes = baseTypes.OrderByDescending(it => it, TypeComparer);
             }
-
-            foreach (var interfaceType in baseTypes)
+            var convs = _convertors;
+            foreach (var type in baseTypes)
             {
-                if (_convertors.TryGetValue(interfaceType, out conv))
+                if (convs.TryGetValue(type, out conv))
                 {
                     yield return conv;
                 }
                 else
                 {
-                    conv = MatchGeneric(interfaceType);
+                    conv = MatchGeneric(type);
                     if (conv != null)
                     {
                         yield return conv;
@@ -87,11 +153,16 @@ namespace blqw
                 }
             }
 
+            foreach (var conv0 in convs.Values)
+            {
+                if (outputType.IsAssignableFrom(conv0.OutputType))
+                {
+                    yield return conv0;
+                }
+            }
+
             yield return _objectConvertor;
         }
-
-
-
         /// <summary>
         /// 获取与 <paramref name="genericType" /> 的泛型定义类型匹配的转换器,如果
         /// <paramref name="genericType" /> 不是泛型,返回 null
@@ -109,7 +180,5 @@ namespace blqw
             }
             return null;
         }
-
-
     }
 }

@@ -1,9 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace blqw
 {
+    /// <summary>
+    /// 处理值类型的转换接口
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public interface IFormValueType<T>
         : IFrom<T, ValueType>
     {

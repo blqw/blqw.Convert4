@@ -1,15 +1,16 @@
-﻿using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Runtime.Serialization;
-using System;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data;
-using System.Text;
-using System.Collections.Concurrent;
+using System.Reflection;
+using System.Runtime.Serialization;
 
-namespace blqw.Services
+namespace blqw.ConvertServices
 {
+    /// <summary>
+    /// 关于类型 <seealso cref="Type"/> 的扩展方法
+    /// </summary>
     public static class TypeExtensions
     {
         /// <summary>
@@ -43,6 +44,7 @@ namespace blqw.Services
             else if (obj is StringDictionary) return TypeMark.StringDictionary;
             return TypeMark.Object;
         }
+
         /// <summary>
         /// 获取真实对象
         /// </summary>
@@ -51,6 +53,7 @@ namespace blqw.Services
         /// <returns></returns>
         public static object GetRealObject(this object obj, out TypeMark mark) =>
             GetRealObject(obj, null, out mark);
+
         /// <summary>
         /// 获取真实对象
         /// </summary>
@@ -214,7 +217,8 @@ namespace blqw.Services
         }
 
         /// <summary>
-        /// 判断类型是否可被实例化
+        /// 判断类型是否可被实例化 <para/>
+        /// 是值类型, 或 至少有一个公开构造函数的非抽象类/非静态类/非泛型定义类
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
@@ -291,9 +295,9 @@ namespace blqw.Services
         }
 
         /// <summary>
-        /// 枚举所有父类
+        /// 枚举指定类型的所有父类, 不包括 <seealso cref="object"/>
         /// </summary>
-        /// <param name="type"> </param>
+        /// <param name="type"> 需要枚举父类的类型 </param>
         /// <returns> </returns>
         public static IEnumerable<Type> EnumerateBaseTypes(this Type type)
         {
@@ -305,12 +309,15 @@ namespace blqw.Services
             }
         }
 
-
         /// <summary>
         /// 类型名称缓存
         /// </summary>
         private static readonly ConcurrentDictionary<Type, string> _typeNames = new ConcurrentDictionary<Type, string>();
-        private static readonly Type System_IValueTupleInternal_Type = Type.GetType("System.IValueTupleInternal", false, false);
+
+        /// <summary>
+        /// 元组类型的接口,通过这个接口判断类型是否是元组类型
+        /// </summary>
+        private static readonly Type _system_IValueTupleInternal_Type = Type.GetType("System.IValueTupleInternal", false, false);
 
         /// <summary>
         /// 获取类型名称的友好展现形式
@@ -361,7 +368,7 @@ namespace blqw.Services
                     }
 
                     //这个表示元组类型
-                    if ((System_IValueTupleInternal_Type?.IsAssignableFrom(t) ?? false))
+                    if ((_system_IValueTupleInternal_Type?.IsAssignableFrom(t) ?? false))
                     {
                         return "(" + string.Join(", ", generic) + ")";
                     }
@@ -370,7 +377,12 @@ namespace blqw.Services
             });
         }
 
-        private static string GetSimpleName(this Type t)
+        /// <summary>
+        /// 获取指定类型的简单名称
+        /// </summary>
+        /// <param name="t">指定类型</param>
+        /// <returns></returns>
+        private static string GetSimpleName(Type t)
         {
             string name;
             if (t.ReflectedType == null)

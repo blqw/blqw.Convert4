@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using System;
 
 namespace blqw
@@ -8,21 +7,28 @@ namespace blqw
     /// </summary>
     public struct ConvertResult
     {
+        /// <summary>
+        /// 转换成功
+        /// </summary>
+        /// <param name="value">返回值</param>
         public ConvertResult(object value)
         {
             Success = true;
             OutputValue = value;
             Error = null;
         }
-
+        /// <summary>
+        /// 转换成功
+        /// </summary>
+        /// <param name="success">是否成功</param>
+        /// <param name="value">返回值</param>
+        /// <param name="ex">错误对象</param>
         internal ConvertResult(bool success, object value, ConvertError ex)
         {
             Success = success;
             OutputValue = value;
             Error = ex;
         }
-
-
         /// <summary>
         /// 是否成功
         /// </summary>
@@ -39,6 +45,7 @@ namespace blqw
         /// <returns></returns>
         public ConvertError Error { get; }
 
+        #region 隐式转换
         public static implicit operator ConvertResult(Exception exception)
         {
             if (exception == null)
@@ -50,6 +57,7 @@ namespace blqw
             e.Exceptions.Add(exception);
             return new ConvertResult(false, null, e);
         }
+        #endregion
 
     }
 }
