@@ -11,9 +11,15 @@ namespace blqw.Convertors
         public override IConvertor GetConvertor(Type outputType)
         {
             var genericArgs = outputType.GetGenericArguments(typeof(IList<>));
+
             if (genericArgs == null)
             {
-                return (IConvertor)Activator.CreateInstance(typeof(InnerConvertor<,>).MakeGenericType(new Type[] { typeof(List<object>), typeof(object) }));
+                //如果无法得道泛型参数, 判断output是否与 List<object> 兼容, 如果是返回 List<object> 的转换器
+                if (outputType.IsAssignableFrom(typeof(List<object>)))
+                {
+                    return new InnerConvertor<List<object>, object>();
+                }
+                return null;
             }
             var args = new Type[genericArgs.Length + 1];
             args[0] = outputType;
