@@ -86,12 +86,37 @@ namespace blqw
             return conv.ChangeType(this, input);
         }
 
+        public ConvertResult ChangeType(Type outputType, object input)
+        {
+            if (outputType.IsGenericTypeDefinition)
+            {
+                return new ArgumentOutOfRangeException(SR.GetString($"{"无法为"}{"泛型定义类型"}`{outputType.GetFriendlyName():!}`{"提供转换器"}"));
+            }
+            if (outputType.IsAbstract && outputType.IsSealed)
+            {
+                return new ArgumentOutOfRangeException(SR.GetString($"{"无法为"}{"静态类型"}`{outputType.GetFriendlyName():!}`{"提供转换器"}"));
+            }
+            var conv = GetConvertor(outputType);
+            if (conv == null)
+            {
+                return new EntryPointNotFoundException(SR.GetString($"转换器未找到"));
+            }
+            return conv.ChangeType(this, input);
+        }
+
         /// <summary>
         /// 获取指定类型的转换器
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         public IConvertor<T> GetConvertor<T>() => _convertorSelector.Get<T>(this);
+
+        /// <summary>
+        /// 获取指定类型的转换器
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public IConvertor GetConvertor(Type outputType) => _convertorSelector.Get(outputType, this);
 
         /// <summary>
         /// 施放资源
