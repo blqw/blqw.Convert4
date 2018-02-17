@@ -1,10 +1,11 @@
 ﻿using blqw.ConvertServices;
 using System;
 using System.Globalization;
+using static System.Int32;
 
 namespace blqw.Convertors
 {
-    class Int32Convertor : BaseConvertor<int>, IFromConvertible<int>, IFrom<int, object>
+    class Int32Convertor : BaseConvertor<int>, IFromConvertible<int>, IFrom<int, object>, IFrom<int, byte[]>
     {
         public int From(ConvertContext context, bool input) => input ? 1 : 0;
         public int From(ConvertContext context, char input) => input;
@@ -15,7 +16,7 @@ namespace blqw.Convertors
         public int From(ConvertContext context, int input) => input;
         public int From(ConvertContext context, uint input)
         {
-            if (input > 2147483647)
+            if (input > MaxValue)
             {
                 context.InvalidCastException($"值超过限制");
                 return 0;
@@ -25,7 +26,7 @@ namespace blqw.Convertors
 
         public int From(ConvertContext context, long input)
         {
-            if ((input < -2147483648) || (input > 2147483647))
+            if ((input < MinValue) || (input > MaxValue))
             {
                 context.InvalidCastException($"值超过限制");
                 return 0;
@@ -35,7 +36,7 @@ namespace blqw.Convertors
 
         public int From(ConvertContext context, ulong input)
         {
-            if (input > 2147483647)
+            if (input > MaxValue)
             {
                 context.InvalidCastException($"值超过限制");
                 return 0;
@@ -44,7 +45,7 @@ namespace blqw.Convertors
         }
         public int From(ConvertContext context, float input)
         {
-            if ((input < -2147483648) || (input > 2147483647))
+            if ((input < MinValue) || (input > MaxValue))
             {
                 context.InvalidCastException($"值超过限制");
                 return 0;
@@ -53,7 +54,7 @@ namespace blqw.Convertors
         }
         public int From(ConvertContext context, double input)
         {
-            if ((input < -2147483648) || (input > 2147483647))
+            if ((input < MinValue) || (input > MaxValue))
             {
                 context.InvalidCastException($"值超过限制");
                 return 0;
@@ -62,36 +63,46 @@ namespace blqw.Convertors
         }
         public int From(ConvertContext context, decimal input)
         {
-            if ((input < -2147483648) || (input > 2147483647))
+            if ((input < MinValue) || (input > MaxValue))
             {
                 context.InvalidCastException($"值超过限制");
                 return 0;
             }
-            return (int)input;
+            return decimal.ToInt32(input);
         }
         public int From(ConvertContext context, DateTime input)
         {
             context.InvalidCastException(input, TypeFriendlyName);
-            return 0;
+            return default;
         }
         public int From(ConvertContext context, string input)
         {
-            if (string.IsNullOrWhiteSpace(input))
+            var s = input?.Trim() ?? "";
+            if (string.IsNullOrWhiteSpace(s))
             {
                 return 0;
             }
-            if (int.TryParse(input, out var result))
+            if (TryParse(s, out var result))
             {
                 return result;
             }
-            var hex = input.ToHex();
-            if (hex != null && int.TryParse(hex, NumberStyles.HexNumber, NumberFormatInfo.InvariantInfo, out result))
+            var hex = s.ToHex();
+            if (hex != null && TryParse(hex, NumberStyles.HexNumber, NumberFormatInfo.InvariantInfo, out result))
             {
                 return result;
             }
             context.InvalidCastException(input, TypeFriendlyName);
             return 0;
         }
-        public int From(ConvertContext context, object input) => input?.GetHashCode() ?? int.MinValue;
+        public int From(ConvertContext context, object input) => input?.GetHashCode() ?? default;
+        public int From(ConvertContext context, byte[] input)
+        {
+            if (input?.Length != 4)
+            {
+                context.InvalidCastException(input, TypeFriendlyName);
+                return default;
+            }
+            return BitConverter.ToInt32(input, 0);
+        }
     }
 }

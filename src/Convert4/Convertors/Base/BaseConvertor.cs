@@ -163,6 +163,10 @@ namespace blqw.Convertors
 
         ConvertResult<T> ChangeTypeImpl(ConvertContext context, object input)
         {
+            if (input is T t)
+            {
+                return new ConvertResult<T>(t);
+            }
             //清空异常
             context.Exception = null;
             //空值转换
