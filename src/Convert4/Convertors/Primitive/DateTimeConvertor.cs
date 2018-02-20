@@ -7,7 +7,7 @@ namespace blqw.Convertors
     /// <summary>
     /// <seealso cref="DateTimeConvertor" /> 转换器
     /// </summary>
-    public class DateTimeConvertor : BaseConvertor<DateTime>, IFrom<DateTime, string>, IFrom<DateTime, IConvertible>
+    public class DateTimeConvertor : BaseConvertor<DateTime>, IFrom<string, DateTime>, IFrom<IConvertible, DateTime>
     {
         /// <summary>
         /// 日期格式化字符

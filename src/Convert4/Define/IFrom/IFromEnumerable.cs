@@ -10,13 +10,13 @@ namespace blqw
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public interface IFromEnumerable<T>
-        : IFrom<T, IList>
-        , IFrom<T, DataRow>
-        , IFrom<T, DataTable>
-        , IFrom<T, IDictionary>
-        , IFrom<T, NameObjectCollectionBase>
-        , IFrom<T, StringDictionary>
-        , IFrom<T, Array>
+        : IFrom<IList, T>
+        , IFrom<DataRow, T>
+        , IFrom<DataTable, T>
+        , IFrom<IDictionary, T>
+        , IFrom<NameObjectCollectionBase, T>
+        , IFrom<StringDictionary, T>
+        , IFrom<Array, T>
     {
 
     }

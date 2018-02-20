@@ -5,7 +5,7 @@ using static System.Int32;
 
 namespace blqw.Convertors
 {
-    class Int32Convertor : BaseConvertor<int>, IFromConvertible<int>, IFrom<int, object>, IFrom<int, byte[]>
+    class Int32Convertor : BaseConvertor<int>, IFromConvertible<int>, IFrom<object, int>, IFrom<byte[], int>
     {
         public int From(ConvertContext context, bool input) => input ? 1 : 0;
         public int From(ConvertContext context, char input) => input;
@@ -97,12 +97,12 @@ namespace blqw.Convertors
         public int From(ConvertContext context, object input) => input?.GetHashCode() ?? default;
         public int From(ConvertContext context, byte[] input)
         {
-            if (input?.Length != 4)
+            if (input == null || input.Length > sizeof(int))
             {
                 context.InvalidCastException(input, TypeFriendlyName);
                 return default;
             }
-            return BitConverter.ToInt32(input, 0);
+            return BitConverter.ToInt32(input.Fill(sizeof(int)), 0);
         }
     }
 }

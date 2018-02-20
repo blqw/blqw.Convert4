@@ -1,3 +1,4 @@
+using System.Linq;
 using blqw.ConvertServices;
 using System;
 using System.Collections.Generic;
@@ -76,9 +77,9 @@ namespace blqw.Convertors
                 if (intf.IsConstructedGenericType && intf.GetGenericTypeDefinition() == typeof(IFrom<,>))
                 {
                     var args = intf.GetGenericArguments();
-                    if (args[0] == typeof(T))
+                    if (args[1] == typeof(T))
                     {
-                        var invoker = (IInvoker)Activator.CreateInstance(typeof(Invoker<>).MakeGenericType(args));
+                        var invoker = (IInvoker)Activator.CreateInstance(typeof(Invoker<>).MakeGenericType(new Type[] { args[1], args[0] }));
                         _invokers.Add(invoker.InputType, invoker);
                         if (invoker.InputType.IsInterface)
                         {
@@ -269,7 +270,7 @@ namespace blqw.Convertors
             try
             {
 
-                if (conv is IFrom<T, TInput> from)
+                if (conv is IFrom<TInput, T> from)
                 {
                     var result = from.From(context, input);
                     if (context.Exception != null)

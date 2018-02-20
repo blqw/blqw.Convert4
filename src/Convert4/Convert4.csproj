@@ -11,8 +11,11 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="Convertors\QPrimitive\**" />
     <Compile Remove="Define\Base\**" />
+    <EmbeddedResource Remove="Convertors\QPrimitive\**" />
     <EmbeddedResource Remove="Define\Base\**" />
+    <None Remove="Convertors\QPrimitive\**" />
     <None Remove="Define\Base\**" />
   </ItemGroup>
   <ItemGroup>

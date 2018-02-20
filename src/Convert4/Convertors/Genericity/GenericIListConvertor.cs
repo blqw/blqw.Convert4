@@ -21,7 +21,7 @@ namespace blqw.Convertors
             return (IConvertor)Activator.CreateInstance(typeof(InnerConvertor<,>).MakeGenericType(args));
         }
 
-        class InnerConvertor<TList, TValue> : BaseConvertor<TList>, IFrom<TList, string>
+        class InnerConvertor<TList, TValue> : BaseConvertor<TList>, IFrom<string, TList>
             where TList : class, IList<TValue>
         {
             static readonly char[] _separator = new[] { ',' };

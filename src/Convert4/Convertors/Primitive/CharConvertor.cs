@@ -6,7 +6,7 @@ namespace blqw.Convertors
     /// <summary>
     /// <seealso cref="char" /> 转换器
     /// </summary>
-    public class CharConvertor : BaseConvertor<char>, IFromConvertible<char>
+    public class CharConvertor : BaseConvertor<char>, IFromConvertible<char>, IFrom<byte[],char>
     {
         public char From(ConvertContext context, bool input) => input ? 'Y' : 'N';
         public char From(ConvertContext context, char input) => input;
@@ -112,9 +112,18 @@ namespace blqw.Convertors
             {
                 return input[0];
             }
-
             context.InvalidCastException(input, TypeFriendlyName);
             return default;
+        }
+
+        public char From(ConvertContext context, byte[] input)
+        {
+            if (input == null || input.Length > sizeof(char))
+            {
+                context.InvalidCastException(input, TypeFriendlyName);
+                return default;
+            }
+            return BitConverter.ToChar(input.Fill(sizeof(char)), 0);
         }
     }
 }

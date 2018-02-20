@@ -5,7 +5,7 @@ namespace blqw.Convertors
     /// <summary>
     /// 布尔值转换器
     /// </summary>
-    public class BooleanConvertor : BaseConvertor<bool>, IFromConvertible<bool>, IFrom<bool, object>
+    public class BooleanConvertor : BaseConvertor<bool>, IFromConvertible<bool>, IFrom<object, bool>
     {
         public bool From(ConvertContext context, bool input) => input;
         public bool From(ConvertContext context, char input) => input != 0;

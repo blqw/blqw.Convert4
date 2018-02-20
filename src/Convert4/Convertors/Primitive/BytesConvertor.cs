@@ -7,7 +7,7 @@ namespace blqw.Convertors
     /// <summary>
     /// <seealso cref="byte" /> 数组转换器
     /// </summary>
-    public class BytesConvertor : BaseConvertor<byte[]>, IFromConvertible<byte[]>, IFrom<byte[], Guid>
+    public class BytesConvertor : BaseConvertor<byte[]>, IFromConvertible<byte[]>, IFrom<Guid, byte[]>
     {
         public byte[] From(ConvertContext context, string input) => input == null ? null : input.Length == 0 ? Array.Empty<byte>() : context.GetEncoding().GetBytes(input);
         public byte[] From(ConvertContext context, bool input) => BitConverter.GetBytes(input);

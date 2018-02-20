@@ -7,7 +7,7 @@ namespace blqw.Convertors
     /// <summary>
     /// <seealso cref="decimal" /> 转换器
     /// </summary>
-    public class DecimalConvertor : BaseConvertor<decimal>, IFromConvertible<decimal>, IFrom<decimal, byte[]>, IFrom<decimal, Guid>
+    public class DecimalConvertor : BaseConvertor<decimal>, IFromConvertible<decimal>, IFrom<byte[], decimal>, IFrom<Guid, decimal>
     {
         public decimal From(ConvertContext context, bool input) => input ? One : Zero;
         public decimal From(ConvertContext context, char input) => input;
@@ -49,20 +49,21 @@ namespace blqw.Convertors
 
         public decimal From(ConvertContext context, byte[] input)
         {
-            if (input?.Length == 16)
+            if (input == null || input.Length > sizeof(decimal))
             {
-                var arr2 = new int[4];
-                Buffer.BlockCopy(input, 0, arr2, 0, 16);
-                return new decimal(arr2);
+                context.InvalidCastException(input, TypeFriendlyName);
+                return default;
             }
-            context.InvalidCastException(input, TypeFriendlyName);
-            return default;
+            var bytes = input.Fill(sizeof(decimal));
+            var arr2 = new int[4];
+            Buffer.BlockCopy(bytes, 0, arr2, 0, sizeof(decimal));
+            return new decimal(arr2);
         }
         public decimal From(ConvertContext context, Guid input)
         {
             var bytes = input.ToByteArray();
             var arr2 = new int[4];
-            Buffer.BlockCopy(bytes, 0, arr2, 0, 16);
+            Buffer.BlockCopy(bytes, 0, arr2, 0, sizeof(decimal));
             return new decimal(arr2);
         }
     }

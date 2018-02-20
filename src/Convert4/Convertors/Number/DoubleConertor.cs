@@ -7,7 +7,7 @@ namespace blqw.Convertors
     /// <summary>
     /// <seealso cref="double" /> 转换器
     /// </summary>
-    public class DoubleConertor : BaseConvertor<double>, IFromConvertible<double>, IFrom<double, byte[]>
+    public class DoubleConertor : BaseConvertor<double>, IFromConvertible<double>, IFrom<byte[], double>
     {
         public double From(ConvertContext context, bool input) => input ? 1 : 0;
         public double From(ConvertContext context, char input) => input;
@@ -48,12 +48,12 @@ namespace blqw.Convertors
         }
         public double From(ConvertContext context, byte[] input)
         {
-            if (input?.Length != 8)
+            if (input == null || input.Length > sizeof(double))
             {
                 context.InvalidCastException(input, TypeFriendlyName);
                 return default;
             }
-            return BitConverter.ToDouble(input, 0);
+            return BitConverter.ToDouble(input.Fill(sizeof(double)), 0);
         }
     }
 }

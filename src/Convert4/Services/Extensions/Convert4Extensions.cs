@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Security.Cryptography;
+using System.Drawing;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -120,6 +122,41 @@ namespace blqw
                 }
             }
             return null;
+        }
+
+        public static string ToBin(this string str)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static string ToOct(this string str)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="bytes"></param>
+        /// <param name="size"></param>
+        /// <returns></returns>
+        public static byte[] Fill(this byte[] bytes, int size)
+        {
+            if (size < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(size), SR.GetString($"{"不能小于"} 0"));
+            }
+
+            if (bytes == null || size <= 0)
+            {
+                return new byte[size];
+            }
+            if (bytes.Length == size)
+            {
+                return bytes;
+            }
+            Array.Resize(ref bytes, size);
+            return bytes;
         }
 
         /// <summary>

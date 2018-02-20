@@ -91,8 +91,6 @@ namespace NUnit.Tests1
             Assert.AreEqual(list3[2], "3");
             Assert.AreEqual(list3[3], "4");
 
-
-
             var list2 = "1,2,3,4".To<IList>();
             Assert.AreEqual(list2?.Count, 4);
             Assert.AreEqual(list2[0], "1");
@@ -162,6 +160,11 @@ namespace NUnit.Tests1
         }
 
 
-
+        [Test]
+        public void Test111()
+        {
+            var a = sizeof(decimal);
+            Console.WriteLine();
+        }
     }
 }
