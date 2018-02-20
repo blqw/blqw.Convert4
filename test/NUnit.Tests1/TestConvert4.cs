@@ -84,6 +84,13 @@ namespace NUnit.Tests1
             Assert.AreEqual(list1[2], 3);
             Assert.AreEqual(list1[3], 4);
 
+            var list11 = new object[] { "1", 2, 3, "4" }.To<IList<int>>();
+            Assert.AreEqual(list11?.Count, 4);
+            Assert.AreEqual(list11[0], 1);
+            Assert.AreEqual(list11[1], 2);
+            Assert.AreEqual(list11[2], 3);
+            Assert.AreEqual(list11[3], 4);
+
             var list3 = "1,2,3,4".To<IEnumerable>().Cast<object>().ToList();
             Assert.AreEqual(list3?.Count, 4);
             Assert.AreEqual(list3[0], "1");

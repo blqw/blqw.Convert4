@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Collections;
 
 namespace blqw.Convertors
 {
@@ -192,6 +193,18 @@ namespace blqw.Convertors
                 }
                 //这里就算异常了,下面还可以尝试其他方案
             }
+            else if (input is IEnumerator == false && input is IEnumerable ee)
+            {
+                invoker = GetInvoker(typeof(IEnumerator));
+                if (invoker != null)
+                {
+                    var result = invoker.ChangeTypeImpl(this, context, ee.GetEnumerator());
+                    if (result.Success)
+                    {
+                        return result;
+                    }
+                }
+            }
 
             //转为各种基本类型进行转换,这次如果失败了就不再继续了
             if (input is IConvertible v0)
@@ -253,6 +266,7 @@ namespace blqw.Convertors
                 }
                 //这里失败了 继续尝试object转换方案
             }
+
 
             return InvokeIForm(this, context, input);
         }

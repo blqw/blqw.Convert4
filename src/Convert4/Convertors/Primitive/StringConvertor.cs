@@ -7,7 +7,7 @@ using System.Text;
 
 namespace blqw.Convertors
 {
-    class StringConvertot : BaseConvertor<string>,
+    class StringConvertor : BaseConvertor<string>,
         IFrom<Type, string>,
         IFrom<byte[], string>,
         IFrom<bool, string>,
