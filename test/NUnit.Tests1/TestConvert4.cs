@@ -30,11 +30,8 @@ namespace NUnit.Tests1
         }
 
         [Test]
-        public void 一般转换测试()
+        public void 测试JSON转换()
         {
-            Assert.AreEqual(1, "1".To<int>());
-            Assert.AreEqual(null, "".To<int?>());
-
             var my = "{\"ID\":1,\"Name\":\"blqw\"}".To<MyClass>();
             Assert.IsNotNull(my);
             Assert.AreEqual(1, my.ID);
@@ -49,18 +46,21 @@ namespace NUnit.Tests1
             Assert.AreEqual(4, arr[3]);
             Assert.AreEqual(5, arr[4]);
             Assert.AreEqual(6, arr[5]);
+        }
 
-            var user = new User()
-            {
-                ID = 1,
-                Name = "blqw",
-                Birthday = DateTime.Now,
-                Sex = true
-            };
-            var my2 = user.To<MyClass>();
-            Assert.IsNotNull(my2);
-            Assert.AreEqual(1, my2.ID);
-            Assert.AreEqual("blqw", my2.Name);
+        [Test]
+        public void 一般转换测试()
+        {
+            Assert.AreEqual(1, "1".To<int>());
+            Assert.AreEqual(true, "true".To<bool>());
+            Assert.AreEqual(false, 0.To<bool>());
+            Assert.AreEqual(true, 1.To<bool>());
+            Assert.AreEqual(DateTime.Parse("2018-02-20 16:50:02"), "2018-02-20 16:50:02".To<DateTime>());
+            Assert.AreEqual(DateTime.Parse("2018.02.20"), "2018.02.20".To<DateTime>());
+            Assert.AreEqual(DateTime.Parse("16:50:09"), "16:50:09".To<DateTime>());
+            Assert.AreEqual(1, "1".To<int>());
+            Assert.AreEqual(null, "".To<int?>());
+            Assert.AreEqual(1, "1".To<int?>());
         }
 
         [Test]

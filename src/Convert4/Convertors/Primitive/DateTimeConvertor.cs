@@ -12,7 +12,22 @@ namespace blqw.Convertors
         /// <summary>
         /// 日期格式化字符
         /// </summary>
-        private static readonly string[] _formats = { "yyyyMMdd", "HHmmss", "yyyyMMddHHmmss", "yyyyMMddHHmmssfff", "yyyyMMddHHmmssffffff" };
+        private static readonly string[] _formats = {
+            "HH:mm",
+            "HHmmss",
+            "HH:mm:ss",
+            "yyyyMMdd",
+            "yyyy/MM/dd",
+            "yyyy-MM-dd",
+            "yyyy.MM.dd",
+            "yyyyMMddHHmmss",
+            "yyyyMMddHHmmssfff",
+            "yyyy-MM-dd HH:mm:ss",
+            "yyyyMMddHHmmssffffff" ,
+            "yyyy-MM-dd HH:mm:ss:fff",
+            "yyyy-MM-dd HH:mm:ss.fff",
+            "yyyy-MM-dd HH:mm:ss:ffffff" ,
+            "yyyy-MM-dd HH:mm:ss.ffffff" , };
 
         public DateTime From(ConvertContext context, IConvertible input)
         {
