@@ -5,7 +5,7 @@ using System.Globalization;
 namespace blqw.Convertors
 {
     /// <summary>
-    /// <seealso cref="DateTimeConvertor" /> 转换器
+    /// <seealso cref="DateTime" /> 转换器
     /// </summary>
     public class DateTimeConvertor : BaseConvertor<DateTime>, IFrom<string, DateTime>, IFrom<IConvertible, DateTime>
     {

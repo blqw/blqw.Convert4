@@ -6,6 +6,8 @@ using System.Net;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Collections;
+using System.Data;
+using System.ComponentModel;
 
 namespace blqw.Convertors
 {
@@ -193,12 +195,19 @@ namespace blqw.Convertors
                 }
                 //这里就算异常了,下面还可以尝试其他方案
             }
-            else if (input is IEnumerator == false && input is IEnumerable ee)
+            else if (input is IEnumerator == false)
             {
                 invoker = GetInvoker(typeof(IEnumerator));
                 if (invoker != null)
                 {
-                    var result = invoker.ChangeTypeImpl(this, context, ee.GetEnumerator());
+                    var ee = (input as IEnumerable)?.GetEnumerator()
+                            ?? input as IEnumerator
+                            ?? (input as DataTable)?.Rows.GetEnumerator()
+                            ?? (input as DataRow)?.ItemArray.GetEnumerator()
+                            ?? (input as DataRowView)?.Row.ItemArray.GetEnumerator()
+                            ?? (input as IListSource)?.GetList()?.GetEnumerator();
+
+                    var result = invoker.ChangeTypeImpl(this, context, ee);
                     if (result.Success)
                     {
                         return result;
