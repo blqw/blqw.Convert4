@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Linq;
 
 namespace blqw.ConvertServices
 {
@@ -39,5 +41,69 @@ namespace blqw.ConvertServices
         /// <returns></returns>
         public static object GetNamedService(this IServiceProvider provider, string name)
             => string.IsNullOrWhiteSpace(name) ? null : provider?.GetNamedServiceProvider()?.GetService(name);
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="name"></param>
+        /// <param name="service"></param>
+        public static void AddNamedSingleton(this IServiceCollection services, string name, object service)
+        {
+            if (services == null)
+            {
+                throw new ArgumentNullException(nameof(services));
+            }
+
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentException("message", nameof(name));
+            }
+
+            if (service == null)
+            {
+                throw new ArgumentNullException(nameof(service));
+            }
+
+            var named = services.OfType<INamedServiceProvider>().FirstOrDefault();
+            if (named == null)
+            {
+                named = new ConvertSettings();
+                services.AddSingleton(named);
+            }
+            named.AddService(name, service);
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="name"></param>
+        /// <param name="service"></param>
+        public static void AddNamedService(this IServiceProvider provider, string name, object service)
+        {
+            if (provider == null)
+            {
+                throw new ArgumentNullException(nameof(provider));
+            }
+
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentException("message", nameof(name));
+            }
+
+            if (service == null)
+            {
+                throw new ArgumentNullException(nameof(service));
+            }
+            var named = provider.GetNamedServiceProvider();
+            if (named == null)
+            {
+                throw new NotSupportedException(SR.GetString($"未找到命名服务提供程序"));
+            }
+            named.AddService(name, service);
+        }
+
+
     }
 }

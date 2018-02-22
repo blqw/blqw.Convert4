@@ -5,9 +5,9 @@ using System.Reflection;
 namespace blqw
 {
     /// <summary>
-    /// 公开属性缓存
+    /// 对象属性操作
     /// </summary>
-    internal static class PublicPropertyCache
+    internal static class PropertyHelper
     {
         /// <summary>
         /// 属性缓存
@@ -31,8 +31,8 @@ namespace blqw
         /// </summary>
         /// <param name="type"> 需要获取属性的类型 </param>
         /// <returns> </returns>
-        public static PropertyHandler[] GetByType(Type type)
-            => type == null ? null : _typeCache.GetOrAdd(type, Create);
+        public static PropertyHandler[] GetByType(Type type) =>
+            type == null ? null : _typeCache.GetOrAdd(type, Create);
 
         /// <summary>
         /// 根据类型创建一个操作属性的对象集合
@@ -61,7 +61,7 @@ namespace blqw
         /// </summary>
         /// <param name="property"> 属性 </param>
         /// <returns></returns>
-        internal static PropertyHandler GetPropertyHandler(this PropertyInfo property)
-            => property == null ? null : _propertyCache.GetOrAdd(property, PropertyHandler.Create);
+        internal static PropertyHandler GetPropertyHandler(this PropertyInfo property) =>
+            property == null ? null : _propertyCache.GetOrAdd(property, PropertyHandler.Create);
     }
 }

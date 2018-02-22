@@ -20,15 +20,7 @@ namespace blqw.Convertors
         public ulong From(ConvertContext context, short input) => (ulong)input;
         public ulong From(ConvertContext context, ushort input) => (ulong)input;
         public ulong From(ConvertContext context, int input) => (ulong)input;
-        public ulong From(ConvertContext context, uint input)
-        {
-            if (input > MaxValue)
-            {
-                context.InvalidCastException($"值超过限制");
-                return default;
-            }
-            return (ulong)input;
-        }
+        public ulong From(ConvertContext context, uint input) => (ulong)input;
         public ulong From(ConvertContext context, long input)
         {
             if (input < 0)

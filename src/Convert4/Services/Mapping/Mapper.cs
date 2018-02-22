@@ -75,7 +75,7 @@ namespace blqw
                 return;
             }
 
-            var ps = PublicPropertyCache.GetByType(input.GetType().GetProperties());
+            var ps = PropertyHelper.GetByType(input.GetType());
             if (ps.Length > 0)
             {
                 _property = new PropertyEnumerator(input, ps);

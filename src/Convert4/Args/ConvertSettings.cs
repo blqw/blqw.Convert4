@@ -11,7 +11,6 @@ namespace blqw
     /// </summary>
     public sealed class ConvertSettings : IServiceProvider, INamedServiceProvider, IForTypeProvider
     {
-
         /// <summary>
         /// 标准服务
         /// </summary>
@@ -20,7 +19,6 @@ namespace blqw
         /// 特别服务
         /// </summary>
         private IDictionary _specialServices;
-
         /// <summary>
         /// 获取标准服务
         /// </summary>
@@ -150,5 +148,6 @@ namespace blqw
         public INamedServiceProvider GetNamedServiceProvider(Type forType) =>
             _specialServices?[forType] as INamedServiceProvider;
 
+        void INamedServiceProvider.AddService(string name, object service) => AddService(name, service);
     }
 }

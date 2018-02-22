@@ -171,7 +171,7 @@ namespace NUnit.Tests1
         public void Test111()
         {
             var a = sizeof(decimal);
-            Console.WriteLine();
+            Console.WriteLine(a);
         }
     }
 }
