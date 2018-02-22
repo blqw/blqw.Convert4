@@ -11,9 +11,18 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="Convertors\QPrimitive\**" />
     <Compile Remove="Define\Base\**" />
+    <Compile Remove="Services\Mapping\**" />
+    <EmbeddedResource Remove="Convertors\QPrimitive\**" />
     <EmbeddedResource Remove="Define\Base\**" />
+    <EmbeddedResource Remove="Services\Mapping\**" />
+    <None Remove="Convertors\QPrimitive\**" />
     <None Remove="Define\Base\**" />
+    <None Remove="Services\Mapping\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Convertors\Common\DataTableConvertor.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Define\IConvertor.cs" />

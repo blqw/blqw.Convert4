@@ -51,6 +51,19 @@ namespace blqw
         /// <exception cref="AggregateException"> 发生一个或多个转换错误问题 </exception>
         public void ThrowIfExceptional() => Error?.TryThrow();
 
+        internal ConvertResult<T0> Cast<T0>()
+        {
+            if (!Success)
+            {
+                return new ConvertResult<T0>(false, default, Error);
+            }
+            if (OutputValue is T0 v)
+            {
+                return new ConvertResult<T0>(true, v, null);
+            }
+            throw new InvalidCastException();
+        }
+
         #region 隐式转换
         public static implicit operator ConvertResult(ConvertResult<T> value) => new ConvertResult(value.Success, value.OutputValue, value.Error);
         public static implicit operator ConvertResult<T>(ConvertResult value) => new ConvertResult<T>(value.Success, value.OutputValue is T t ? t : default, value.Error);

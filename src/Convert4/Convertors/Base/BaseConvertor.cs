@@ -1,9 +1,13 @@
+using System.Linq;
 using blqw.ConvertServices;
 using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Collections;
+using System.Data;
+using System.ComponentModel;
 
 namespace blqw.Convertors
 {
@@ -76,9 +80,9 @@ namespace blqw.Convertors
                 if (intf.IsConstructedGenericType && intf.GetGenericTypeDefinition() == typeof(IFrom<,>))
                 {
                     var args = intf.GetGenericArguments();
-                    if (args[0] == typeof(T))
+                    if (args[1] == typeof(T))
                     {
-                        var invoker = (IInvoker)Activator.CreateInstance(typeof(Invoker<>).MakeGenericType(args));
+                        var invoker = (IInvoker)Activator.CreateInstance(typeof(Invoker<>).MakeGenericType(new Type[] { args[1], args[0] }));
                         _invokers.Add(invoker.InputType, invoker);
                         if (invoker.InputType.IsInterface)
                         {
@@ -163,6 +167,10 @@ namespace blqw.Convertors
 
         ConvertResult<T> ChangeTypeImpl(ConvertContext context, object input)
         {
+            if (input is T t)
+            {
+                return new ConvertResult<T>(t);
+            }
             //清空异常
             context.Exception = null;
             //空值转换
@@ -186,6 +194,25 @@ namespace blqw.Convertors
                     return result;
                 }
                 //这里就算异常了,下面还可以尝试其他方案
+            }
+            else if (input is IEnumerator == false)
+            {
+                invoker = GetInvoker(typeof(IEnumerator));
+                if (invoker != null)
+                {
+                    var ee = (input as IEnumerable)?.GetEnumerator()
+                            ?? input as IEnumerator
+                            ?? (input as DataTable)?.Rows.GetEnumerator()
+                            ?? (input as DataRow)?.ItemArray.GetEnumerator()
+                            ?? (input as DataRowView)?.Row.ItemArray.GetEnumerator()
+                            ?? (input as IListSource)?.GetList()?.GetEnumerator();
+
+                    var result = invoker.ChangeTypeImpl(this, context, ee);
+                    if (result.Success)
+                    {
+                        return result;
+                    }
+                }
             }
 
             //转为各种基本类型进行转换,这次如果失败了就不再继续了
@@ -249,6 +276,7 @@ namespace blqw.Convertors
                 //这里失败了 继续尝试object转换方案
             }
 
+
             return InvokeIForm(this, context, input);
         }
 
@@ -265,7 +293,7 @@ namespace blqw.Convertors
             try
             {
 
-                if (conv is IFrom<T, TInput> from)
+                if (conv is IFrom<TInput, T> from)
                 {
                     var result = from.From(context, input);
                     if (context.Exception != null)

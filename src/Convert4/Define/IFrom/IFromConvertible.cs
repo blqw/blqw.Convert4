@@ -7,21 +7,21 @@ namespace blqw
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public interface IFromConvertible<T>
-        : IFrom<T, bool>
-        , IFrom<T, char>
-        , IFrom<T, sbyte>
-        , IFrom<T, byte>
-        , IFrom<T, short>
-        , IFrom<T, ushort>
-        , IFrom<T, int>
-        , IFrom<T, uint>
-        , IFrom<T, long>
-        , IFrom<T, ulong>
-        , IFrom<T, float>
-        , IFrom<T, double>
-        , IFrom<T, decimal>
-        , IFrom<T, DateTime>
-        , IFrom<T, string>
+        : IFrom<bool, T>
+        , IFrom<char, T>
+        , IFrom<sbyte, T>
+        , IFrom<byte, T>
+        , IFrom<short, T>
+        , IFrom<ushort, T>
+        , IFrom<int, T>
+        , IFrom<uint, T>
+        , IFrom<long, T>
+        , IFrom<ulong, T>
+        , IFrom<float, T>
+        , IFrom<double, T>
+        , IFrom<decimal, T>
+        , IFrom<DateTime, T>
+        , IFrom<string, T>
     {
     }
 }

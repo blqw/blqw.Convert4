@@ -7,12 +7,12 @@ namespace blqw
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public interface IFromSystemType<T>
-        : IFrom<T, Guid>
-        , IFrom<T, TimeSpan>
-        , IFrom<T, Uri>
-        , IFrom<T, Type>
-        , IFrom<T, IntPtr>
-        , IFrom<T, UIntPtr>
+        : IFrom<Guid, T>
+        , IFrom<TimeSpan, T>
+        , IFrom<Uri, T>
+        , IFrom<Type, T>
+        , IFrom<IntPtr, T>
+        , IFrom<UIntPtr, T>
     {
 
     }

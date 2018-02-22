@@ -1,5 +1,6 @@
 ﻿using blqw.ConvertServices;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace blqw.Convertors
@@ -27,23 +28,34 @@ namespace blqw.Convertors
             return (IConvertor)Activator.CreateInstance(typeof(InnerConvertor<,>).MakeGenericType(args));
         }
 
-        class InnerConvertor<TList, TValue> : BaseConvertor<TList>, IFrom<TList, string>
+        class InnerConvertor<TList, TValue> : BaseConvertor<TList>
+                                            , IFrom<string, TList>
+                                            , IFrom<IEnumerator, TList>
             where TList : class, IList<TValue>
         {
             static readonly char[] _separator = new[] { ',' };
 
             public TList From(ConvertContext context, string input)
             {
-                var list = OutputType.IsInterface ? new List<TValue>() : (IList<TValue>)CreateOutputInstance(OutputType);
                 var separator = context.GetStringSeparators();
 
                 var arr = separator is string[] s
                             ? input.Split(s, context.GetStringSplitOptions())
                             : input.Split(separator as char[] ?? _separator, context.GetStringSplitOptions());
 
-                foreach (var item in arr)
+                return From(context, arr.GetEnumerator());
+            }
+
+            public TList From(ConvertContext context, IEnumerator input)
+            {
+                if (input == null)
                 {
-                    var result = context.ChangeType<TValue>(item);
+                    return null;
+                }
+                var list = OutputType.IsInterface ? new List<TValue>() : (IList<TValue>)CreateOutputInstance(OutputType);
+                while (input.MoveNext())
+                {
+                    var result = context.ChangeType<TValue>(input.Current);
                     if (!result.Success)
                     {
                         context.Exception = context.InvalidCastException(input, TypeFriendlyName) + result.Error;
@@ -51,7 +63,6 @@ namespace blqw.Convertors
                     }
                     list.Add(result.OutputValue);
                 }
-
                 return (TList)list;
             }
         }

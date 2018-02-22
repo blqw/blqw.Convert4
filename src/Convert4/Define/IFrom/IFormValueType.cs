@@ -7,7 +7,7 @@ namespace blqw
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public interface IFormValueType<T>
-        : IFrom<T, ValueType>
+        : IFrom<ValueType, T>
     {
 
     }

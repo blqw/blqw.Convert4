@@ -5,7 +5,7 @@
     /// </summary>
     /// <typeparam name="TOutput"></typeparam>
     /// <typeparam name="TInput"></typeparam>
-    public interface IFrom<TOutput, TInput>
+    public interface IFrom<TInput, TOutput>
     {
         TOutput From(ConvertContext context, TInput input);
     }

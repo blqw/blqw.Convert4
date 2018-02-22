@@ -5,6 +5,9 @@ MinimumVisualStudioVersion = 15.0.26124.0
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Convert4", "src\Convert4\Convert4.csproj", "{CAD184E4-32F3-4AAE-9B5D-61FD4CFE6ECA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NUnit.Tests1", "test\NUnit.Tests1\NUnit.Tests1.csproj", "{8EDF4429-251A-416D-BB68-93F227191BCF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{CAD184E4-32F3-4AAE-9B5D-61FD4CFE6ECA} = {CAD184E4-32F3-4AAE-9B5D-61FD4CFE6ECA}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
