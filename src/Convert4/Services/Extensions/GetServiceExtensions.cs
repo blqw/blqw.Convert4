@@ -28,7 +28,7 @@ namespace blqw.ConvertServices
         /// <param name="forType">指定类型</param>
         /// <returns></returns>
         public static IFormatProvider GetFormatProvider(this IServiceProvider provider, Type forType) =>
-            provider?.GetService<IForTypeProvider>()?.GetServiceProvider(forType)?.GetService<IFormatProvider>()
+            provider?.GetDedicatedServiceProvider(forType)?.GetService<IFormatProvider>()
             ?? provider?.GetService<IFormatProvider>();
 
         /// <summary>
@@ -62,7 +62,7 @@ namespace blqw.ConvertServices
         /// <returns></returns>
         public static object GetStringSeparators(this IServiceProvider provider)
         {
-            var separator = provider?.GetNamedService(StringSeparator);
+            var separator = provider?.GetNamedService<object>(StringSeparator);
             switch (separator)
             {
                 case char[] r:
@@ -85,7 +85,7 @@ namespace blqw.ConvertServices
         /// <returns></returns>
         public static string GetStringSeparator(this IServiceProvider provider)
         {
-            var separator = provider?.GetNamedService(StringSeparator);
+            var separator = provider?.GetNamedService<object>(StringSeparator);
             switch (separator)
             {
                 case char[] r:

@@ -1,6 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Collections;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace blqw.ConvertServices
 {
@@ -13,6 +15,8 @@ namespace blqw.ConvertServices
         /// 服务提供程序
         /// </summary>
         private IServiceProvider[] _serviceProviders;
+
+        private Hashtable _hashtable;
         /// <summary>
         /// 初始化聚合服务提供程序
         /// </summary>
@@ -29,7 +33,31 @@ namespace blqw.ConvertServices
             {
                 return this;
             }
+            if (serviceType == typeof(IDictionary))
+            {
+                if (_hashtable == null)
+                {
+                    _hashtable = Merge(_serviceProviders.Select(x=>x.GetService(serviceType)).OfType<IDictionary>());
+                }
+                return _hashtable;
+            }
             return _serviceProviders.Select(x => x.GetService(serviceType)).FirstOrDefault(x => x != null);
+        }
+
+        private Hashtable Merge(IEnumerable<IDictionary> maps)
+        {
+            var hashtable = new Hashtable();
+            foreach (var map in maps)
+            {
+                foreach (var key in map.Keys)
+                {
+                    if (!hashtable.ContainsKey(key))
+                    {
+                        hashtable[key] = map[key];
+                    }
+                }
+            }
+            return hashtable;
         }
 
         /// <summary>

@@ -53,10 +53,36 @@ namespace blqw
             using (var context = new ConvertContext(settings))
             {
                 var result = context.ChangeType<T>(input);
-                result.ThrowIfExceptional();
+                if (!result.Success)
+                {
+                    if (settings?.Throwable ?? true)
+                    {
+                        result.ThrowIfExceptional();
+                    }
+                    return settings?.DefaultValue is T t ? t : default;
+                }
                 return result.OutputValue;
             }
         }
+
+
+        public static object ChangeType(this object input, Type type, ConvertSettings settings)
+        {
+            using (var context = new ConvertContext(settings))
+            {
+                var result = context.ChangeType(type, input);
+                if (!result.Success)
+                {
+                    if (settings?.Throwable ?? true)
+                    {
+                        result.ThrowIfExceptional();
+                    }
+                    return settings?.DefaultValue;
+                }
+                return result.OutputValue;
+            }
+        }
+
 
         /// <summary>
         /// 获取一个 <see cref="IFormatterConverter"> 类型的简单转换器

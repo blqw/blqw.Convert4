@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Linq;
 
 namespace blqw.ConvertServices
 {
@@ -16,5 +18,12 @@ namespace blqw.ConvertServices
         /// <returns></returns>
         public static T GetService<T>(this IServiceProvider provider, T defaultValue = default) =>
             provider?.GetService(typeof(T)) is T t ? t : defaultValue;
+
+
+        public static ServiceDescriptor GetSingletonServiceDescriptor<T>(this IServiceCollection services) =>
+            services?.FirstOrDefault(x => x.ServiceType == typeof(T) && x.ImplementationInstance is T);
+
+        public static T GetSingletonService<T>(this IServiceCollection services) =>
+            (T)services?.GetSingletonServiceDescriptor<T>()?.ImplementationInstance;
     }
 }

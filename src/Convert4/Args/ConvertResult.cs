@@ -45,6 +45,8 @@ namespace blqw
         /// <returns></returns>
         public ConvertError Error { get; }
 
+        public void ThrowIfExceptional() => Error?.TryThrow();
+
         #region 隐式转换
         public static implicit operator ConvertResult(Exception exception)
         {

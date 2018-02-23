@@ -1,6 +1,6 @@
 ﻿using System.Data;
 
-namespace blqw.Services
+namespace blqw.ConvertServices
 {
     /// <summary>
     /// <seealso cref="DataSet"/> 枚举器

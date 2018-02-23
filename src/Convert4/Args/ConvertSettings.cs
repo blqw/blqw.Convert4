@@ -9,16 +9,18 @@ namespace blqw
     /// <summary>
     /// 转换器设置参数
     /// </summary>
-    public sealed class ConvertSettings : IServiceProvider, INamedServiceProvider, IForTypeProvider
+    public sealed class ConvertSettings : IServiceProvider
     {
+        //public ConvertSettings()
+        //{
+        //    AddService(new DedicatedServiceProviderEngine<Type>());
+        //    AddService(new DedicatedServiceProviderEngine<string>());
+        //}
         /// <summary>
         /// 标准服务
         /// </summary>
         private IList<object> _services;
-        /// <summary>
-        /// 特别服务
-        /// </summary>
-        private IDictionary _specialServices;
+
         /// <summary>
         /// 获取标准服务
         /// </summary>
@@ -34,16 +36,21 @@ namespace blqw
             {
                 return this;
             }
-            return _services?.FirstOrDefault(serviceType.IsInstanceOfType);
+            var service = _services?.FirstOrDefault(serviceType.IsInstanceOfType);
+            if (service == null)
+            {
+                if (serviceType.IsGenericType && serviceType.IsConstructedGenericType && serviceType.GetGenericTypeDefinition() == typeof(DedicatedServiceProviderEngine<>))
+                {
+                    service = Activator.CreateInstance(serviceType);
+                    AddService(service);
+                    //if (service is IDedicatedServiceProviderEngine engine)
+                    //{
+                    //    AddService(engine.GetServiceProviderService());
+                    //}
+                }
+            }
+            return service;
         }
-        /// <summary>
-        /// 获取命名服务
-        /// </summary>
-        /// <param name="serviceName">服务名称</param>
-        /// <returns></returns>
-        public object GetService(string serviceName) =>
-                    _specialServices?[serviceName];
-
 
         /// <summary>
         /// 添加标准服务
@@ -67,14 +74,7 @@ namespace blqw
         /// <returns></returns>
         public ConvertSettings AddService(string name, object service)
         {
-            if (!string.IsNullOrWhiteSpace(name))
-            {
-                if (_specialServices == null)
-                {
-                    _specialServices = new Hashtable();
-                }
-                _specialServices[name] = service;
-            }
+            this.AddNamedService(name, service);
             return this;
         }
         /// <summary>
@@ -106,11 +106,7 @@ namespace blqw
             {
                 return this;
             }
-            if (_specialServices == null)
-            {
-                _specialServices = new Hashtable();
-            }
-            _specialServices.Add(forType, new ConvertSettings().AddService(service));
+            this.AddForTypeService(forType, service);
             return this;
         }
         /// <summary>
@@ -126,28 +122,19 @@ namespace blqw
             {
                 return this;
             }
-            if (_specialServices == null)
-            {
-                _specialServices = new Hashtable();
-            }
-            _specialServices.Add(forType, new ConvertSettings().AddService(name, service));
+            var provider = this.GetOrAddGetDedicatedServiceProvider(forType, t => new DedicatedServiceProviderEngine<string>());
+            provider.AddNamedService(name, service);
             return this;
         }
 
         /// <summary>
-        /// 获取提供指定类型的服务提供程序
+        /// 是否抛出异常
         /// </summary>
-        /// <param name="forType">指定类型</param>
-        public IServiceProvider GetServiceProvider(Type forType) =>
-            _specialServices?[forType] as IServiceProvider;
+        public bool Throwable { get; set; } = true;
 
         /// <summary>
-        /// 获取提供指定类型服务提供程序
+        /// 默认值
         /// </summary>
-        /// <param name="forType">指定类型</param>
-        public INamedServiceProvider GetNamedServiceProvider(Type forType) =>
-            _specialServices?[forType] as INamedServiceProvider;
-
-        void INamedServiceProvider.AddService(string name, object service) => AddService(name, service);
+        public object DefaultValue { get; set; }
     }
 }

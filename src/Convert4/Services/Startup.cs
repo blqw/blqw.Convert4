@@ -1,3 +1,4 @@
+using System.Collections;
 using blqw.ConvertServices;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -35,6 +36,8 @@ namespace blqw
             types.Where(x => x.IsClass && x.Instantiable() && typeof(IConvertor).IsAssignableFrom(x))
                  .ForEach(x => services.AddSingleton(typeof(IConvertor), x));
             services.AddSingleton(typeof(IConvertorSelector), typeof(ConvertorSelector));
+            services.AddNamedSingleton();
+            services.AddForTypeSingleton();
         }
 
         /// <summary>

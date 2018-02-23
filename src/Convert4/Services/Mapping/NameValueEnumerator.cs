@@ -2,7 +2,7 @@
 using System.Collections.Specialized;
 using System.Reflection;
 
-namespace blqw.Services
+namespace blqw.ConvertServices
 {
     /// <summary>
     /// <seealso cref="NameValueCollection" /> 枚举器

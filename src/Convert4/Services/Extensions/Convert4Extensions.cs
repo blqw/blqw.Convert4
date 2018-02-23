@@ -175,14 +175,14 @@ namespace blqw
         /// <param name="separator">字符串分隔符</param>
         /// <returns></returns>
         public static ConvertSettings AddStringSeparator(this ConvertSettings settings, string separator) =>
-            settings?.AddService(StringSeparator, separator);
+            settings?.AddService(StringSeparator, new[] { separator });
 
         /// <summary>
         /// 设置字符串分隔符
         /// </summary>
         /// <param name="separator">字符串分隔符</param>
         public static ConvertSettings AddStringSeparator(this ConvertSettings settings, char separator) =>
-            settings?.AddService(StringSeparator, separator);
+            settings?.AddService(StringSeparator, new [] { separator });
 
         /// <summary>
         /// 设置字符串分隔符

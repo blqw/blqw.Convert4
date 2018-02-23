@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace blqw.Convertors
 {
@@ -45,10 +43,9 @@ namespace blqw.Convertors
                 {
                     return new ConvertResult(null);
                 }
-                return _convertor.ChangeType(context, input);
+                return context.ChangeType<TValue>(input);
             }
 
-            private IConvertor<TValue> _convertor;
         }
     }
 }
