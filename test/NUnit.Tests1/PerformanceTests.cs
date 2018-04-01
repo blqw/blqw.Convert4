@@ -32,7 +32,7 @@ namespace NUnit.Tests1
 
             foreach (var type in types)
             {
-                Console.WriteLine("".ChangeType(type, new ConvertSettings() { Throwable = false }));
+                Console.WriteLine("".ChangeType(type, null, null));
             }
         }
 

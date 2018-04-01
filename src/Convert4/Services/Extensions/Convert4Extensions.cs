@@ -165,9 +165,14 @@ namespace blqw
         /// <typeparam name="T">指定类型</typeparam>
         /// <param name="format">格式化字符串</param>
         /// <returns></returns>
-        public static ConvertSettings AddFormat<T>(this ConvertSettings settings, string format)
-          where T : IFormattable =>
-            settings?.AddForType(typeof(T), Format, format);
+        public static ConvertSettings AddFormat(this ConvertSettings settings, Type formattableType, string format)
+        {
+            if (!typeof(IFormattable).IsAssignableFrom(formattableType))
+            {
+                return settings;
+            }
+            return settings?.AddNamedForType(formattableType, Format, format);
+        }
 
         /// <summary>
         /// 设置字符串分隔符
@@ -175,28 +180,28 @@ namespace blqw
         /// <param name="separator">字符串分隔符</param>
         /// <returns></returns>
         public static ConvertSettings AddStringSeparator(this ConvertSettings settings, string separator) =>
-            settings?.AddService(StringSeparator, new[] { separator });
+            settings?.AddNamedService(StringSeparator, new[] { separator });
 
         /// <summary>
         /// 设置字符串分隔符
         /// </summary>
         /// <param name="separator">字符串分隔符</param>
         public static ConvertSettings AddStringSeparator(this ConvertSettings settings, char separator) =>
-            settings?.AddService(StringSeparator, new [] { separator });
+            settings?.AddNamedService(StringSeparator, new[] { separator });
 
         /// <summary>
         /// 设置字符串分隔符
         /// </summary>
         /// <param name="separator">字符串分隔符</param>
         public static ConvertSettings AddStringSeparator(this ConvertSettings settings, params char[] separator) =>
-            settings?.AddService(StringSeparator, separator);
+            settings?.AddNamedService(StringSeparator, separator);
 
         /// <summary>
         /// 设置字符串分隔符
         /// </summary>
         /// <param name="separator">字符串分隔符</param>
         public static ConvertSettings AddStringSeparator(this ConvertSettings settings, params string[] separator) =>
-            settings?.AddService(StringSeparator, separator);
+            settings?.AddNamedService(StringSeparator, separator);
 
         /// <summary>
         /// 设置字符串分割选项

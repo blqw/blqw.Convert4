@@ -48,38 +48,41 @@ namespace blqw
         /// <typeparam name="T"> 要返回的对象类型的泛型 </typeparam>
         /// <param name="input"> 需要转换类型的对象 </param>
         /// <param name="defaultValue"> 转换失败时返回的默认值 </param>
+        public static T To<T>(this object input, ConvertSettings settings, T defaultValue)
+        {
+            using (var context = new ConvertContext(settings))
+            {
+                var result = context.ChangeType<T>(input);
+                return result.Success ? result.OutputValue : defaultValue;
+            }
+        }
+
         public static T To<T>(this object input, ConvertSettings settings)
         {
             using (var context = new ConvertContext(settings))
             {
                 var result = context.ChangeType<T>(input);
-                if (!result.Success)
-                {
-                    if (settings?.Throwable ?? true)
-                    {
-                        result.ThrowIfExceptional();
-                    }
-                    return settings?.DefaultValue is T t ? t : default;
-                }
+                result.ThrowIfExceptional();
                 return result.OutputValue;
             }
         }
-
 
         public static object ChangeType(this object input, Type type, ConvertSettings settings)
         {
             using (var context = new ConvertContext(settings))
             {
                 var result = context.ChangeType(type, input);
-                if (!result.Success)
-                {
-                    if (settings?.Throwable ?? true)
-                    {
-                        result.ThrowIfExceptional();
-                    }
-                    return settings?.DefaultValue;
-                }
+                result.ThrowIfExceptional();
                 return result.OutputValue;
+            }
+        }
+
+        public static object ChangeType(this object input, Type type, ConvertSettings settings, object defaultValue)
+        {
+            using (var context = new ConvertContext(settings))
+            {
+                var result = context.ChangeType(type, input);
+                return result.Success ? result.OutputValue : defaultValue;
             }
         }
 

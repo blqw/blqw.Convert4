@@ -35,7 +35,7 @@ namespace blqw.Convertors
             input?.ToString(context.GetFormatProvider(input?.GetType()));
 
         public string From(ConvertContext context, IFormattable input) =>
-            input?.ToString(context.GetFormat(input.GetType()), context.GetFormatProvider(input?.GetType()));
+            input?.ToString(context.GetFormat(input.GetType()), context.GetFormatProvider(input.GetType()));
 
         public string From(ConvertContext context, byte[] input) =>
             context.GetEncoding().GetString(input);

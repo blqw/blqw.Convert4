@@ -9,55 +9,31 @@ namespace blqw.ConvertServices
     /// <summary>
     /// 聚合服务提供程序
     /// </summary>
-    internal class AggregateServicesProvider : IServiceProvider, IServiceScopeFactory, IDisposable
+    public class AggregateServicesProvider : IServiceProvider, IServiceScopeFactory, IDisposable
     {
         /// <summary>
         /// 服务提供程序
         /// </summary>
         private IServiceProvider[] _serviceProviders;
 
-        private Hashtable _hashtable;
         /// <summary>
         /// 初始化聚合服务提供程序
         /// </summary>
         /// <param name="serviceProviders">一组服务提供程序</param>
         public AggregateServicesProvider(params IServiceProvider[] serviceProviders) =>
             _serviceProviders = serviceProviders ?? throw new ArgumentNullException(nameof(serviceProviders));
+
         /// <summary>
         /// 获取服务, 循环服务提供程序, 并返回第一个得到的服务, 如果全部提供程序均没有返回服务, 则返回null
         /// </summary>
         /// <param name="serviceType">服务类型</param>
-        public object GetService(Type serviceType)
+        public virtual object GetService(Type serviceType)
         {
             if (serviceType == typeof(IServiceScopeFactory))
             {
                 return this;
             }
-            if (serviceType == typeof(IDictionary))
-            {
-                if (_hashtable == null)
-                {
-                    _hashtable = Merge(_serviceProviders.Select(x=>x.GetService(serviceType)).OfType<IDictionary>());
-                }
-                return _hashtable;
-            }
             return _serviceProviders.Select(x => x.GetService(serviceType)).FirstOrDefault(x => x != null);
-        }
-
-        private Hashtable Merge(IEnumerable<IDictionary> maps)
-        {
-            var hashtable = new Hashtable();
-            foreach (var map in maps)
-            {
-                foreach (var key in map.Keys)
-                {
-                    if (!hashtable.ContainsKey(key))
-                    {
-                        hashtable[key] = map[key];
-                    }
-                }
-            }
-            return hashtable;
         }
 
         /// <summary>

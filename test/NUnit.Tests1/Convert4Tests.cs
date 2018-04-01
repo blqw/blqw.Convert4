@@ -139,10 +139,10 @@ namespace NUnit.Tests1
             var enUSResult = time.ToString(enUS);
             var urPKResult = time.ToString(urPK);
 
-            var formatTest = time.To<string>(new ConvertSettings().AddFormat<DateTime>(format));
+            var formatTest = time.To<string>(new ConvertSettings().AddFormat(typeof(DateTime), format));
             var enUSTest = time.To<string>(new ConvertSettings().AddService(enUS));
-            var urPKTest = time.To<string>(new ConvertSettings().AddForType<DateTime>(urPK));
-            var urPKTest2 = time.To<string>(new ConvertSettings().AddForType<int>(urPK));
+            var urPKTest = time.To<string>(new ConvertSettings().AddForType(typeof(DateTime), urPK));
+            var urPKTest2 = time.To<string>(new ConvertSettings().AddForType(typeof(int), urPK));
 
             Assert.AreEqual(formatTest, formatResult);
             Assert.AreEqual(enUSTest, enUSResult);
@@ -166,66 +166,5 @@ namespace NUnit.Tests1
             Assert.AreEqual(typeof(int).MakeByRefType().To<string>(), "int&");
             Assert.AreEqual(typeof(int[]).To<string>(), "int[]");
         }
-
-
-        [Test]
-        public void 测试命名服务()
-        {
-            {
-                IServiceCollection services = new ServiceCollection();
-                services.AddNamedSingleton("xxx", "xxx");
-                services.AddNamedSingleton("yyy", "yyy");
-                var provider = services.BuildServiceProvider();
-                provider.AddNamedService("zzz", "zzz");
-
-                Assert.AreEqual("xxx", provider.GetNamedService<string>("xxx"));
-                Assert.AreEqual("yyy", provider.GetNamedService<string>("yyy"));
-                Assert.AreEqual("zzz", provider.GetNamedService<string>("zzz"));
-            }
-
-            {
-                IServiceCollection services = new ServiceCollection();
-                services.AddNamedSingleton("xxx", "xxx");
-                services.AddNamedSingleton("yyy", "yyy");
-                var provider = services.BuildServiceProvider();
-                provider.AddNamedService("zzz", "zzz");
-
-                using (var scope = provider.CreateScope())
-                {
-                    Assert.AreEqual("xxx", scope.ServiceProvider.GetNamedService<string>("xxx"));
-                    Assert.AreEqual("yyy", scope.ServiceProvider.GetNamedService<string>("yyy"));
-
-                    scope.ServiceProvider.AddNamedService("yyy", "222");
-                    Assert.AreEqual("222", scope.ServiceProvider.GetNamedService<string>("yyy"));
-                    scope.ServiceProvider.AddNamedService("!!!", "000");
-                    Assert.AreEqual("000", scope.ServiceProvider.GetNamedService<string>("!!!"));
-                }
-
-                Assert.AreEqual("xxx", provider.GetNamedService<string>("xxx"));
-                Assert.AreEqual("yyy", provider.GetNamedService<string>("yyy"));
-                Assert.AreEqual("zzz", provider.GetNamedService<string>("zzz"));
-                Assert.IsNull(provider.GetNamedService<string>("!!!"));
-            }
-
-            {
-                IServiceCollection services = new ServiceCollection();
-                services.AddNamedSingleton("xxx", "xxx");
-                services.AddNamedSingleton("yyy", "yyy");
-                var provider = services.BuildServiceProvider();
-                provider.AddNamedService("zzz", "zzz");
-
-                using (var scope = provider.CreateScope())
-                {
-                    Assert.IsNull(scope.ServiceProvider.GetNamedService<string>("zzz"));
-                    //Assert.AreEqual("zzz", scope.ServiceProvider.GetNamedService<string>("zzz"));
-
-                    scope.ServiceProvider.AddNamedService("zzz", "444");
-                    Assert.AreEqual("444", scope.ServiceProvider.GetNamedService<string>("zzz"));
-                }
-
-                Assert.AreEqual(provider.GetNamedService<string>("zzz"), "zzz");
-            }
-        }
-
     }
 }

@@ -22,16 +22,6 @@ namespace blqw.ConvertServices
             provider?.GetService(typeof(CultureInfo)) as CultureInfo ?? CultureInfo.CurrentCulture;
 
         /// <summary>
-        /// 获取提供给指定类型的 <seealso cref="IFormatProvider"/> 对象
-        /// </summary>
-        /// <param name="provider">服务提供程序</param>
-        /// <param name="forType">指定类型</param>
-        /// <returns></returns>
-        public static IFormatProvider GetFormatProvider(this IServiceProvider provider, Type forType) =>
-            provider?.GetDedicatedServiceProvider(forType)?.GetService<IFormatProvider>()
-            ?? provider?.GetService<IFormatProvider>();
-
-        /// <summary>
         /// 获取编码对象 <seealso cref="Encoding"/>, 默认返回 <seealso cref="Encoding.UTF8"/>
         /// </summary>
         /// <param name="provider"></param>
@@ -62,7 +52,7 @@ namespace blqw.ConvertServices
         /// <returns></returns>
         public static object GetStringSeparators(this IServiceProvider provider)
         {
-            var separator = provider?.GetNamedService<object>(StringSeparator);
+            var separator = (provider?.GetService(typeof(ConvertSettings)) as ConvertSettings)?.GetNamedService(StringSeparator);
             switch (separator)
             {
                 case char[] r:
@@ -85,7 +75,7 @@ namespace blqw.ConvertServices
         /// <returns></returns>
         public static string GetStringSeparator(this IServiceProvider provider)
         {
-            var separator = provider?.GetNamedService<object>(StringSeparator);
+            var separator = (provider?.GetService(typeof(ConvertSettings)) as ConvertSettings)?.GetNamedService(StringSeparator);
             switch (separator)
             {
                 case char[] r:
@@ -108,22 +98,21 @@ namespace blqw.ConvertServices
         /// <returns></returns>
         public static ISerializationService GetSerialization(this IServiceProvider provider)
         {
-            var contract = provider?.GetNamedService<string>(SerializationContract);
-            if (string.IsNullOrWhiteSpace(contract))
+            if (provider?.GetService(typeof(ConvertSettings)) is ConvertSettings settings)
             {
-                return null;
+                if (settings.GetOwnService(typeof(ISerializationService)) is ISerializationService service)
+                {
+                    return service;
+                }
+                var contract = settings.GetNamedService(SerializationContract) as string;
+                if (string.IsNullOrWhiteSpace(contract))
+                {
+                    return null;
+                }
+                return provider.GetServices<ISerializationService>()?.First(x => x.Contract == contract);
             }
-            return provider.GetServices<ISerializationService>()?.First(x => x.Contract == contract);
+            return provider?.GetServices<ISerializationService>()?.First();
         }
-
-        /// <summary>
-        /// 获取指定类型的格式化字符串
-        /// </summary>
-        /// <typeparam name="T">指定类型</typeparam>
-        /// <param name="provider">服务提供程序</param>
-        public static string GetFormat<T>(this IServiceProvider provider)
-          where T : IFormattable =>
-            provider?.GetFormat(typeof(T));
 
         /// <summary>
         /// 获取指定类型的格式化字符串
@@ -132,10 +121,12 @@ namespace blqw.ConvertServices
         /// <param name="forType">指定类型</param>
         /// <returns></returns>
         public static string GetFormat(this IServiceProvider provider, Type forType) =>
-            forType == null ? null : provider?.GetForTypeNamedService<string>(forType, Format, null);
+            forType == null ? null : (provider?.GetService(typeof(ConvertSettings)) as ConvertSettings)?.GetNamedServiceForType(forType, Format) as string;
 
 
-
+        public static IFormatProvider GetFormatProvider(this IServiceProvider provider, Type forType) =>
+            forType == null ? null : (provider?.GetService(typeof(ConvertSettings)) as ConvertSettings)?.GetServiceForType(forType, typeof(IFormatProvider)) as IFormatProvider
+                                     ?? provider.GetService(typeof(IFormatProvider)) as IFormatProvider;
 
 
     }

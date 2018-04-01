@@ -11,15 +11,14 @@ namespace blqw
     /// </summary>
     public sealed class ConvertSettings : IServiceProvider
     {
-        //public ConvertSettings()
-        //{
-        //    AddService(new DedicatedServiceProviderEngine<Type>());
-        //    AddService(new DedicatedServiceProviderEngine<string>());
-        //}
+        public static readonly ConvertSettings Global = new ConvertSettings();
+
         /// <summary>
         /// 标准服务
         /// </summary>
-        private IList<object> _services;
+        private IList<(Type type, string name, object service)> _services;
+
+        private int _boundary = 0;
 
         /// <summary>
         /// 获取标准服务
@@ -32,24 +31,224 @@ namespace blqw
             {
                 return null;
             }
-            if (serviceType.IsInstanceOfType(this))
+            if (serviceType == typeof(ConvertSettings))
             {
                 return this;
             }
-            var service = _services?.FirstOrDefault(serviceType.IsInstanceOfType);
-            if (service == null)
+            if (_services == null)
             {
-                if (serviceType.IsGenericType && serviceType.IsConstructedGenericType && serviceType.GetGenericTypeDefinition() == typeof(DedicatedServiceProviderEngine<>))
+                return null;
+            }
+            var (i, s) = Get(null, serviceType);
+            if (i >= 0)
+            {
+                return s;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// 获取标准服务
+        /// </summary>
+        /// <param name="serviceType">服务类型</param>
+        /// <returns></returns>
+        public object GetOwnService(Type serviceType)
+        {
+            if (serviceType == null)
+            {
+                return null;
+            }
+            if (serviceType == typeof(ConvertSettings))
+            {
+                return this;
+            }
+            if (_services == null)
+            {
+                return ReferenceEquals(Global, this) ? null : Global.GetOwnService(serviceType);
+            }
+            var (i, s) = Get(null, serviceType);
+            if (i >= 0)
+            {
+                return s;
+            }
+            return ReferenceEquals(Global, this) ? null : Global.GetOwnService(serviceType);
+        }
+
+        /// <summary>
+        /// 获取命名服务
+        /// </summary>
+        /// <param name="name">服务名称</param>
+        /// <returns></returns>
+        public object GetNamedService(string name)
+        {
+            if (name == null || _services == null)
+            {
+                return ReferenceEquals(Global, this) ? null : Global.GetNamedService(name);
+            }
+            var (i, s) = Get(null, name);
+            if (i >= 0)
+            {
+                return s;
+            }
+            return ReferenceEquals(Global, this) ? null : Global.GetNamedService(name);
+        }
+
+        /// <summary>
+        /// 获取标准服务
+        /// </summary>
+        /// <param name="serviceType">服务类型</param>
+        /// <returns></returns>
+        public object GetService<TService>()
+        {
+            if (typeof(TService) == typeof(ConvertSettings))
+            {
+                return this;
+            }
+            if (_services == null)
+            {
+                return ReferenceEquals(Global, this) ? null : Global.GetService<TService>();
+            }
+            var (i, s) = Get<TService>(null);
+            if (i >= 0)
+            {
+                return s;
+            }
+            return ReferenceEquals(Global, this) ? null : Global.GetService<TService>();
+        }
+
+        /// <summary>
+        /// 获取类型专属的标准服务
+        /// </summary>
+        /// <param name="serviceType">服务类型</param>
+        /// <returns></returns>
+        public object GetServiceForType(Type forType, Type serviceType)
+        {
+            if (serviceType == null || _services == null)
+            {
+                return ReferenceEquals(Global, this) ? null : Global.GetServiceForType(forType, serviceType);
+            }
+            var (i, s) = Get(forType, serviceType);
+            if (i >= 0)
+            {
+                return s;
+            }
+            (i, s) = Get(null, serviceType);
+            if (i >= 0)
+            {
+                return s;
+            }
+            return ReferenceEquals(Global, this) ? null : Global.GetServiceForType(forType, serviceType);
+        }
+
+        /// <summary>
+        /// 获取类型专属的命名服务
+        /// </summary>
+        /// <param name="name">服务名称</param>
+        /// <returns></returns>
+        public object GetNamedServiceForType(Type forType, string name)
+        {
+            if (name == null || _services == null)
+            {
+                return ReferenceEquals(Global, this) ? null : Global.GetNamedServiceForType(forType, name);
+            }
+            var (i, s) = Get(forType, name);
+            if (i >= 0)
+            {
+                return s;
+            }
+            (i, s) = Get(null, name);
+            if (i >= 0)
+            {
+                return s;
+            }
+            return ReferenceEquals(Global, this) ? null : Global.GetNamedServiceForType(forType, name);
+        }
+
+        /// <summary>
+        /// 获取类型专属的标准服务
+        /// </summary>
+        /// <param name="serviceType">服务类型</param>
+        /// <returns></returns>
+        public object GetServiceForType<TService>(Type forType)
+        {
+            if (_services == null)
+            {
+                return ReferenceEquals(Global, this) ? null : Global.GetServiceForType<TService>(forType);
+            }
+            var (i, s) = Get<TService>(forType);
+            if (i >= 0)
+            {
+                return s;
+            }
+            (i, s) = Get<TService>(null);
+            if (i >= 0)
+            {
+                return s;
+            }
+            return ReferenceEquals(Global, this) ? null : Global.GetServiceForType<TService>(forType);
+        }
+
+        private (int, object) Get(Type forType, string name)
+        {
+            var start = 0;
+            var end = _boundary;
+            if (forType == null)
+            {
+                start = _boundary;
+                end = _services.Count;
+            }
+
+            for (var i = start; i < end; i++)
+            {
+                var (t, n, v) = _services[i];
+                if (forType == t && name == n)
                 {
-                    service = Activator.CreateInstance(serviceType);
-                    AddService(service);
-                    //if (service is IDedicatedServiceProviderEngine engine)
-                    //{
-                    //    AddService(engine.GetServiceProviderService());
-                    //}
+                    return (i, v);
                 }
             }
-            return service;
+            return (-1, null);
+        }
+
+        private (int, object) Get<T>(Type forType)
+        {
+            var start = 0;
+            var end = _boundary;
+            if (forType == null)
+            {
+                start = _boundary;
+                end = _services.Count;
+            }
+
+            for (var i = start; i < end; i++)
+            {
+                var (t, n, v) = _services[i];
+                if (forType == t && n == null && v is T)
+                {
+                    return (i, v);
+                }
+            }
+            return (-1, null);
+        }
+
+        private (int, object) Get(Type forType, Type serviceType)
+        {
+            var start = 0;
+            var end = _boundary;
+            if (forType == null)
+            {
+                start = _boundary;
+                end = _services.Count;
+            }
+
+            for (var i = start; i < end; i++)
+            {
+                var (t, n, v) = _services[i];
+                if (forType == t && n == null && serviceType.IsInstanceOfType(v))
+                {
+                    return (i, v);
+                }
+            }
+            return (-1, null);
         }
 
         /// <summary>
@@ -57,84 +256,140 @@ namespace blqw
         /// </summary>
         /// <param name="service">服务实例</param>
         /// <returns></returns>
-        public ConvertSettings AddService(object service)
+        public ConvertSettings AddService<TService>(TService service)
         {
+            if (service == null)
+            {
+                throw new ArgumentNullException(nameof(service));
+            }
+
             if (_services == null)
             {
-                _services = new List<object>();
+                _services = new List<(Type, string, object)>() { (null, null, service) };
+                return this;
             }
-            _services.Add(service);
+            var (i, s) = Get(null, typeof(TService));
+            if (i <= 0)
+            {
+                _services.Add((null, null, service));
+            }
+            else
+            {
+                _services[i] = (null, null, service);
+            }
             return this;
         }
+
         /// <summary>
         /// 添加命名服务
         /// </summary>
         /// <param name="name">服务名称</param>
         /// <param name="service">服务实例</param>
         /// <returns></returns>
-        public ConvertSettings AddService(string name, object service)
+        public ConvertSettings AddNamedService(string name, object service)
         {
-            this.AddNamedService(name, service);
-            return this;
-        }
-        /// <summary>
-        /// 添加提供给指定类型的标准服务
-        /// </summary>
-        /// <typeparam name="T">指定类型</typeparam>
-        /// <param name="service">服务实例</param>
-        /// <returns></returns>
-        public ConvertSettings AddForType<T>(object service) =>
-            AddForType(typeof(T), service);
-        /// <summary>
-        /// 添加提供给指定类型的命名服务
-        /// </summary>
-        /// <typeparam name="T">指定类型</typeparam>
-        /// <param name="name">服务名称</param>
-        /// <param name="service">服务实例</param>
-        /// <returns></returns>
-        public ConvertSettings AddForType<T>(string name, object service) =>
-            AddForType(typeof(T), name, service);
-        /// <summary>
-        /// 添加提供给指定类型的标准服务
-        /// </summary>
-        /// <param name="forType">指定类型</param>
-        /// <param name="service">服务实例</param>
-        /// <returns></returns>
-        public ConvertSettings AddForType(Type forType, object service)
-        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentException("message", nameof(name));
+            }
             if (service == null)
             {
-                return this;
+                throw new ArgumentNullException(nameof(service));
             }
-            this.AddForTypeService(forType, service);
-            return this;
-        }
-        /// <summary>
-        /// 添加提供给指定类型的命名服务
-        /// </summary>
-        /// <param name="forType">指定类型</param>
-        /// <param name="name">服务名称</param>
-        /// <param name="service">服务实例</param>
-        /// <returns></returns>
-        public ConvertSettings AddForType(Type forType, string name, object service)
-        {
-            if (service == null)
+
+            if (_services == null)
             {
+                _services = new List<(Type, string, object)>() { (null, name, service) };
                 return this;
             }
-            var provider = this.GetOrAddGetDedicatedServiceProvider(forType, t => new DedicatedServiceProviderEngine<string>());
-            provider.AddNamedService(name, service);
+            var (i, s) = Get(null, name);
+            if (i <= 0)
+            {
+                _services.Add((null, name, service));
+            }
+            else
+            {
+                _services[i] = (null, name, service);
+            }
             return this;
         }
 
         /// <summary>
-        /// 是否抛出异常
+        /// 添加类型专属的标准服务
         /// </summary>
-        public bool Throwable { get; set; } = true;
+        /// <param name="forType">指定类型</param>
+        /// <param name="service">服务实例</param>
+        /// <returns></returns>
+        public ConvertSettings AddForType<TService>(Type forType, TService service)
+        {
+            if (forType == null)
+            {
+                throw new ArgumentNullException(nameof(forType));
+            }
+            if (service == null)
+            {
+                throw new ArgumentNullException(nameof(service));
+            }
+
+            if (_services == null)
+            {
+                _services = new List<(Type, string, object)>() { (forType, null, service) };
+                _boundary++;
+                return this;
+            }
+            var (i, s) = Get(forType, typeof(TService));
+            if (i <= 0)
+            {
+                _services.Add((forType, null, service));
+                _boundary++;
+
+            }
+            else
+            {
+                _services[i] = (forType, null, service);
+            }
+            return this;
+        }
 
         /// <summary>
-        /// 默认值
+        /// 添加类型专属的命名服务
         /// </summary>
-        public object DefaultValue { get; set; }
+        /// <param name="forType">指定类型</param>
+        /// <param name="name">服务名称</param>
+        /// <param name="service">服务实例</param>
+        /// <returns></returns>
+        public ConvertSettings AddNamedForType(Type forType, string name, object service)
+        {
+            if (forType == null)
+            {
+                throw new ArgumentNullException(nameof(forType));
+            }
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentException("message", nameof(name));
+            }
+            if (service == null)
+            {
+                throw new ArgumentNullException(nameof(service));
+            }
+
+            if (_services == null)
+            {
+                _services = new List<(Type, string, object)>() { (forType, name, service) };
+                _boundary++;
+                return this;
+            }
+            var (i, s) = Get(forType, name);
+            if (i <= 0)
+            {
+                _services.Add((forType, name, service));
+                _boundary++;
+            }
+            else
+            {
+                _services[i] = (forType, name, service);
+            }
+            return this;
+        }
     }
 }
