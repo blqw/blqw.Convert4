@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NUnit.Tests1", "test\NUnit.
 		{CAD184E4-32F3-4AAE-9B5D-61FD4CFE6ECA} = {CAD184E4-32F3-4AAE-9B5D-61FD4CFE6ECA}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp1", "test\ConsoleApp1\ConsoleApp1.csproj", "{36997793-BC60-473D-B0CE-52D1A916AC22}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +45,18 @@ Global
 		{8EDF4429-251A-416D-BB68-93F227191BCF}.Release|x64.Build.0 = Release|Any CPU
 		{8EDF4429-251A-416D-BB68-93F227191BCF}.Release|x86.ActiveCfg = Release|Any CPU
 		{8EDF4429-251A-416D-BB68-93F227191BCF}.Release|x86.Build.0 = Release|Any CPU
+		{36997793-BC60-473D-B0CE-52D1A916AC22}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36997793-BC60-473D-B0CE-52D1A916AC22}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36997793-BC60-473D-B0CE-52D1A916AC22}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{36997793-BC60-473D-B0CE-52D1A916AC22}.Debug|x64.Build.0 = Debug|Any CPU
+		{36997793-BC60-473D-B0CE-52D1A916AC22}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{36997793-BC60-473D-B0CE-52D1A916AC22}.Debug|x86.Build.0 = Debug|Any CPU
+		{36997793-BC60-473D-B0CE-52D1A916AC22}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36997793-BC60-473D-B0CE-52D1A916AC22}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36997793-BC60-473D-B0CE-52D1A916AC22}.Release|x64.ActiveCfg = Release|Any CPU
+		{36997793-BC60-473D-B0CE-52D1A916AC22}.Release|x64.Build.0 = Release|Any CPU
+		{36997793-BC60-473D-B0CE-52D1A916AC22}.Release|x86.ActiveCfg = Release|Any CPU
+		{36997793-BC60-473D-B0CE-52D1A916AC22}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
