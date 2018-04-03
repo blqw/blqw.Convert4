@@ -21,13 +21,14 @@ namespace blqw
         /// 转换器选择器
         /// </summary>
         private readonly IConvertorSelector _convertorSelector;
+        private readonly ConvertSettings _settings;
 
 
         /// <summary>
         /// 使用 <seealso cref="Startup.ServiceProvider"/> 创建上下文并提供服务提供程序
         /// </summary>
         public ConvertContext()
-            : this(null)
+            : this(null, null)
         {
         }
 
@@ -39,16 +40,21 @@ namespace blqw
         /// 当 <paramref name="serviceProvider"/> 为 <seealso cref="AggregateServicesProvider"/> 时, 不做处理 <para/>
         /// 否则组合 <paramref name="serviceProvider"/> 和 <seealso cref="Startup.ServiceProvider"/>
         /// </param>
-        public ConvertContext(IServiceProvider serviceProvider)
+        public ConvertContext(ConvertSettings settings)
+            : this(settings, null)
         {
-            /* Startup.ServiceProvider 作为全局的服务提供组件,
-             * 如果有自定义的 IServiceProvider 则会组合为 AggregateServicesProvider,
-             * 顺序为 IServiceProvider参数 -> Startup.ServiceProvider,
-             * AggregateServicesProvider 会根据构造函数中传入的一组 IServiceProvider 的顺序依次执行 GetService,
-             * 并返回第一个服务
-             *
-             * 如果传入的 IServiceProvider 实际类型为 AggregateServicesProvider, 则不做处理
-             */
+        }
+
+        /// <summary>
+        /// 创建上下文并提供服务提供程序
+        /// </summary>
+        /// <param name="serviceProvider"> 服务提供程序<para />
+        /// 当 <paramref name="serviceProvider"/> 为 <see cref="null"/> 时, 使用 <seealso cref="Startup.ServiceProvider"/> <para/>
+        /// 当 <paramref name="serviceProvider"/> 为 <seealso cref="AggregateServicesProvider"/> 时, 不做处理 <para/>
+        /// 否则组合 <paramref name="serviceProvider"/> 和 <seealso cref="Startup.ServiceProvider"/>
+        /// </param>
+        public ConvertContext(ConvertSettings settings, IServiceProvider serviceProvider)
+        {
             var provider = serviceProvider == null
                                 ? (IServiceProvider)Startup.ServiceProvider
                                 : serviceProvider as AggregateServicesProvider
@@ -56,6 +62,7 @@ namespace blqw
             _serviceScope = provider.CreateScope();
             _serviceProvider = _serviceScope.ServiceProvider;
             _convertorSelector = _serviceProvider.GetService<IConvertorSelector>();
+            _settings = settings;
         }
 
         /// <summary>
@@ -167,6 +174,6 @@ namespace blqw
         /// </summary>
         /// <param name="serviceType">服务类型</param>
         /// <returns></returns>
-        public object GetService(Type serviceType) => _serviceProvider?.GetService(serviceType);
+        public object GetService(Type serviceType) => _settings?.GetService(serviceType) ?? _serviceProvider?.GetService(serviceType);
     }
 }
