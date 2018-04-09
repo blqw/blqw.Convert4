@@ -9,6 +9,7 @@ namespace blqw
     /// </summary>
     public sealed class ConvertContext : IServiceProvider, IDisposable
     {
+        public static readonly ConvertContext None = new ConvertContext();
         /// <summary>
         /// 服务提供程序
         /// </summary>
