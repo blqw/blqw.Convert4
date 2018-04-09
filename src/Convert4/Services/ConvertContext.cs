@@ -174,6 +174,13 @@ namespace blqw
         /// </summary>
         /// <param name="serviceType">服务类型</param>
         /// <returns></returns>
-        public object GetService(Type serviceType) => _settings?.GetService(serviceType) ?? _serviceProvider?.GetService(serviceType);
+        public object GetService(Type serviceType)
+        {
+            if (serviceType == typeof(ConvertSettings))
+            {
+                return _settings;
+            }
+            return _settings?.GetService(serviceType) ?? _serviceProvider?.GetService(serviceType);
+        }
     }
 }
