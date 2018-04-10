@@ -1,4 +1,6 @@
-﻿namespace blqw.ConvertServices
+﻿using System;
+
+namespace blqw.ConvertServices
 {
     /// <summary>
     /// 提供获取当前元素键值方法的枚举器
@@ -33,6 +35,6 @@
         /// <summary>
         /// 异常消息
         /// </summary>
-        string Error { get; }
+        FormattableString Error { get; }
     }
 }

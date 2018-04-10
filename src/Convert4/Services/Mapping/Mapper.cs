@@ -87,7 +87,7 @@ namespace blqw
         /// <summary>
         /// 异常文本
         /// </summary>
-        public string Error { get; }
+        public FormattableString Error { get; }
 
         /// <summary>
         /// 键

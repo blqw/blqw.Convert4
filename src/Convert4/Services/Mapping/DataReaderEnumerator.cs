@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
 
 namespace blqw.ConvertServices
 {
@@ -29,7 +30,7 @@ namespace blqw.ConvertServices
         {
             if (reader.IsClosed)
             {
-                Error = "DataReader已经关闭";
+                Error = $"DataReader{"已经关闭"}";
                 return;
             }
             _reader = reader;
@@ -40,7 +41,7 @@ namespace blqw.ConvertServices
         /// <summary>
         /// 异常
         /// </summary>
-        public string Error { get; }
+        public FormattableString Error { get; }
 
         /// <summary> 将枚举数推进到集合的下一个元素。 </summary>
         /// <returns> 如果枚举数成功地推进到下一个元素，则为 true；如果枚举数越过集合的结尾，则为 false。 </returns>

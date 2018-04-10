@@ -40,7 +40,7 @@ namespace blqw.ConvertServices
                 _getValue = type.GetProperty("Value", FLAGS).GetPropertyHandler()?.Get;
                 if ((_getKey == null) || (_getValue == null))
                 {
-                    Error = "值添加到单元格失败:无法获取Key/Name和Value";
+                    Error = $"{"值添加到单元格失败"}:{"无法获取"}Key/Name{"和"}Value";
                     return;
                 }
                 _first = true;
@@ -50,7 +50,7 @@ namespace blqw.ConvertServices
         /// <summary>
         /// 异常信息
         /// </summary>
-        public string Error { get; }
+        public FormattableString Error { get; }
 
         /// <summary>
         /// 将枚举数推进到集合的下一个元素。

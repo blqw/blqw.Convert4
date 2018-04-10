@@ -21,7 +21,7 @@ namespace blqw.ConvertServices
         private readonly int _count;
         private readonly NameValueCollection _nv;
         /// <summary>
-        /// 初始化 
+        /// 初始化
         /// </summary>
         /// <param name="collection"></param>
         public NameValueEnumerator(NameObjectCollectionBase collection)
@@ -36,7 +36,7 @@ namespace blqw.ConvertServices
         /// <summary>
         /// 异常消息
         /// </summary>
-        public string Error { get; }
+        public FormattableString Error { get; }
 
         /// <summary>
         /// 将枚举数推进到集合的下一个元素。

@@ -1,4 +1,6 @@
-﻿namespace blqw.ConvertServices
+﻿using System;
+
+namespace blqw.ConvertServices
 {
     /// <summary>
     /// 属性枚举器
@@ -30,7 +32,7 @@
         /// <summary>
         /// 异常消息
         /// </summary>
-        public string Error { get; }
+        public FormattableString Error { get; }
 
         /// <summary>
         /// 将枚举数推进到集合的下一个元素。

@@ -6,12 +6,19 @@ using System.Text;
 
 namespace blqw.Convertors
 {
-    class IListConvertor : BaseConvertor<IList>, IFrom<string, IList>, IFrom<IEnumerator, IList>
+    class IListConvertor : BaseConvertor<IList>,
+                           IFrom<string, IList>,
+                           IFrom<IEnumerator, IList>
     {
         static readonly char[] _separator = new[] { ',' };
 
         public IList From(ConvertContext context, string input)
         {
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                return null;
+            }
+
             var separator = context.GetStringSeparators();
 
             var arr = separator is string[] s
@@ -23,7 +30,7 @@ namespace blqw.Convertors
 
         public IList From(ConvertContext context, IEnumerator input)
         {
-            if (input == null)
+            if (input is null)
             {
                 return null;
             }
