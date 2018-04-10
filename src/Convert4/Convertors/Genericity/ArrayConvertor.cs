@@ -10,17 +10,33 @@ namespace blqw.Convertors
     {
         public override Type OutputType => typeof(Array);
 
-        public override IConvertor GetConvertor(Type outputType) =>
-            (IConvertor)Activator.CreateInstance(typeof(InnerConvertor<>).MakeGenericType(outputType.GetElementType()));
+        public override IConvertor GetConvertor(Type outputType)
+        {
+            if (outputType.IsInterface)
+            {
+                return new InnerConvertor<object>(this);
+            }
+            return (IConvertor)Activator.CreateInstance(typeof(InnerConvertor<>).MakeGenericType(outputType.GetElementType()), this);
+        }
 
         class InnerConvertor<T> : BaseConvertor<T[]>,
                                   IFrom<string, T[]>,
                                   IFrom<IEnumerator, T[]>
         {
             static readonly char[] _separator = new[] { ',' };
+            private readonly ArrayConvertor _parent;
+
+            public InnerConvertor(ArrayConvertor parent) => _parent = parent;
+
+            public override IConvertor GetConvertor(Type outputType) => _parent.GetConvertor(outputType);
 
             public T[] From(ConvertContext context, string input)
             {
+                if (string.IsNullOrEmpty(input))
+                {
+                    return Array.Empty<T>();
+                }
+
                 var separator = context.GetStringSeparators();
 
                 var arr = separator is string[] s
@@ -36,7 +52,7 @@ namespace blqw.Convertors
                 {
                     return null;
                 }
-                var result = context.ChangeType<List<T>>(input.Current);
+                var result = context.ChangeType<List<T>>(input);
                 if (!result.Success)
                 {
                     context.Exception = context.InvalidCastException(input, TypeFriendlyName) + result.Error;

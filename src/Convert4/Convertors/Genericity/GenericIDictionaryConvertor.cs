@@ -19,20 +19,25 @@ namespace blqw.Convertors
                 //如果无法得道泛型参数, 判断output是否与 List<object> 兼容, 如果是返回 List<object> 的转换器
                 if (outputType.IsAssignableFrom(typeof(IDictionary<string, object>)))
                 {
-                    return new InnerConvertor<IDictionary<string, object>, string, object>();
+                    return new InnerConvertor<IDictionary<string, object>, string, object>(this);
                 }
                 return null;
             }
             var args = new Type[genericArgs.Length + 1];
             args[0] = outputType;
             genericArgs.CopyTo(args, 1);
-            return (IConvertor)Activator.CreateInstance(typeof(InnerConvertor<,,>).MakeGenericType(args));
+            return (IConvertor)Activator.CreateInstance(typeof(InnerConvertor<,,>).MakeGenericType(args), this);
         }
 
         class InnerConvertor<TDictionary, TKey, TValue> : BaseConvertor<TDictionary>,
                                                           IFrom<object, TDictionary>
             where TDictionary : class, IDictionary<TKey, TValue>
         {
+            private readonly GenericIDictionaryConvertor _parent;
+
+            public InnerConvertor(GenericIDictionaryConvertor parent) => _parent = parent;
+
+            public override IConvertor GetConvertor(Type outputType) => _parent.GetConvertor(outputType);
 
             public TDictionary From(ConvertContext context, object input)
             {

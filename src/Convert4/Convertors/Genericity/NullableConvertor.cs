@@ -20,13 +20,19 @@ namespace blqw.Convertors
                 throw new ArgumentOutOfRangeException(nameof(outputType));
             }
             var args = new Type[] { underlyingType };
-            return (IConvertor)Activator.CreateInstance(typeof(InnerConvertor<>).MakeGenericType(args));
+            return (IConvertor)Activator.CreateInstance(typeof(InnerConvertor<>).MakeGenericType(args), this);
         }
 
 
         class InnerConvertor<TValue> : BaseConvertor<TValue?>, IConvertor
             where TValue : struct
         {
+            private readonly NullableConvertor _parent;
+
+            public InnerConvertor(NullableConvertor parent) => _parent = parent;
+
+            public override IConvertor GetConvertor(Type outputType) => _parent.GetConvertor(outputType);
+
             public override ConvertResult<TValue?> ChangeType(ConvertContext context, object input)
             {
                 if (input == null || input is DBNull || (input is string s && string.IsNullOrWhiteSpace(s)))

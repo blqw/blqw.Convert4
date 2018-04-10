@@ -14,9 +14,9 @@ namespace blqw.Convertors
 
         public IList From(ConvertContext context, string input)
         {
-            if (string.IsNullOrWhiteSpace(input))
+            if (string.IsNullOrEmpty(input))
             {
-                return null;
+                return Array.Empty<object>();
             }
 
             var separator = context.GetStringSeparators();

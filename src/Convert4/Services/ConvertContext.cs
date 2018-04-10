@@ -89,7 +89,7 @@ namespace blqw
             var conv = GetConvertor<T>();
             if (conv == null)
             {
-                return new EntryPointNotFoundException(SR.GetString($"转换器未找到"));
+                return new EntryPointNotFoundException(SR.GetString($"未找到适合的转换器"));
             }
             return conv.ChangeType(this, input);
         }
@@ -107,7 +107,7 @@ namespace blqw
             var conv = GetConvertor(outputType);
             if (conv == null)
             {
-                return new EntryPointNotFoundException(SR.GetString($"转换器未找到"));
+                return new EntryPointNotFoundException(SR.GetString($"未找到适合的转换器"));
             }
             return conv.ChangeType(this, input);
         }

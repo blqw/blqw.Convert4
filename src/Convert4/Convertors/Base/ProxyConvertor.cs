@@ -8,13 +8,27 @@ namespace blqw.Convertors
     internal sealed class ProxyConvertor<T> : BaseConvertor<T>, IConvertor
     {
         public ProxyConvertor(IConvertor convertor) =>
-            _innerConvertor = convertor ?? (FailConvertor<T>)new EntryPointNotFoundException(SR.GetString($"转换器未找到"));
+            _innerConvertor = convertor ?? (FailConvertor<T>)new EntryPointNotFoundException(SR.GetString($"未找到适合的转换器"));
 
-        public override ConvertResult<T> ChangeType(ConvertContext context, object input) =>
-            _innerConvertor.ChangeType(context, input);
+        public override ConvertResult<T> ChangeType(ConvertContext context, object input)
+        {
+            var result = _innerConvertor.ChangeType(context, input);
+            if (result.Success == false)
+            {
+                return context.InvalidCastException(input, TypeFriendlyName) + result.Error;
+            }
+            return result;
+        }
 
-        ConvertResult IConvertor.ChangeType(ConvertContext context, object input) =>
-            _innerConvertor.ChangeType(context, input);
+        ConvertResult IConvertor.ChangeType(ConvertContext context, object input)
+        {
+            var result = _innerConvertor.ChangeType(context, input);
+            if (result.Success == false)
+            {
+                return context.InvalidCastException(input, TypeFriendlyName) + result.Error;
+            }
+            return result;
+        }
 
         public override IConvertor GetConvertor(Type outputType) => _innerConvertor.GetConvertor(outputType);
 

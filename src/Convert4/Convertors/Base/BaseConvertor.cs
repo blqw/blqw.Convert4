@@ -205,7 +205,8 @@ namespace blqw.Convertors
                             ?? (input as DataTable)?.Rows.GetEnumerator()
                             ?? (input as DataRow)?.ItemArray.GetEnumerator()
                             ?? (input as DataRowView)?.Row.ItemArray.GetEnumerator()
-                            ?? (input as IListSource)?.GetList()?.GetEnumerator();
+                            ?? (input as IListSource)?.GetList()?.GetEnumerator()
+                            ?? new object[] { input }.GetEnumerator();
 
                     var result = invoker.ChangeTypeImpl(this, context, ee);
                     if (result.Success)

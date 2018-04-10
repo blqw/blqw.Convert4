@@ -20,7 +20,7 @@ namespace blqw.Convertors
                 throw new ArgumentOutOfRangeException(nameof(outputType), $"类型{outputType.GetFriendlyName()}必须是枚举");
             }
 
-            return (IConvertor)Activator.CreateInstance(typeof(InnerConvertor<>).MakeGenericType(outputType.GetElementType()));
+            return (IConvertor)Activator.CreateInstance(typeof(InnerConvertor<>).MakeGenericType(outputType), this);
         }
 
         class InnerConvertor<T> : BaseConvertor<T>,
@@ -28,6 +28,12 @@ namespace blqw.Convertors
                                   IFrom<IConvertible, T>
         where T : struct
         {
+            private readonly EnumConvertor _parent;
+
+            public InnerConvertor(EnumConvertor parent) => _parent = parent;
+
+            public override IConvertor GetConvertor(Type outputType) => _parent.GetConvertor(outputType);
+
             public T From(ConvertContext context, string input)
             {
                 if (string.IsNullOrWhiteSpace(input))

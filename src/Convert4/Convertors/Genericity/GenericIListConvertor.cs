@@ -18,14 +18,14 @@ namespace blqw.Convertors
                 //如果无法得道泛型参数, 判断output是否与 List<object> 兼容, 如果是返回 List<object> 的转换器
                 if (outputType.IsAssignableFrom(typeof(List<object>)))
                 {
-                    return new InnerConvertor<List<object>, object>();
+                    return new InnerConvertor<List<object>, object>(this);
                 }
                 return null;
             }
             var args = new Type[genericArgs.Length + 1];
             args[0] = outputType;
             genericArgs.CopyTo(args, 1);
-            return (IConvertor)Activator.CreateInstance(typeof(InnerConvertor<,>).MakeGenericType(args));
+            return (IConvertor)Activator.CreateInstance(typeof(InnerConvertor<,>).MakeGenericType(args), this);
         }
 
         class InnerConvertor<TList, TValue> : BaseConvertor<TList>
@@ -34,9 +34,17 @@ namespace blqw.Convertors
             where TList : class, IList<TValue>
         {
             static readonly char[] _separator = new[] { ',' };
+            private readonly GenericIListConvertor _parent;
+
+            public InnerConvertor(GenericIListConvertor parent) => _parent = parent;
 
             public TList From(ConvertContext context, string input)
             {
+                if (string.IsNullOrEmpty(input))
+                {
+                    var list = OutputType.IsInterface ? new List<TValue>() : (IList<TValue>)CreateOutputInstance(OutputType);
+                    return (TList)list;
+                }
                 var separator = context.GetStringSeparators();
 
                 var arr = separator is string[] s
@@ -65,6 +73,8 @@ namespace blqw.Convertors
                 }
                 return (TList)list;
             }
+
+            public override IConvertor GetConvertor(Type outputType) => _parent.GetConvertor(outputType);
         }
 
     }
