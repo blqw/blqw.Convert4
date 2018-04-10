@@ -49,11 +49,16 @@ namespace blqw.Convertors
         {
             private readonly ConvertContext _context;
             private readonly Type _type;
+            /// <summary>
+            /// 键转换器
+            /// </summary>
+            private readonly IConvertor<string> _stringConvertor;
 
             public NVCollectiontBuilder(ConvertContext context, Type type)
             {
                 _context = context;
                 _type = type;
+                _stringConvertor = context.GetConvertor<string>();
                 Instance = null;
             }
 
