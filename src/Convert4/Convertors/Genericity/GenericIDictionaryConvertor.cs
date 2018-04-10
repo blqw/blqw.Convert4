@@ -8,7 +8,6 @@ namespace blqw.Convertors
 {
     class GenericIDictionaryConvertor : BaseConvertor<IDictionary<object, object>>
     {
-
         public override Type OutputType => typeof(IDictionary<,>);
 
         public override IConvertor GetConvertor(Type outputType)
