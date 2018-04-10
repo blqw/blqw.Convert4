@@ -98,9 +98,9 @@ namespace blqw.Dynamic
             if (p?.Get != null)
             {
                 result = p.Get(_entity);
-                var r = TryParse(result, binder.ReturnType, out var b);
-                result = b ? DynamicFactory.Create(r) : DynamicPrimitive.Null;
-                return b;
+                var r = result.Convert(binder.ReturnType, null);
+                result = r.Success ? DynamicFactory.Create(r.OutputValue) : DynamicPrimitive.Null;
+                return r.Success;
             }
             result = DynamicPrimitive.Null;
             return true;

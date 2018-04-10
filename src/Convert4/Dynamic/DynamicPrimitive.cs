@@ -68,8 +68,8 @@ namespace blqw.Dynamic
             {
                 return true;
             }
-            var value = TryParse(_value, obj.GetType(), out var b); //尝试类型转换后比较
-            return b && Equals(value, obj);
+            var result = _value.Convert(obj.GetType(), null); //尝试类型转换后比较
+            return result.Success && Equals(result.OutputValue, obj);
         }
 
         /// <summary>
@@ -169,7 +169,8 @@ namespace blqw.Dynamic
         /// </summary>
         public override bool TryUnaryOperation(UnaryOperationBinder binder, out object result)
         {
-            if (TryParse<bool>(_value, out var value) == false) //转型失败
+            var value = _value.Convert<bool>(null);
+            if (value.Success == false) //转型失败
             {
                 result = null;
                 return false;
@@ -178,10 +179,10 @@ namespace blqw.Dynamic
             {
                 case ExpressionType.IsFalse:
                 case ExpressionType.Not:
-                    result = value == false;
+                    result = value.OutputValue == false;
                     return true;
                 case ExpressionType.IsTrue:
-                    result = value;
+                    result = value.OutputValue;
                     return true;
                 default:
                     break;

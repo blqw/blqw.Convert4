@@ -13,12 +13,18 @@ namespace blqw
     {
         public static readonly ConvertSettings Global = new ConvertSettings();
 
+        private static readonly object _unSet = new object();
+
         /// <summary>
         /// 标准服务
         /// </summary>
         private IList<(Type type, string name, object service)> _services;
 
         private int _boundary = 0;
+
+        public object DefaultValue { get; set; } = _unSet;
+
+        public bool Throwable => ReferenceEquals(DefaultValue, _unSet);
 
         /// <summary>
         /// 获取标准服务

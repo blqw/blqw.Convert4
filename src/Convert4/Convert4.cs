@@ -12,63 +12,6 @@ namespace blqw
     /// </summary>
     public static class Convert4
     {
-        /// <summary>
-        /// 返回一个指定类型的对象，该对象的值等效于指定的对象。转换失败返回默认值
-        /// </summary>
-        /// <typeparam name="T"> 要返回的对象类型的泛型 </typeparam>
-        /// <param name="input"> 需要转换类型的对象 </param>
-        /// <param name="defaultValue"> 转换失败时返回的默认值 </param>
-        public static T To<T>(this object input, T defaultValue)
-        {
-            using (var context = new ConvertContext())
-            {
-                var result = context.ChangeType<T>(input);
-                return result.Success ? result.OutputValue : defaultValue;
-            }
-        }
-
-        /// <summary>
-        /// 返回一个指定类型的对象，该对象的值等效于指定的对象。转换失败返回默认值
-        /// </summary>
-        /// <typeparam name="T"> 要返回的对象类型的泛型 </typeparam>
-        /// <param name="input"> 需要转换类型的对象 </param>
-        /// <param name="defaultValue"> 转换失败时返回的默认值 </param>
-        public static T To<T>(this object input)
-        {
-            using (var context = new ConvertContext())
-            {
-                var result = context.ChangeType<T>(input);
-                result.ThrowIfExceptional();
-                return result.OutputValue;
-            }
-        }
-
-        /// <summary>
-        /// 返回一个指定类型的对象，该对象的值等效于指定的对象。转换失败返回默认值
-        /// </summary>
-        /// <typeparam name="T"> 要返回的对象类型的泛型 </typeparam>
-        /// <param name="input"> 需要转换类型的对象 </param>
-        /// <param name="defaultValue"> 转换失败时返回的默认值 </param>
-        public static T To<T>(this object input, ConvertSettings settings, T defaultValue)
-        {
-            using (var context = new ConvertContext(settings))
-            {
-                var result = context.ChangeType<T>(input);
-                return result.Success ? result.OutputValue : defaultValue;
-            }
-        }
-
-        public static T To<T>(this object input, ConvertSettings settings)
-        {
-            using (var context = new ConvertContext(settings))
-            {
-                var result = context.ChangeType<T>(input);
-                result.ThrowIfExceptional();
-                return result.OutputValue;
-            }
-        }
-
-
         public static ConvertResult<T> Convert<T>(this object input, ConvertSettings settings)
         {
             using (var context = new ConvertContext(settings))
@@ -85,52 +28,42 @@ namespace blqw
             }
         }
 
-        public static object ChangeType(this object input, Type outputType, ConvertSettings settings)
+        /// <summary>
+        /// 返回一个指定类型的对象，该对象的值等效于指定的对象。转换失败返回默认值
+        /// </summary>
+        /// <typeparam name="T"> 要返回的对象类型的泛型 </typeparam>
+        /// <param name="input"> 需要转换类型的对象 </param>
+        /// <param name="defaultValue"> 转换失败时返回的默认值 </param>
+        public static T To<T>(this object input, T defaultValue)
         {
-            using (var context = new ConvertContext(settings))
-            {
-                var result = context.ChangeType(outputType, input);
-                result.ThrowIfExceptional();
-                return result.OutputValue;
-            }
+            var result = input.Convert<T>(null);
+            return result.Success ? result.OutputValue : defaultValue;
+        }
+
+        /// <summary>
+        /// 返回一个指定类型的对象，该对象的值等效于指定的对象。转换失败返回默认值
+        /// </summary>
+        /// <typeparam name="T"> 要返回的对象类型的泛型 </typeparam>
+        /// <param name="input"> 需要转换类型的对象 </param>
+        /// <param name="defaultValue"> 转换失败时返回的默认值 </param>
+        public static T To<T>(this object input)
+        {
+            var result = input.Convert<T>(null);
+            result.ThrowIfExceptional();
+            return result.OutputValue;
         }
 
         public static object ChangeType(this object input, Type outputType)
         {
-            using (var context = new ConvertContext())
-            {
-                var result = context.ChangeType(outputType, input);
-                result.ThrowIfExceptional();
-                return result.OutputValue;
-            }
+            var result = input.Convert(outputType, null);
+            result.ThrowIfExceptional();
+            return result.OutputValue;
         }
 
-        public static object ChangeType(this object input, Type outputType, ConvertSettings settings, object defaultValue)
+        public static object ChangeType(this object input, Type outputType, object defaultValue)
         {
-            using (var context = new ConvertContext(settings))
-            {
-                var result = context.ChangeType(outputType, input);
-                return result.Success ? result.OutputValue : defaultValue;
-            }
-        }
-
-        public static T ChangeType<T>(this object input, ConvertSettings settings)
-        {
-            using (var context = new ConvertContext(settings))
-            {
-                var result = context.ChangeType<T>(input);
-                result.ThrowIfExceptional();
-                return result.OutputValue;
-            }
-        }
-
-        public static T ChangeType<T>(this object input, ConvertSettings settings, T defaultValue)
-        {
-            using (var context = new ConvertContext(settings))
-            {
-                var result = context.ChangeType<T>(input);
-                return result.Success ? result.OutputValue : defaultValue;
-            }
+            var result = input.Convert(outputType, null);
+            return result.Success ? result.OutputValue : defaultValue;
         }
 
         /// <summary>
@@ -140,25 +73,11 @@ namespace blqw
         /// <param name="outputType">转换后的类型</param>
         /// <param name="result"></param>
         /// <returns></returns>
-        public static bool TryChangeType(object input, Type outputType, out object result) =>
-            TryChangeType(input, outputType, null, out result);
-
-        /// <summary>
-        /// 尝试对指定对象进行类型转换,返回是否转换成功
-        /// </summary>
-        /// <param name="input">需要转换类型的对象</param>
-        /// <param name="outputType">转换后的类型</param>
-        /// <param name="settings">参数设置</param>
-        /// <param name="result"></param>
-        /// <returns></returns>
-        public static bool TryChangeType(object input, Type outputType, ConvertSettings settings, out object result)
+        public static bool TryChangeType(object input, Type outputType, out object result)
         {
-            using (var context = new ConvertContext(settings))
-            {
-                var r = context.ChangeType(outputType, input);
-                result = r.OutputValue;
-                return r.Success;
-            }
+            var r = input.Convert(outputType, null);
+            result = r.OutputValue;
+            return r.Success;
         }
 
         /// <summary>
@@ -168,80 +87,12 @@ namespace blqw
         /// <param name="outputType">转换后的类型</param>
         /// <param name="result"></param>
         /// <returns></returns>
-        public static bool TryChangeType<T>(object input, out T result) =>
-            TryChangeType(input, null, out result);
-
-        /// <summary>
-        /// 尝试对指定对象进行类型转换,返回是否转换成功
-        /// </summary>
-        /// <param name="input">需要转换类型的对象</param>
-        /// <param name="outputType">转换后的类型</param>
-        /// <param name="settings">参数设置</param>
-        /// <param name="result"></param>
-        /// <returns></returns>
-        public static bool TryChangeType<T>(object input, ConvertSettings settings, out T result)
+        public static bool TryChangeType<T>(object input, out T result)
         {
-            using (var context = new ConvertContext(settings))
-            {
-                var r = context.ChangeType<T>(input);
-                result = r.OutputValue;
-                return r.Success;
-            }
+            var r = input.Convert<T>(null);
+            result = r.OutputValue;
+            return r.Success;
         }
-
-        /// <summary>
-        /// 尝试对指定对象进行类型转换
-        /// </summary>
-        /// <param name="input">需要转换类型的对象</param>
-        /// <param name="outputType">转换后的类型</param>
-        /// <param name="result"></param>
-        /// <returns></returns>
-        public static object TryParse(object input, Type outputType, ConvertSettings settings, out bool success)
-        {
-            using (var context = new ConvertContext(settings))
-            {
-                var r = context.ChangeType(outputType, input);
-                success = r.Success;
-                return r.OutputValue;
-            }
-        }
-
-        /// <summary>
-        /// 尝试对指定对象进行类型转换
-        /// </summary>
-        /// <param name="input">需要转换类型的对象</param>
-        /// <param name="outputType">转换后的类型</param>
-        /// <param name="result"></param>
-        /// <returns></returns>
-        public static object TryParse(object input, Type outputType, out bool success) =>
-            TryParse(input, outputType, null, out success);
-
-        /// <summary>
-        /// 尝试对指定对象进行类型转换
-        /// </summary>
-        /// <param name="input">需要转换类型的对象</param>
-        /// <param name="outputType">转换后的类型</param>
-        /// <param name="result"></param>
-        /// <returns></returns>
-        public static T TryParse<T>(object input, ConvertSettings settings, out bool success)
-        {
-            using (var context = new ConvertContext(settings))
-            {
-                var r = context.ChangeType<T>(input);
-                success = r.Success;
-                return r.OutputValue;
-            }
-        }
-
-        /// <summary>
-        /// 尝试对指定对象进行类型转换
-        /// </summary>
-        /// <param name="input">需要转换类型的对象</param>
-        /// <param name="outputType">转换后的类型</param>
-        /// <param name="result"></param>
-        /// <returns></returns>
-        public static T TryParse<T>(object input, out bool success) =>
-            TryParse<T>(input, null, out success);
 
         /// <summary>
         /// 转为动态类型
