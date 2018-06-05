@@ -16,6 +16,10 @@ namespace blqw.Dynamic
         private readonly object _entity;
         private readonly PropertyHandler[] _properties;
         private readonly int _propertyCount;
+        /// <summary>
+        /// 表示一个空的上下文
+        /// </summary>
+        private static readonly ConvertContext _emptyContext = new ConvertContext();
 
         /// <summary>
         /// 初始化
@@ -118,7 +122,7 @@ namespace blqw.Dynamic
             {
                 return false;
             }
-            return p.SetValue(ConvertContext.None, _entity, value);
+            return p.SetValue(_emptyContext, _entity, value);
         }
     }
 }
