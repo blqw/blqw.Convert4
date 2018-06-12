@@ -3,6 +3,16 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>blqw</RootNamespace>
+    <Authors>blqw</Authors>
+    <PackageId>blqw.Convert4</PackageId>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Product>blqw.Convert4</Product>
+    <Copyright>blqw Copyright 2019</Copyright>
+    <AssemblyVersion>0.0.2.0</AssemblyVersion>
+    <NeutralLanguage></NeutralLanguage>
+    <FileVersion>0.0.2.0</FileVersion>
+    <Version>0.0.2-beta</Version>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <LangVersion>latest</LangVersion>
