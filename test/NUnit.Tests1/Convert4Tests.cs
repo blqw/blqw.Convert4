@@ -170,7 +170,7 @@ namespace NUnit.Tests1
         [Test]
         public void 测试动态类型属性()
         {
-            dynamic a = "aaa".ToDynamic();
+            var a = "aaa".ToDynamic();
             Assert.IsTrue(a.Length == 3);
             Assert.IsTrue(a.Length > 2);
             Assert.IsTrue(a.Length < 4);
@@ -181,6 +181,14 @@ namespace NUnit.Tests1
             var c = true.ToDynamic();
             Assert.IsTrue(c == true);
             Assert.IsFalse(!c);
+
+            var d = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase) { ["id"] = 999 }.ToDynamic();
+            Assert.IsTrue(d.id == 999);
+            Assert.IsTrue(d.ID == 999);
+            Assert.IsTrue(d.iD == 999);
+            Assert.IsTrue(d.Id == 999);
+
+
         }
 
         enum MyEnum

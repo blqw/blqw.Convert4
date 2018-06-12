@@ -28,12 +28,13 @@
     <Content Include="Args\ConvertError.cs" />
     <Content Include="Args\ConvertResultT.cs" />
     <Content Include="Define\Genericity\IConvertor.cs" />
-    <Content Include="Services\Startup.cs" />
+    <Content Include="Services\ServiceContainer.cs" />
     <Content Include="Convertors\Base\BaseConvertor.cs" />
     <Content Include="Services\Helper\StringResourceHelper.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.CSharp" Version="4.4.1" />
+    <PackageReference Include="blqw.Startup" Version="2.0.2-beta" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
   </ItemGroup>
 </Project>

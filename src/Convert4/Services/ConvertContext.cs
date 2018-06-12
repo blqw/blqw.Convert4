@@ -27,7 +27,7 @@ namespace blqw
         private readonly ConvertSettings _settings;
 
         /// <summary>
-        /// 使用 <seealso cref="Startup.ServiceProvider"/> 创建上下文并提供服务提供程序
+        /// 使用 <seealso cref="ServiceContainer.ServiceProvider"/> 创建上下文并提供服务提供程序
         /// </summary>
         public ConvertContext()
             : this(null, null)
@@ -38,9 +38,9 @@ namespace blqw
         /// 创建上下文并提供服务提供程序
         /// </summary>
         /// <param name="serviceProvider"> 服务提供程序<para />
-        /// 当 <paramref name="serviceProvider"/> 为 <see cref="null"/> 时, 使用 <seealso cref="Startup.ServiceProvider"/> <para/>
+        /// 当 <paramref name="serviceProvider"/> 为 <see cref="null"/> 时, 使用 <seealso cref="ServiceContainer.ServiceProvider"/> <para/>
         /// 当 <paramref name="serviceProvider"/> 为 <seealso cref="AggregateServicesProvider"/> 时, 不做处理 <para/>
-        /// 否则组合 <paramref name="serviceProvider"/> 和 <seealso cref="Startup.ServiceProvider"/>
+        /// 否则组合 <paramref name="serviceProvider"/> 和 <seealso cref="ServiceContainer.ServiceProvider"/>
         /// </param>
         public ConvertContext(ConvertSettings settings)
             : this(settings, null)
@@ -51,16 +51,16 @@ namespace blqw
         /// 创建上下文并提供服务提供程序
         /// </summary>
         /// <param name="serviceProvider"> 服务提供程序<para />
-        /// 当 <paramref name="serviceProvider"/> 为 <see cref="null"/> 时, 使用 <seealso cref="Startup.ServiceProvider"/> <para/>
+        /// 当 <paramref name="serviceProvider"/> 为 <see cref="null"/> 时, 使用 <seealso cref="ServiceContainer.ServiceProvider"/> <para/>
         /// 当 <paramref name="serviceProvider"/> 为 <seealso cref="AggregateServicesProvider"/> 时, 不做处理 <para/>
-        /// 否则组合 <paramref name="serviceProvider"/> 和 <seealso cref="Startup.ServiceProvider"/>
+        /// 否则组合 <paramref name="serviceProvider"/> 和 <seealso cref="ServiceContainer.ServiceProvider"/>
         /// </param>
         public ConvertContext(ConvertSettings settings, IServiceProvider serviceProvider)
         {
             var provider = serviceProvider == null
-                                ? (IServiceProvider)Startup.ServiceProvider
+                                ? (IServiceProvider)ServiceContainer.ServiceProvider
                                 : serviceProvider as AggregateServicesProvider
-                                ?? new AggregateServicesProvider(serviceProvider, Startup.ServiceProvider);
+                                ?? new AggregateServicesProvider(serviceProvider, ServiceContainer.ServiceProvider);
             _serviceScope = provider.CreateScope();
             _serviceProvider = _serviceScope.ServiceProvider;
             _convertorSelector = _serviceProvider.GetService<IConvertorSelector>();

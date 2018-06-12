@@ -4,35 +4,38 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
 using System.Reflection;
+using blqw;
+using System.Threading;
 
+[assembly: AssemblyStartup(typeof(blqw.ServiceContainer))]
 namespace blqw
 {
     /// <summary>
     /// 启动器, 用于注入和获取服务
     /// <para></para> 可由 https://github.com/blqw/blqw.Startup 启动, 也可以独立执行
     /// </summary>
-    static class Startup
+    internal static class ServiceContainer
     {
         /// <summary>
         /// 注入的服务提供程序
         /// </summary>
-        private static ServiceProvider _serviceProvider;
+        private static ServiceProvider _injectedServices;
         /// <summary>
         /// 非注入的服务提供程序
         /// </summary>
-        private static ServiceProvider _internalProvider;
+        private static ServiceProvider _inbuiltServices;
         /// <summary>
         /// 服务提供程序更新事件
         /// </summary>
         private static event EventHandler<ServiceProvider> _changed;
 
         /// <summary>
-        /// 注入组件
+        /// 配置服务
         /// </summary>
         /// <param name="services"></param>
         public static void ConfigureServices(IServiceCollection services)
         {
-            var types = Assembly.GetAssembly(typeof(Convert4)).SafeGetTypes();
+            var types = typeof(Convert4).Assembly.SafeGetTypes();
             types.Where(x => x.IsClass && x.Instantiable() && typeof(IConvertor).IsAssignableFrom(x))
                  .ForEach(x => services.AddSingleton(typeof(IConvertor), x));
             services.AddSingleton(typeof(IConvertorSelector), typeof(ConvertorSelector));
@@ -45,32 +48,34 @@ namespace blqw
         {
             get
             {
-                if (_serviceProvider != null)
+                if (_injectedServices != null)
                 {
-                    return _serviceProvider;
+                    return _injectedServices;
                 }
 
                 //获取服务提供程序时, 如果没有注入服务, 则创建标准服务提供程序
-                if (_internalProvider == null)
+                if (_inbuiltServices == null)
                 {
                     var services = new ServiceCollection();
                     ConfigureServices(services);
-                    _internalProvider = services.BuildServiceProvider();
-                    OnChanged(_internalProvider);
+                    _inbuiltServices = services.BuildServiceProvider();
+                    OnChanged(_inbuiltServices);
                 }
 
-                return _internalProvider;
+                return _inbuiltServices;
             }
         }
 
         /// <summary>
-        /// 获取已注入的组件
+        /// 安装服务
         /// </summary>
-        /// <param name="convertors"></param>
         public static void Configure(ServiceProvider serviceProvider)
         {
-            _serviceProvider = serviceProvider;
-            OnChanged(serviceProvider);
+            var prev = Interlocked.Exchange(ref _injectedServices, serviceProvider);
+            if (prev != serviceProvider)
+            {
+                OnChanged(serviceProvider);
+            }
         }
 
         /// <summary>

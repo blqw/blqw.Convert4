@@ -44,7 +44,7 @@ namespace blqw
              * services.AddSingleton<Func<PropertyInfo, IServiceProvider>>(p => new PropertyReflecter(p));
              */
 
-            var reflecter = Startup.ServiceProvider.GetService<Func<PropertyInfo, IServiceProvider>>()?.Invoke(property);
+            var reflecter = ServiceContainer.ServiceProvider.GetService<Func<PropertyInfo, IServiceProvider>>()?.Invoke(property);
             Get = reflecter?.GetService<Func<object, object>>() ?? property.GetValue;
             Set = reflecter?.GetService<Action<object, object>>() ?? property.SetValue;
         }
