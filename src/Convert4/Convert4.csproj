@@ -13,6 +13,11 @@
     <NeutralLanguage></NeutralLanguage>
     <FileVersion>0.0.2.0</FileVersion>
     <Version>0.0.2-beta</Version>
+    <PackageProjectUrl>https://github.com/blqw/blqw.convert4</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/blqw/blqw.Convert4/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageIconUrl>https://avatars3.githubusercontent.com/u/9656154?s=80&amp;v=4</PackageIconUrl>
+    <RepositoryUrl>https://github.com/blqw/blqw.convert4</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <LangVersion>latest</LangVersion>
