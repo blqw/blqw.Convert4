@@ -9,10 +9,10 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Product>blqw.Convert4</Product>
     <Copyright>blqw Copyright 2019</Copyright>
-    <AssemblyVersion>0.0.3.0</AssemblyVersion>
+    <AssemblyVersion>0.0.4.0</AssemblyVersion>
     <NeutralLanguage></NeutralLanguage>
-    <FileVersion>0.0.3.0</FileVersion>
-    <Version>0.0.3-beta</Version>
+    <FileVersion>0.0.4.0</FileVersion>
+    <Version>0.0.4-beta</Version>
     <PackageProjectUrl>https://github.com/blqw/blqw.convert4</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/blqw/blqw.Convert4/blob/master/LICENSE</PackageLicenseUrl>
     <PackageIconUrl>https://avatars3.githubusercontent.com/u/9656154?s=80&amp;v=4</PackageIconUrl>
