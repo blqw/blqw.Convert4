@@ -9,10 +9,10 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Product>blqw.Convert4</Product>
     <Copyright>blqw Copyright 2019</Copyright>
-    <AssemblyVersion>0.0.2.0</AssemblyVersion>
+    <AssemblyVersion>0.0.3.0</AssemblyVersion>
     <NeutralLanguage></NeutralLanguage>
-    <FileVersion>0.0.2.0</FileVersion>
-    <Version>0.0.2-beta</Version>
+    <FileVersion>0.0.3.0</FileVersion>
+    <Version>0.0.3-beta</Version>
     <PackageProjectUrl>https://github.com/blqw/blqw.convert4</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/blqw/blqw.Convert4/blob/master/LICENSE</PackageLicenseUrl>
     <PackageIconUrl>https://avatars3.githubusercontent.com/u/9656154?s=80&amp;v=4</PackageIconUrl>
@@ -28,24 +28,11 @@
   <ItemGroup>
     <Compile Remove="Convertors\QPrimitive\**" />
     <Compile Remove="Define\Base\**" />
+    <Compile Remove="Convertors\Common\DataTableConvertor.cs" />
     <EmbeddedResource Remove="Convertors\QPrimitive\**" />
     <EmbeddedResource Remove="Define\Base\**" />
     <None Remove="Convertors\QPrimitive\**" />
     <None Remove="Define\Base\**" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Remove="Convertors\Common\DataTableConvertor.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Define\IConvertor.cs" />
-    <Content Include="Services\ConvertContext.cs" />
-    <Content Include="Args\ConvertResult.cs" />
-    <Content Include="Args\ConvertError.cs" />
-    <Content Include="Args\ConvertResultT.cs" />
-    <Content Include="Define\Genericity\IConvertor.cs" />
-    <Content Include="Services\ServiceContainer.cs" />
-    <Content Include="Convertors\Base\BaseConvertor.cs" />
-    <Content Include="Services\Helper\StringResourceHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="blqw.Startup" Version="2.0.2-beta" />
