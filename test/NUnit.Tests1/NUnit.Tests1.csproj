@@ -50,6 +50,7 @@
     <Compile Include="Convert4Tests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="2018.06.14-dynamic转换bug.cs" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

@@ -1,4 +1,4 @@
-using System.Linq;
+ï»¿using System.Linq;
 using blqw.ConvertServices;
 using System;
 using System.Collections.Generic;
@@ -8,35 +8,36 @@ using System.Text;
 using System.Collections;
 using System.Data;
 using System.ComponentModel;
+using System.Dynamic;
 
 namespace blqw.Convertors
 {
     /// <summary>
-    /// ×ª»»Æ÷»ùÀà
+    /// è½¬æ¢å™¨åŸºç±»
     /// </summary>
-    /// <typeparam name="T">Êä³öÀàĞÍ</typeparam>
+    /// <typeparam name="T">è¾“å‡ºç±»å‹</typeparam>
     public abstract class BaseConvertor<T> : IConvertor<T>
     {
         /// <summary>
-        /// »ù´¡µ÷ÓÃÆ÷½Ó¿Ú
+        /// åŸºç¡€è°ƒç”¨å™¨æ¥å£
         /// </summary>
         protected interface IInvoker
         {
             /// <summary>
-            /// µ÷ÓÃ×ª»»·½·¨
+            /// è°ƒç”¨è½¬æ¢æ–¹æ³•
             /// </summary>
-            /// <param name="conv">×ª»»Æ÷</param>
-            /// <param name="context">×ª»»ÉÏÏÂÎÄ</param>
-            /// <param name="input">ÊäÈëÖµ</param>
+            /// <param name="conv">è½¬æ¢å™¨</param>
+            /// <param name="context">è½¬æ¢ä¸Šä¸‹æ–‡</param>
+            /// <param name="input">è¾“å…¥å€¼</param>
             ConvertResult<T> ChangeTypeImpl(IConvertor<T> conv, ConvertContext context, object input);
             /// <summary>
-            /// ÊäÈëÀàĞÍ
+            /// è¾“å…¥ç±»å‹
             /// </summary>
             Type InputType { get; }
         }
 
         /// <summary>
-        /// ×ª»»Æ÷·ºĞÍÊµÏÖ
+        /// è½¬æ¢å™¨æ³›å‹å®ç°
         /// </summary>
         /// <typeparam name="TInput"></typeparam>
         private class Invoker<TInput> : IInvoker
@@ -46,30 +47,30 @@ namespace blqw.Convertors
 
             }
             /// <summary>
-            /// µ÷ÓÃ×ª»»·½·¨
+            /// è°ƒç”¨è½¬æ¢æ–¹æ³•
             /// </summary>
-            /// <param name="conv">×ª»»Æ÷</param>
-            /// <param name="context">×ª»»ÉÏÏÂÎÄ</param>
-            /// <param name="input">ÊäÈëÖµ</param>
+            /// <param name="conv">è½¬æ¢å™¨</param>
+            /// <param name="context">è½¬æ¢ä¸Šä¸‹æ–‡</param>
+            /// <param name="input">è¾“å…¥å€¼</param>
             ConvertResult<T> IInvoker.ChangeTypeImpl(IConvertor<T> conv, ConvertContext context, object input)
                 => InvokeIForm(conv, context, (TInput)input);
 
             /// <summary>
-            /// ÊäÈëÀàĞÍ
+            /// è¾“å…¥ç±»å‹
             /// </summary>
             public Type InputType => typeof(TInput);
         }
         /// <summary>
-        /// µ÷ÓÃÆ÷×Öµä
+        /// è°ƒç”¨å™¨å­—å…¸
         /// </summary>
         private Dictionary<Type, IInvoker> _invokers;
         /// <summary>
-        /// ½Ó¿ÚÀàĞÍµ÷ÓÃÆ÷¼¯ºÏ
+        /// æ¥å£ç±»å‹è°ƒç”¨å™¨é›†åˆ
         /// </summary>
         private readonly List<IInvoker> _interfaceInvokers;
 
         /// <summary>
-        /// ¹¹Ôìº¯Êı, ¸ù¾İÊµ¼ÊÀàĞÍµÄ <seealso cref="IFrom{TOutput, TInput}"/> ½Ó¿ÚÇé¿ö, °´ÕÕ TInput ÀàĞÍ»º´æµ÷ÓÃÆ÷
+        /// æ„é€ å‡½æ•°, æ ¹æ®å®é™…ç±»å‹çš„ <seealso cref="IFrom{TOutput, TInput}"/> æ¥å£æƒ…å†µ, æŒ‰ç…§ TInput ç±»å‹ç¼“å­˜è°ƒç”¨å™¨
         /// </summary>
         public BaseConvertor()
         {
@@ -96,9 +97,9 @@ namespace blqw.Convertors
         }
 
         /// <summary>
-        /// »ñÈ¡Ö¸¶¨ÊäÈëÀàĞÍµÄµ÷ÓÃÆ÷
+        /// è·å–æŒ‡å®šè¾“å…¥ç±»å‹çš„è°ƒç”¨å™¨
         /// </summary>
-        /// <param name="inputType">Ö¸¶¨ÊäÈëÀàĞÍ</param>
+        /// <param name="inputType">æŒ‡å®šè¾“å…¥ç±»å‹</param>
         /// <returns></returns>
         protected IInvoker GetInvoker(Type inputType)
         {
@@ -136,13 +137,13 @@ namespace blqw.Convertors
         }
 
         /// <summary>
-        /// ´´ÔìÒ»¸ö·µ»ØÖµÊµÀı
+        /// åˆ›é€ ä¸€ä¸ªè¿”å›å€¼å®ä¾‹
         /// </summary>
         protected virtual T CreateOutputInstance(Type type) =>
             (T)Activator.CreateInstance(type);
 
         /// <summary>
-        /// Êä³öÀàĞÍ
+        /// è¾“å‡ºç±»å‹
         /// </summary>
         public virtual Type OutputType { get; } = typeof(T);
 
@@ -152,15 +153,15 @@ namespace blqw.Convertors
         public virtual string TypeName { get; }
 
         /// <summary>
-        /// <seealso cref="OutputType"/>µÄÓÑºÃÃû³Æ
+        /// <seealso cref="OutputType"/>çš„å‹å¥½åç§°
         /// </summary>
         public virtual string TypeFriendlyName { get; }
 
         /// <summary>
-        /// ×ª»»·½·¨
+        /// è½¬æ¢æ–¹æ³•
         /// </summary>
-        /// <param name="context">×ª»»ÉÏÏÂÎÄ</param>
-        /// <param name="input">ÊäÈëÖµ</param>
+        /// <param name="context">è½¬æ¢ä¸Šä¸‹æ–‡</param>
+        /// <param name="input">è¾“å…¥å€¼</param>
         /// <returns></returns>
         ConvertResult IConvertor.ChangeType(ConvertContext context, object input) =>
             ChangeTypeImpl(context, input);
@@ -171,9 +172,9 @@ namespace blqw.Convertors
             {
                 return new ConvertResult<T>(t);
             }
-            //Çå¿ÕÒì³£
+            //æ¸…ç©ºå¼‚å¸¸
             context.Exception = null;
-            //¿ÕÖµ×ª»»
+            //ç©ºå€¼è½¬æ¢
             if (input == null)
             {
                 if (this is IFromNull<T> conv)
@@ -181,10 +182,10 @@ namespace blqw.Convertors
                     var result = conv.FromNull(context);
                     return context.Exception ?? new ConvertResult<T>(result);
                 }
-                return context.InvalidCastException($"`null`{"ÎŞ·¨×ª»»Îª"} {TypeFriendlyName:!}");
+                return context.InvalidCastException($"`null`{"æ— æ³•è½¬æ¢ä¸º"} {TypeFriendlyName:!}");
             }
 
-            //»ñÈ¡Ö¸¶¨ÊäÈëÀàĞÍµÄ×ª»»·½·¨µ÷ÓÃÆ÷
+            //è·å–æŒ‡å®šè¾“å…¥ç±»å‹çš„è½¬æ¢æ–¹æ³•è°ƒç”¨å™¨
             var invoker = GetInvoker(input.GetType());
             if (invoker != null)
             {
@@ -193,7 +194,15 @@ namespace blqw.Convertors
                 {
                     return result;
                 }
-                //ÕâÀï¾ÍËãÒì³£ÁË,ÏÂÃæ»¹¿ÉÒÔ³¢ÊÔÆäËû·½°¸
+                //è¿™é‡Œå°±ç®—å¼‚å¸¸äº†,ä¸‹é¢è¿˜å¯ä»¥å°è¯•å…¶ä»–æ–¹æ¡ˆ
+            }
+            else if (input is IObjectReference refObj)
+            {
+                var newObj = refObj.GetRealObject(new StreamingContext(StreamingContextStates.Clone, context));
+                if (!ReferenceEquals(newObj, refObj))
+                {
+                    return ChangeTypeImpl(context, newObj);
+                }
             }
             else if (input is IEnumerator == false)
             {
@@ -216,7 +225,7 @@ namespace blqw.Convertors
                 }
             }
 
-            //×ªÎª¸÷ÖÖ»ù±¾ÀàĞÍ½øĞĞ×ª»»,Õâ´ÎÈç¹ûÊ§°ÜÁË¾Í²»ÔÙ¼ÌĞøÁË
+            //è½¬ä¸ºå„ç§åŸºæœ¬ç±»å‹è¿›è¡Œè½¬æ¢,è¿™æ¬¡å¦‚æœå¤±è´¥äº†å°±ä¸å†ç»§ç»­äº†
             if (input is IConvertible v0)
             {
                 switch (v0.GetTypeCode())
@@ -227,7 +236,7 @@ namespace blqw.Convertors
                             var result = conv.FromDBNull(context);
                             return context.Exception ?? new ConvertResult<T>(result);
                         }
-                        return context.Exception = new InvalidCastException(SR.GetString($"`DBNull`{"ÎŞ·¨×ª»»Îª"} {TypeFriendlyName:!}"));
+                        return context.Exception = new InvalidCastException(SR.GetString($"`DBNull`{"æ— æ³•è½¬æ¢ä¸º"} {TypeFriendlyName:!}"));
                     case TypeCode.Boolean:
                         return InvokeIForm(this, context, v0.ToBoolean(context.GetCultureInfo()));
                     case TypeCode.Byte:
@@ -263,7 +272,7 @@ namespace blqw.Convertors
                 }
             }
 
-            //¼¸ÖÖ¿ÉÒÔÓëstringµÈ¼ÛµÄÀàĞÍ,¿ÉÒÔ³¢ÊÔ×ªÎªstringºóÔÙ´Î×ª»»
+            //å‡ ç§å¯ä»¥ä¸stringç­‰ä»·çš„ç±»å‹,å¯ä»¥å°è¯•è½¬ä¸ºstringåå†æ¬¡è½¬æ¢
             if (input is StringBuilder
                 || input is Uri
                 || input is IPAddress
@@ -274,7 +283,7 @@ namespace blqw.Convertors
                 {
                     return InvokeIForm(this, context, result.OutputValue);
                 }
-                //ÕâÀïÊ§°ÜÁË ¼ÌĞø³¢ÊÔobject×ª»»·½°¸
+                //è¿™é‡Œå¤±è´¥äº† ç»§ç»­å°è¯•objectè½¬æ¢æ–¹æ¡ˆ
             }
 
 
@@ -282,12 +291,12 @@ namespace blqw.Convertors
         }
 
         /// <summary>
-        /// µ÷ÓÃ×ª»»·½·¨
+        /// è°ƒç”¨è½¬æ¢æ–¹æ³•
         /// </summary>
-        /// <typeparam name="TInput">ÊäÈëÀàĞÍ</typeparam>
-        /// <param name="conv">×ª»»Æ÷</param>
-        /// <param name="context">×ª»»ÉÏÏÂÎÄ</param>
-        /// <param name="input">ÊäÈëÖµ</param>
+        /// <typeparam name="TInput">è¾“å…¥ç±»å‹</typeparam>
+        /// <param name="conv">è½¬æ¢å™¨</param>
+        /// <param name="context">è½¬æ¢ä¸Šä¸‹æ–‡</param>
+        /// <param name="input">è¾“å…¥å€¼</param>
         /// <returns></returns>
         static ConvertResult<T> InvokeIForm<TInput>(IConvertor<T> conv, ConvertContext context, TInput input)
         {
@@ -321,9 +330,9 @@ namespace blqw.Convertors
         }
 
         /// <summary>
-        /// »ñÈ¡×Ó×ª»»Æ÷
+        /// è·å–å­è½¬æ¢å™¨
         /// </summary>
-        /// <typeparam name="T1">×Ó×ª»»Æ÷Êä³öÀàĞÍ</typeparam>
+        /// <typeparam name="T1">å­è½¬æ¢å™¨è¾“å‡ºç±»å‹</typeparam>
         /// <returns></returns>
         public virtual IConvertor<T1> GetConvertor<T1>()
         {
@@ -336,7 +345,7 @@ namespace blqw.Convertors
         }
 
         /// <summary>
-        /// ×ª»»×ª»»·½·¨
+        /// è½¬æ¢è½¬æ¢æ–¹æ³•
         /// </summary>
         /// <param name="context"></param>
         /// <param name="input"></param>
@@ -345,14 +354,14 @@ namespace blqw.Convertors
             ChangeTypeImpl(context, input);
 
         /// <summary>
-        /// »ñÈ¡×Ó×ª»»Æ÷
+        /// è·å–å­è½¬æ¢å™¨
         /// </summary>
-        /// <param name="outputType">×Ó×ª»»Æ÷Êä³öÀàĞÍ</param>
+        /// <param name="outputType">å­è½¬æ¢å™¨è¾“å‡ºç±»å‹</param>
         /// <returns></returns>
         public virtual IConvertor GetConvertor(Type outputType) => null;
 
         /// <summary>
-        /// ÓÅÏÈ¼¶ Ä¬ÈÏ0
+        /// ä¼˜å…ˆçº§ é»˜è®¤0
         /// </summary>
         public virtual uint Priority { get; } = 0;
     }
