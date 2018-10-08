@@ -42,7 +42,7 @@ namespace blqw.Convertors
         public string From(ConvertContext context, bool input) => input ? "true" : "false";
 
         private string ToString(ConvertContext context, object input) =>
-            context.GetSerialization()?.ToString(context, input) ?? input?.ToString();
+            context.GetSerializer()?.ToString(input) ?? input?.ToString();
 
         public string From(ConvertContext context, IDataReader input) => ToString(context, input);
 
@@ -53,7 +53,7 @@ namespace blqw.Convertors
         public string From(ConvertContext context, DataTable input) => ToString(context, input);
 
         public string From(ConvertContext context, IEnumerable input) =>
-            context.GetSerialization()?.ToString(context, input) ?? From(context, input?.GetEnumerator());
+            context.GetSerializer()?.ToString(input) ?? From(context, input?.GetEnumerator());
 
         public string From(ConvertContext context, object input)
         {
@@ -75,7 +75,8 @@ namespace blqw.Convertors
             var s = context.ChangeType<string>(input.Current);
             if (!s.Success)
             {
-                context.Exception = context.InvalidCastException(input, TypeFriendlyName) + s.Error;
+                context.Error.AddError(s.Error);
+                context.InvalidCastException(input, TypeFriendlyName);
                 return null;
             }
             var separator = context.GetStringSeparator() ?? ",";
@@ -86,7 +87,8 @@ namespace blqw.Convertors
                 s = context.ChangeType<string>(input.Current);
                 if (!s.Success)
                 {
-                    context.Exception = context.InvalidCastException(input, TypeFriendlyName) + s.Error;
+                    context.Error.AddError(s.Error);
+                    context.InvalidCastException(input, TypeFriendlyName);
                     return null;
                 }
             } while (input.MoveNext());

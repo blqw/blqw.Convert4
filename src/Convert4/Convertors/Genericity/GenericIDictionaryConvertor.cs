@@ -108,14 +108,14 @@ namespace blqw.Convertors
                     var rkey = _keyConvertor.ChangeType(_context, key);
                     if (rkey.Success == false)
                     {
-                        _context.Exception = new InvalidOperationException($"添加到字典{_type.GetFriendlyName()}失败") + rkey.Error;
+                        _context.InvalidOperationException($"{"向"} {_type.GetFriendlyName():!} {"中添加元素"}{"失败"},{"原因:"}Key{"转换失败"}");
                         return false;
                     }
 
                     var rval = _valueConvertor.ChangeType(_context, value);
                     if (rval.Success == false)
                     {
-                        _context.Exception = new InvalidOperationException($"向字典{_type.GetFriendlyName()}中添加元素 {key} 失败") + rval.Error;
+                        _context.InvalidOperationException($"{"向"} {_type.GetFriendlyName():!} {"中添加元素"} {key:!} {"失败"},{"原因:"}Value{"转换失败"}");
                         return false;
                     }
                     try
@@ -125,7 +125,8 @@ namespace blqw.Convertors
                     }
                     catch (Exception ex)
                     {
-                        _context.Exception = new InvalidOperationException($"向字典{_type.GetFriendlyName()}中添加元素 {key} 失败,原因:{ex.Message}", ex);
+                        _context.Error.AddException(ex);
+                        _context.InvalidOperationException($"{"向"} {_type.GetFriendlyName():!} {"中添加元素"} {key:!} {"失败"},{"原因:"}{ex.Message}");
                         return false;
                     }
                 }
@@ -148,7 +149,8 @@ namespace blqw.Convertors
                     }
                     catch (Exception ex)
                     {
-                        _context.Exception = ex;
+                        _context.Error.AddException(ex);
+                        _context.InvalidOperationException($"{"创建"} {_type.GetFriendlyName()} {"失败"},{"原因"}:{ex.Message}");
                         return false;
                     }
                 }

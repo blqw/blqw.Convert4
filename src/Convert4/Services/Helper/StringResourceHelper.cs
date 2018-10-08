@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -61,6 +61,11 @@ namespace blqw
         /// <returns></returns>
         public static string GetString(CultureInfo culture, FormattableString str)
         {
+            if (str == null)
+            {
+                return string.Empty;
+            }
+
             if (str.ArgumentCount == 0)
             {
                 if (string.IsNullOrWhiteSpace(str.Format))
@@ -135,5 +140,7 @@ namespace blqw
         /// <returns></returns>
         public static string Concat(CultureInfo culture, params string[] strs) =>
             strs == null ? null : strs.Length == 0 ? "" : string.Concat(strs.Select(x => GetStringImpl(culture, x)));
+
+
     }
 }

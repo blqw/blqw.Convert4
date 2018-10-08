@@ -28,7 +28,8 @@ namespace blqw.Convertors
             {
                 return result;
             }
-            context.InvalidCastException($"{input:!} {"不是一个有效的url"}");
+
+            context.OverflowException($"{input:!} {"不是一个有效的url"}");
             return null;
         }
     }

@@ -66,11 +66,13 @@ namespace blqw.Convertors
                     var result = context.ChangeType<TValue>(input.Current);
                     if (!result.Success)
                     {
-                        context.Exception = context.InvalidCastException(input, TypeFriendlyName) + result.Error;
+                        context.Error.AddError(result.Error);
+                        context.InvalidCastException(input.Current, TypeFriendlyName);
                         return null;
                     }
                     list.Add(result.OutputValue);
                 }
+                context.ClearException();
                 return (TList)list;
             }
 

@@ -9,6 +9,8 @@ using System.Collections;
 using System.Data;
 using System.ComponentModel;
 using System.Dynamic;
+using System.Runtime.InteropServices.ComTypes;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace blqw.Convertors
 {
@@ -73,6 +75,11 @@ namespace blqw.Convertors
         /// 构造函数, 根据实际类型的 <seealso cref="IFrom{TOutput, TInput}"/> 接口情况, 按照 TInput 类型缓存调用器
         /// </summary>
         public BaseConvertor()
+            : this(typeof(T))
+        {
+        }
+
+        protected BaseConvertor(Type outputType)
         {
             _invokers = new Dictionary<Type, IInvoker>();
             _interfaceInvokers = new List<IInvoker>();
@@ -92,6 +99,7 @@ namespace blqw.Convertors
                     }
                 }
             }
+            OutputType = outputType;
             TypeName = OutputType.FullName;
             TypeFriendlyName = OutputType.GetFriendlyName();
         }
@@ -145,7 +153,7 @@ namespace blqw.Convertors
         /// <summary>
         /// 输出类型
         /// </summary>
-        public virtual Type OutputType { get; } = typeof(T);
+        public virtual Type OutputType { get; }
 
         /// <summary>
         /// <seealso cref="OutputType"/>.FullName
@@ -172,17 +180,18 @@ namespace blqw.Convertors
             {
                 return new ConvertResult<T>(t);
             }
-            //清空异常
-            context.Exception = null;
             //空值转换
             if (input == null)
             {
-                if (this is IFromNull<T> conv)
+                using (var scope = context.Error.CreateScope())
                 {
-                    var result = conv.FromNull(context);
-                    return context.Exception ?? new ConvertResult<T>(result);
+                    if (this is IFromNull<T> conv)
+                    {
+                        var result = conv.FromNull(context);
+                        return !scope.HasError ? new ConvertResult<T>(result) : (ConvertResult<T>)context.Exception;
+                    }
                 }
-                return context.InvalidCastException($"`null`{"无法转换为"} {TypeFriendlyName:!}");
+                return context.GetInvalidCastException("null", TypeFriendlyName);
             }
 
             //获取指定输入类型的转换方法调用器
@@ -222,6 +231,7 @@ namespace blqw.Convertors
                     {
                         return result;
                     }
+                    context.Error.AddError(result.Error);
                 }
             }
 
@@ -236,7 +246,7 @@ namespace blqw.Convertors
                             var result = conv.FromDBNull(context);
                             return context.Exception ?? new ConvertResult<T>(result);
                         }
-                        return context.Exception = new InvalidCastException(SR.GetString($"`DBNull`{"无法转换为"} {TypeFriendlyName:!}"));
+                        return context.GetInvalidCastException("DBNull", TypeFriendlyName);
                     case TypeCode.Boolean:
                         return InvokeIForm(this, context, v0.ToBoolean(context.GetCultureInfo()));
                     case TypeCode.Byte:
@@ -283,6 +293,7 @@ namespace blqw.Convertors
                 {
                     return InvokeIForm(this, context, result.OutputValue);
                 }
+                context.Error.AddError(result.Error);
                 //这里失败了 继续尝试object转换方案
             }
 
@@ -302,15 +313,13 @@ namespace blqw.Convertors
         {
             try
             {
-
                 if (conv is IFrom<TInput, T> from)
                 {
-                    var result = from.From(context, input);
-                    if (context.Exception != null)
+                    using (var scope = context.Error.CreateScope())
                     {
-                        return context.Exception;
+                        var result = from.From(context, input);
+                        return scope.HasError ? (ConvertResult<T>)context.Exception : new ConvertResult<T>(result);
                     }
-                    return new ConvertResult<T>(result);
                 }
                 if (input is IObjectReference refObj)
                 {
@@ -323,10 +332,10 @@ namespace blqw.Convertors
             }
             catch (Exception e)
             {
-                return context.Exception = e;
+                return e;
             }
 
-            return context.InvalidCastException(input, (conv as BaseConvertor<T>).TypeFriendlyName ?? conv.OutputType.GetFriendlyName());
+            return context.GetInvalidCastException(input, (conv as BaseConvertor<T>).TypeFriendlyName ?? conv.OutputType.GetFriendlyName());
         }
 
         /// <summary>

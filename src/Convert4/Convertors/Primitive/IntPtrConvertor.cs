@@ -16,7 +16,8 @@ namespace blqw.Convertors
             var result = context.ChangeType<long>(input);
             if (!result.Success)
             {
-                context.Exception = context.InvalidCastException(input, TypeFriendlyName) + result.Error;
+                context.Error.AddError(result.Error);
+                context.InvalidCastException(input, TypeFriendlyName);
                 return default;
             }
             return new IntPtr(result.OutputValue);

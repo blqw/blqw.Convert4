@@ -13,20 +13,20 @@ namespace blqw.Convertors
         public override ConvertResult<T> ChangeType(ConvertContext context, object input)
         {
             var result = _innerConvertor.ChangeType(context, input);
-            if (result.Success == false)
-            {
-                return context.InvalidCastException(input, TypeFriendlyName) + result.Error;
-            }
+            //if (result.Success == false)
+            //{
+            //    return context.InvalidCastException(input, TypeFriendlyName) + result.Error;
+            //}
             return result;
         }
 
         ConvertResult IConvertor.ChangeType(ConvertContext context, object input)
         {
             var result = _innerConvertor.ChangeType(context, input);
-            if (result.Success == false)
-            {
-                return context.InvalidCastException(input, TypeFriendlyName) + result.Error;
-            }
+            //if (result.Success == false)
+            //{
+            //    return context.InvalidCastException(input, TypeFriendlyName) + result.Error;
+            //}
             return result;
         }
 

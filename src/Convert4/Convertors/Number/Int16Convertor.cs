@@ -24,7 +24,7 @@ namespace blqw.Convertors
         {
             if (input > MaxValue)
             {
-                context.InvalidCastException($"值超过限制");
+                context.OverflowException($"{input} > {MaxValue}");
                 return default;
             }
             return (short)input;
@@ -33,7 +33,7 @@ namespace blqw.Convertors
         {
             if ((input < MinValue) || (input > MaxValue))
             {
-                context.InvalidCastException($"值超过限制");
+                context.OverflowException(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}");
                 return 0;
             }
             return (short)input;
@@ -42,7 +42,7 @@ namespace blqw.Convertors
         {
             if (input > (int)MaxValue)
             {
-                context.InvalidCastException($"值超过限制");
+                context.OverflowException($"{input} > {MaxValue}");
                 return 0;
             }
             return (short)input;
@@ -51,7 +51,7 @@ namespace blqw.Convertors
         {
             if ((input < MinValue) || (input > MaxValue))
             {
-                context.InvalidCastException($"值超过限制");
+                context.OverflowException(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}");
                 return 0;
             }
             return (short)input;
@@ -60,7 +60,7 @@ namespace blqw.Convertors
         {
             if ((input < MinValue) || (input > MaxValue))
             {
-                context.InvalidCastException($"值超过限制");
+                context.OverflowException(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}");
                 return 0;
             }
             return (short)input;
@@ -69,7 +69,7 @@ namespace blqw.Convertors
         {
             if ((input < MinValue) || (input > MaxValue))
             {
-                context.InvalidCastException($"值超过限制");
+                context.OverflowException(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}");
                 return 0;
             }
             return decimal.ToInt16(input);

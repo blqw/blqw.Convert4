@@ -18,35 +18,8 @@ namespace blqw
             Property = property;
             PropertyType = property.PropertyType;
             Name = property.Name;
-
-            /* 注入方式类似这个样子
-             *
-             * class PropertyReflecter : IServiceProvider
-             * {
-             *     PropertyInfo _property;
-             *     public PropertyReflecter(PropertyInfo property) =>
-             *         _property = property;
-             *
-             *     public object GetService(Type serviceType)
-             *     {
-             *         if(serviceType == typeof(Func<object, object>))
-             *         {
-             *             return (Func<object, object>)_property.GetValue;
-             *         }
-             *         else if(serviceType == typeof(Action<object, object>))
-             *         {
-             *             return (Action<object, object>)_property.SetValue;
-             *         }
-             *         return null;
-             *     }
-             * }
-             *
-             * services.AddSingleton<Func<PropertyInfo, IServiceProvider>>(p => new PropertyReflecter(p));
-             */
-
-            var reflecter = ServiceContainer.ServiceProvider.GetService<Func<PropertyInfo, IServiceProvider>>()?.Invoke(property);
-            Get = reflecter?.GetService<Func<object, object>>() ?? property.GetValue;
-            Set = reflecter?.GetService<Action<object, object>>() ?? property.SetValue;
+            Get = property.GetValue;
+            Set = property.SetValue;
         }
 
         /// <summary>
@@ -98,7 +71,7 @@ namespace blqw
             }
             catch (Exception ex)
             {
-                context.Exception = ex;
+                context.Error.AddException(ex);
                 return false;
             }
         }

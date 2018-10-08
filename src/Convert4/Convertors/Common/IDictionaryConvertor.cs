@@ -40,6 +40,15 @@ namespace blqw.Convertors
             return builder.Instance;
         }
 
+        public override IConvertor GetConvertor(Type outputType)
+        {
+            if (outputType == typeof(ArrayList))
+            {
+                return this;
+            }
+            return base.GetConvertor(outputType);
+        }
+
         /// <summary>
         /// <seealso cref="IDictionary" /> 构造器
         /// </summary>
@@ -69,7 +78,8 @@ namespace blqw.Convertors
                 }
                 catch (Exception ex)
                 {
-                    _context.Exception = new InvalidOperationException($"向字典{_type.GetFriendlyName()}中添加元素 {key} 失败,原因:{ex.Message}", ex);
+                    _context.Error.AddException(ex);
+                    _context.InvalidOperationException($"{"向"} {_type.GetFriendlyName():!} {"中添加元素"} {key:!} {"失败"},{"原因:"}{ex.Message}");
                     return false;
                 }
             }
@@ -92,7 +102,8 @@ namespace blqw.Convertors
                 }
                 catch (Exception ex)
                 {
-                    _context.Exception = ex;
+                    _context.Error.AddException(ex);
+                    _context.InvalidOperationException($"{"创建"} {_type.GetFriendlyName()} {"失败"},{"原因"}:{ex.Message}");
                     return false;
                 }
             }

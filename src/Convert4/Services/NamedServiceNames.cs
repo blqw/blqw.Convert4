@@ -8,17 +8,16 @@
         /// <summary>
         /// 字符串分隔符服务
         /// </summary>
-        public static readonly string StringSeparator = nameof(StringSeparator);
+        public const string STRING_SEPARATOR = nameof(STRING_SEPARATOR);
 
         /// <summary>
         /// 字符串格式化服务
         /// </summary>
-        public static readonly string Format = nameof(Format);
+        public const string FORMAT = nameof(FORMAT);
 
         /// <summary>
         /// 序列化协议
         /// </summary>
-        public static readonly string SerializationContract = nameof(SerializationContract);
-
+        public const string SERIALIZATION_CONTRACT = nameof(SERIALIZATION_CONTRACT);
     }
 }

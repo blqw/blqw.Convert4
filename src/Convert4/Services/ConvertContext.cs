@@ -1,4 +1,4 @@
-using blqw.ConvertServices;
+﻿using blqw.ConvertServices;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
@@ -27,40 +27,31 @@ namespace blqw
         private readonly ConvertSettings _settings;
 
         /// <summary>
-        /// 使用 <seealso cref="ServiceContainer.ServiceProvider"/> 创建上下文并提供服务提供程序
+        /// 使用 <seealso cref="ConvertConfig.Current"/> 创建上下文并提供服务提供程序
         /// </summary>
         public ConvertContext()
-            : this(null, null)
+            : this(ConvertSettings.Global)
         {
+
         }
 
         /// <summary>
         /// 创建上下文并提供服务提供程序
         /// </summary>
         /// <param name="serviceProvider"> 服务提供程序<para />
-        /// 当 <paramref name="serviceProvider"/> 为 <see cref="null"/> 时, 使用 <seealso cref="ServiceContainer.ServiceProvider"/> <para/>
+        /// 当 <paramref name="serviceProvider"/> 为 <see cref="null"/> 时, 使用 <seealso cref="ConvertConfig.Current"/> <para/>
         /// 当 <paramref name="serviceProvider"/> 为 <seealso cref="AggregateServicesProvider"/> 时, 不做处理 <para/>
-        /// 否则组合 <paramref name="serviceProvider"/> 和 <seealso cref="ServiceContainer.ServiceProvider"/>
+        /// 否则组合 <paramref name="serviceProvider"/> 和 <seealso cref="ConvertConfig.Current"/>
         /// </param>
         public ConvertContext(ConvertSettings settings)
-            : this(settings, null)
         {
-        }
+            if (settings == null)
+            {
+                settings = ConvertSettings.Global;
+            }
+            var provider = settings.ServiceProvider as AggregateServicesProvider
+                            ?? settings.ServiceProvider.Join(ConvertSettings.Global.ServiceProvider);
 
-        /// <summary>
-        /// 创建上下文并提供服务提供程序
-        /// </summary>
-        /// <param name="serviceProvider"> 服务提供程序<para />
-        /// 当 <paramref name="serviceProvider"/> 为 <see cref="null"/> 时, 使用 <seealso cref="ServiceContainer.ServiceProvider"/> <para/>
-        /// 当 <paramref name="serviceProvider"/> 为 <seealso cref="AggregateServicesProvider"/> 时, 不做处理 <para/>
-        /// 否则组合 <paramref name="serviceProvider"/> 和 <seealso cref="ServiceContainer.ServiceProvider"/>
-        /// </param>
-        public ConvertContext(ConvertSettings settings, IServiceProvider serviceProvider)
-        {
-            var provider = serviceProvider == null
-                                ? (IServiceProvider)ServiceContainer.ServiceProvider
-                                : serviceProvider as AggregateServicesProvider
-                                ?? new AggregateServicesProvider(serviceProvider, ServiceContainer.ServiceProvider);
             _serviceScope = provider.CreateScope();
             _serviceProvider = _serviceScope.ServiceProvider;
             _convertorSelector = _serviceProvider.GetService<IConvertorSelector>();
@@ -90,7 +81,12 @@ namespace blqw
         /// <summary>
         /// 异常
         /// </summary>
-        public Exception Exception { get; set; }
+        public Exception Exception => Error.Exception;
+
+        private ConvertError _error;
+        internal ConvertError Error => _error ?? (_error = new ConvertError(null));
+
+        public void ClearException() => _error?.Clear();
 
         /// <summary>
         /// 获取服务
@@ -105,5 +101,10 @@ namespace blqw
             }
             return _settings?.GetService(serviceType) ?? _serviceProvider?.GetService(serviceType);
         }
+
+
+
+
+
     }
 }

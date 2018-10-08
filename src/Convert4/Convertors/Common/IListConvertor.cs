@@ -10,7 +10,20 @@ namespace blqw.Convertors
                            IFrom<string, IList>,
                            IFrom<IEnumerator, IList>
     {
+
+
+        public override IConvertor GetConvertor(Type outputType) =>
+            outputType == OutputType ? this : new IListConvertor(outputType).Proxy(outputType);
+
         static readonly char[] _separator = new[] { ',' };
+
+        public IListConvertor()
+        {
+        }
+
+        public IListConvertor(Type outputType) : base(outputType)
+        {
+        }
 
         public IList From(ConvertContext context, string input)
         {
@@ -34,13 +47,14 @@ namespace blqw.Convertors
             {
                 return null;
             }
-            var list = new ArrayList();
+            var list = (IList)Activator.CreateInstance(OutputType);
             while (input.MoveNext())
             {
                 var result = context.ChangeType<object>(input.Current);
                 if (!result.Success)
                 {
-                    context.Exception = context.InvalidCastException(input, TypeFriendlyName) + result.Error;
+                    context.Error.AddError(result.Error);
+                    context.InvalidCastException(input, TypeFriendlyName);
                     return null;
                 }
                 list.Add(input.Current);

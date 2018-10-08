@@ -12,6 +12,8 @@ using System.Globalization;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Specialized;
 using System.Data;
+using System.Diagnostics;
+using Newtonsoft.Json;
 
 namespace NUnit.Tests1
 {
@@ -34,6 +36,9 @@ namespace NUnit.Tests1
         [Test]
         public void 测试JSON转换()
         {
+            ConvertSettings.Global.AddSerializer("JSON", JsonConvert.SerializeObject, JsonConvert.DeserializeObject);
+            ConvertSettings.Global.AddSerializationContract("JSON");
+
             var my = "{\"ID\":1,\"Name\":\"blqw\"}".To<MyClass>();
             Assert.IsNotNull(my);
             Assert.AreEqual(1, my.ID);
@@ -525,10 +530,14 @@ namespace NUnit.Tests1
                 dataset.Tables.Add(table2);
 
                 dataset.To<Dictionary<string, List<user>>>();
+                Assert.Fail();
             }
             catch (AggregateException ex)
             {
-                Assert.Fail(ex.ToString());
+                var messages = ex.InnerExceptions.Select(x => x.Message).ToList();
+                messages.Add("-----------------------------");
+                messages.Add(ex.ToString());
+                Assert.Pass(string.Join(Environment.NewLine, messages.ToArray()));
             }
         }
 

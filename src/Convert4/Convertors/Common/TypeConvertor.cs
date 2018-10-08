@@ -42,7 +42,7 @@ namespace blqw.Convertors
 
             if (result == null)
             {
-                context.Exception = new TypeLoadException($"{input:!} {"并不是一个类型"}");
+                context.Error.AddException(new TypeLoadException($"{input:!} {"并不是一个类型"}"));
             }
             return result;
         }

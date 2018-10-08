@@ -17,15 +17,7 @@ namespace blqw.ConvertServices
         /// <param name="context">转换上下文</param>
         /// <param name="value">对象实例</param>
         /// <returns></returns>
-        string ToString(ConvertContext context, object value);
-        /// <summary>
-        /// 字符串转为对象
-        /// </summary>
-        /// <param name="context">转换上下文</param>
-        /// <param name="value">对象实例</param>
-        /// <param name="type">转换类型</param>
-        /// <returns></returns>
-        object ToObject(ConvertContext context, string value, Type type);
+        string ToString(object value);
         /// <summary>
         /// 字符串转为泛型对象
         /// </summary>
@@ -33,6 +25,6 @@ namespace blqw.ConvertServices
         /// <param name="context">转换上下文</param>
         /// <param name="value">对象实例</param>
         /// <returns></returns>
-        T ToObject<T>(ConvertContext context, string value);
+        T ToObject<T>(string value);
     }
 }

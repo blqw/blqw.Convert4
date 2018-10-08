@@ -87,7 +87,8 @@ namespace blqw.Convertors
                 }
                 catch (Exception ex)
                 {
-                    _context.Exception = ex;
+                    _context.Error.AddException(ex);
+                    _context.InvalidOperationException($"{"创建"} NameValueCollection {"失败"},{"原因"}:{ex.Message}");
                     return false;
                 }
             }
@@ -98,11 +99,13 @@ namespace blqw.Convertors
                 var rkey = conv.ChangeType(_context, key);
                 if (rkey.Success == false)
                 {
+                    _context.InvalidOperationException($"{"向"} NameValueCollection {"添加元素"}{"失败"},{"原因:"}Key{"转换失败"}");
                     return false;
                 }
                 var rval = conv.ChangeType(_context, value);
                 if (rval.Success == false)
                 {
+                    _context.InvalidOperationException($"{"向"} NameValueCollection {"添加元素"} {rkey.OutputValue:!} {"失败"},{"原因:"}Value{"转换失败"}");
                     return false;
                 }
                 try
@@ -112,7 +115,8 @@ namespace blqw.Convertors
                 }
                 catch (Exception ex)
                 {
-                    _context.Exception = ex;
+                    _context.Error.AddException(ex);
+                    _context.InvalidOperationException($"{"向"} NameValueCollection {"添加元素"} {rkey.OutputValue:!} {"失败"},{"原因:"}{ex.Message}");
                     return false;
                 }
             }

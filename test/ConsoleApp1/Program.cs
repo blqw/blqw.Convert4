@@ -28,7 +28,7 @@ namespace ConsoleApp1
             {
                 var s = "1;2;3;4;;;";
                 CodeTimer.Time("系统方式转型性能3", count, () => s.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToList());
-                CodeTimer.Time("Convert4方式转型性能3", count, () => s.Convert<List<int>>(new ConvertSettings()
+                CodeTimer.Time("Convert4方式转型性能3", count, () => s.Convert<List<int>>(ConvertSettings.Global
                                                                     .AddStringSeparator(';')
                                                                     .AddStringSplitOptions(StringSplitOptions.RemoveEmptyEntries)));
             }
@@ -60,7 +60,7 @@ namespace ConsoleApp1
             {
                 var s = "1;2;3;4;;;";
                 CodeTimer.Time("系统方式转型性能3", count, () => s.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToList());
-                CodeTimer.Time("Convert4方式转型性能3", count, () => s.Convert<List<int>>(new ConvertSettings()
+                CodeTimer.Time("Convert4方式转型性能3", count, () => s.Convert<List<int>>(ConvertSettings.Global
                                                                     .AddStringSeparator(';')
                                                                     .AddStringSplitOptions(StringSplitOptions.RemoveEmptyEntries)));
             }

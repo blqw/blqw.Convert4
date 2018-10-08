@@ -16,14 +16,33 @@ namespace blqw.ConvertServices
         /// <param name="provider"></param>
         /// <param name="defaultValue">默认服务</param>
         /// <returns></returns>
-        public static T GetService<T>(this IServiceProvider provider, T defaultValue = default) =>
+        internal static T GetService<T>(this IServiceProvider provider, T defaultValue = default) =>
             provider?.GetService(typeof(T)) is T t ? t : defaultValue;
 
 
-        public static ServiceDescriptor GetSingletonServiceDescriptor<T>(this IServiceCollection services) =>
-            services?.FirstOrDefault(x => x.ServiceType == typeof(T) && x.ImplementationInstance is T);
+        internal static IServiceProvider Join(this IServiceProvider provider, IServiceProvider provider2)
+        {
+            if (provider == null || provider2 == null)
+            {
+                return provider ?? provider2;
+            }
+            return new AggregateServicesProvider(provider, provider2);
+        }
 
-        public static T GetSingletonService<T>(this IServiceCollection services) =>
-            (T)services?.GetSingletonServiceDescriptor<T>()?.ImplementationInstance;
+        /// <summary>
+        /// 添加Convert4服务
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddConvert4(this IServiceCollection services)
+        {
+            var types = typeof(Convert4).Assembly.SafeGetTypes();
+            types.Where(x => x.IsClass && x.Instantiable() && typeof(IConvertor).IsAssignableFrom(x))
+                 .ForEach(x => services.AddSingleton(typeof(IConvertor), x));
+            services.AddSingleton(typeof(IConvertorSelector), typeof(ConvertorSelector));
+            services.AddSingleton<ConvertSettings>();
+            return services;
+        }
+
     }
 }

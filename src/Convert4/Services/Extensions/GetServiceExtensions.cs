@@ -52,7 +52,7 @@ namespace blqw.ConvertServices
         /// <returns></returns>
         public static object GetStringSeparators(this IServiceProvider provider)
         {
-            var separator = (provider?.GetService(typeof(ConvertSettings)) as ConvertSettings)?.GetNamedService(StringSeparator);
+            var separator = (provider?.GetService(typeof(ConvertSettings)) as ConvertSettings)?.GetNamedService(STRING_SEPARATOR);
             switch (separator)
             {
                 case char[] r:
@@ -75,7 +75,7 @@ namespace blqw.ConvertServices
         /// <returns></returns>
         public static string GetStringSeparator(this IServiceProvider provider)
         {
-            var separator = (provider?.GetService(typeof(ConvertSettings)) as ConvertSettings)?.GetNamedService(StringSeparator);
+            var separator = (provider?.GetService(typeof(ConvertSettings)) as ConvertSettings)?.GetNamedService(STRING_SEPARATOR);
             switch (separator)
             {
                 case char[] r:
@@ -96,22 +96,22 @@ namespace blqw.ConvertServices
         /// </summary>
         /// <param name="provider">服务提供程序</param>
         /// <returns></returns>
-        public static ISerializationService GetSerialization(this IServiceProvider provider)
+        public static ISerializationService GetSerializer(this IServiceProvider provider)
         {
-            if (provider?.GetService(typeof(ConvertSettings)) is ConvertSettings settings)
+            if (provider == null)
             {
-                if (settings.GetOwnService(typeof(ISerializationService)) is ISerializationService service)
-                {
-                    return service;
-                }
-                var contract = settings.GetNamedService(SerializationContract) as string;
+                return null;
+            }
+            if (provider.GetService(typeof(ConvertSettings)) is ConvertSettings settings)
+            {
+                var contract = settings.GetNamedService(SERIALIZATION_CONTRACT) as string;
                 if (string.IsNullOrWhiteSpace(contract))
                 {
-                    return null;
+                    return settings.GetService<ISerializationService>();
                 }
-                return provider.GetServices<ISerializationService>()?.First(x => x.Contract == contract);
+                return provider.GetServices<ISerializationService>().FirstOrDefault(x => x.Contract == contract);
             }
-            return provider?.GetServices<ISerializationService>()?.First();
+            return provider.GetService<ISerializationService>();
         }
 
         /// <summary>
@@ -120,14 +120,30 @@ namespace blqw.ConvertServices
         /// <param name="provider">服务提供程序</param>
         /// <param name="forType">指定类型</param>
         /// <returns></returns>
-        public static string GetFormat(this IServiceProvider provider, Type forType) =>
-            forType == null ? null : (provider?.GetService(typeof(ConvertSettings)) as ConvertSettings)?.GetNamedServiceForType(forType, Format) as string;
+        public static string GetFormat(this IServiceProvider provider, Type forType)
+        {
+            if (forType == null || provider == null)
+            {
+                return null;
+            }
+            if (provider.GetService(typeof(ConvertSettings)) is ConvertSettings settings)
+            {
+                return settings.GetNamedServiceForType(forType, FORMAT) as string;
+            }
+            return null;
+        }
 
-
-        public static IFormatProvider GetFormatProvider(this IServiceProvider provider, Type forType) =>
-            forType == null ? null : (provider?.GetService(typeof(ConvertSettings)) as ConvertSettings)?.GetServiceForType(forType, typeof(IFormatProvider)) as IFormatProvider
-                                     ?? provider.GetService(typeof(IFormatProvider)) as IFormatProvider;
-
-
+        public static IFormatProvider GetFormatProvider(this IServiceProvider provider, Type forType)
+        {
+            if (forType == null || provider == null)
+            {
+                return null;
+            }
+            if (provider.GetService(typeof(ConvertSettings)) is ConvertSettings settings)
+            {
+                return settings.GetServiceForType(forType, typeof(IFormatProvider)) as IFormatProvider;
+            }
+            return provider.GetService(typeof(IFormatProvider)) as IFormatProvider;
+        }
     }
 }

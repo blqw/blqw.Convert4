@@ -99,12 +99,5 @@ namespace blqw
         /// </summary>
         public static dynamic ToDynamic(this object obj) => DynamicFactory.Create(obj);
 
-
-        /// <summary>
-        /// 获取一个 <see cref="IFormatterConverter"> 类型的简单转换器
-        /// </summary>
-        /// <returns></returns>
-        public static IFormatterConverter GetFormatterConverter() =>
-            throw new NotImplementedException(); //TODO:未实现
     }
 }

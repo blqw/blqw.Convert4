@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 namespace blqw
 {
@@ -43,7 +43,7 @@ namespace blqw
         /// 如果失败,则返回异常
         /// </summary>
         /// <returns></returns>
-        public ConvertError Error { get; }
+        internal ConvertError Error { get; }
 
         public void ThrowIfExceptional() => Error?.TryThrow();
 
@@ -55,8 +55,7 @@ namespace blqw
                 throw new ArgumentNullException(nameof(exception));
             }
 
-            var e = new ConvertError();
-            e.Exceptions.Add(exception);
+            var e = new ConvertError(exception);
             return new ConvertResult(false, null, e);
         }
         #endregion

@@ -47,7 +47,7 @@ namespace blqw.Convertors
                 }
                 catch (Exception ex)
                 {
-                    context.Exception = ex;
+                    context.Error.AddException(ex);
                     return default;
                 }
 
@@ -66,7 +66,7 @@ namespace blqw.Convertors
                         return result;
                     }
                 }
-                context.InvalidCastException($"{result:!} {"不是有效的枚举值"}");
+                context.OverflowException($"{result:!} {"不是有效的枚举值"}");
                 return default;
             }
 
@@ -117,7 +117,7 @@ namespace blqw.Convertors
                         return result;
                     }
                 }
-                context.InvalidCastException($"{result:!} {"不是有效的枚举值"}");
+                context.OverflowException($"{result:!} {"不是有效的枚举值"}");
                 return default;
             }
         }

@@ -19,11 +19,12 @@ namespace blqw.Convertors
         public float From(ConvertContext context, short input) => (float)input;
         public float From(ConvertContext context, ushort input) => (float)input;
         public float From(ConvertContext context, int input) => (float)input;
+
         public float From(ConvertContext context, uint input)
         {
             if (input > MaxValue)
             {
-                context.InvalidCastException($"值超过限制");
+                context.OverflowException($"{input} > {MaxValue}");
                 return default;
             }
             return (float)input;
@@ -32,7 +33,7 @@ namespace blqw.Convertors
         {
             if ((input < MinValue) || (input > MaxValue))
             {
-                context.InvalidCastException($"值超过限制");
+                context.OverflowException(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}");
                 return 0;
             }
             return (float)input;
@@ -41,7 +42,7 @@ namespace blqw.Convertors
         {
             if (input > MaxValue)
             {
-                context.InvalidCastException($"值超过限制");
+                context.OverflowException($"{input} > {MaxValue}");
                 return 0;
             }
             return (float)input;
@@ -50,7 +51,7 @@ namespace blqw.Convertors
         {
             if ((input < MinValue) || (input > MaxValue))
             {
-                context.InvalidCastException($"值超过限制");
+                context.OverflowException(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}");
                 return 0;
             }
             return (float)input;
@@ -59,7 +60,7 @@ namespace blqw.Convertors
         {
             if ((input < MinValue) || (input > MaxValue))
             {
-                context.InvalidCastException($"值超过限制");
+                context.OverflowException(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}");
                 return 0;
             }
             return (float)input;

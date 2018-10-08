@@ -98,11 +98,6 @@ namespace blqw
                 }
                 if (conv != null)
                 {
-                    if (conv.OutputType != outputType)
-                    {
-                        conv = (IConvertor)Activator.CreateInstance(typeof(ProxyConvertor<>).MakeGenericType(outputType), conv);
-                    }
-
                     _convertors = new Dictionary<Type, IConvertor>(convs)
                     {
                         [outputType] = conv

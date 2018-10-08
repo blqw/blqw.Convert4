@@ -37,6 +37,19 @@ namespace blqw.Convertors
                     return Array.Empty<T>();
                 }
 
+                var serializer = context.GetSerializer();
+                if (serializer != null)
+                {
+                    try
+                    {
+                        return serializer.ToObject<T[]>(input);
+                    }
+                    catch (Exception)
+                    {
+
+                    }
+                }
+
                 var separator = context.GetStringSeparators();
 
                 var arr = separator is string[] s
@@ -55,9 +68,11 @@ namespace blqw.Convertors
                 var result = context.ChangeType<List<T>>(input);
                 if (!result.Success)
                 {
-                    context.Exception = context.InvalidCastException(input, TypeFriendlyName) + result.Error;
+                    context.Error.AddError(result.Error);
+                    context.InvalidCastException(input, TypeFriendlyName);
                     return null;
                 }
+                context.ClearException();
                 return result.OutputValue.ToArray();
             }
         }

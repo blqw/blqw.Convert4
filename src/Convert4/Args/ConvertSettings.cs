@@ -1,4 +1,6 @@
 ﻿using blqw.ConvertServices;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -11,20 +13,43 @@ namespace blqw
     /// </summary>
     public sealed class ConvertSettings : IServiceProvider
     {
-        public static readonly ConvertSettings Global = new ConvertSettings();
+        /// <summary>
+        /// 服务提供程序
+        /// </summary>
+        public IServiceProvider ServiceProvider { get; }
+
+        /// <summary>
+        /// 全局设置
+        /// </summary>
+        public static readonly ConvertSettings Global = new ServiceCollection().AddConvert4().BuildServiceProvider().GetService<ConvertSettings>();
+
+
+        public ConvertSettings(IServiceProvider provider = null) =>
+            ServiceProvider = provider ?? Global.ServiceProvider;
 
         private static readonly object _unSet = new object();
 
-        /// <summary>
-        /// 标准服务
-        /// </summary>
-        private IList<(Type type, string name, object service)> _services;
-
-        private int _boundary = 0;
+        private LinkedList<(Type, string, object)> _services;
+        private LinkedListNode<(Type, string, object)> _firstForTypeService;
 
         public object DefaultValue { get; set; } = _unSet;
 
         public bool Throwable => ReferenceEquals(DefaultValue, _unSet);
+
+        public LinkedList<(Type, string, object)> Services
+        {
+            get
+            {
+                if (_services != null)
+                {
+                    return _services;
+                }
+                var services = new LinkedList<(Type, string, object)>();
+                services.AddFirst((null, null, null));
+                _firstForTypeService = services.AddLast((null, null, null));
+                return _services = services;
+            }
+        }
 
         /// <summary>
         /// 获取标准服务
@@ -41,43 +66,12 @@ namespace blqw
             {
                 return this;
             }
-            if (_services == null)
+            if (Services == null)
             {
                 return null;
             }
-            var (i, s) = Get(null, serviceType);
-            if (i >= 0)
-            {
-                return s;
-            }
-            return null;
-        }
-
-        /// <summary>
-        /// 获取标准服务
-        /// </summary>
-        /// <param name="serviceType">服务类型</param>
-        /// <returns></returns>
-        public object GetOwnService(Type serviceType)
-        {
-            if (serviceType == null)
-            {
-                return null;
-            }
-            if (serviceType == typeof(ConvertSettings))
-            {
-                return this;
-            }
-            if (_services == null)
-            {
-                return ReferenceEquals(Global, this) ? null : Global.GetOwnService(serviceType);
-            }
-            var (i, s) = Get(null, serviceType);
-            if (i >= 0)
-            {
-                return s;
-            }
-            return ReferenceEquals(Global, this) ? null : Global.GetOwnService(serviceType);
+            return GetExact(null, serviceType, null, out _)
+                ?? GetEnumerable(null, serviceType);
         }
 
         /// <summary>
@@ -87,39 +81,11 @@ namespace blqw
         /// <returns></returns>
         public object GetNamedService(string name)
         {
-            if (name == null || _services == null)
+            if (name == null || Services == null)
             {
-                return ReferenceEquals(Global, this) ? null : Global.GetNamedService(name);
+                return null;
             }
-            var (i, s) = Get(null, name);
-            if (i >= 0)
-            {
-                return s;
-            }
-            return ReferenceEquals(Global, this) ? null : Global.GetNamedService(name);
-        }
-
-        /// <summary>
-        /// 获取标准服务
-        /// </summary>
-        /// <param name="serviceType">服务类型</param>
-        /// <returns></returns>
-        public object GetService<TService>()
-        {
-            if (typeof(TService) == typeof(ConvertSettings))
-            {
-                return this;
-            }
-            if (_services == null)
-            {
-                return ReferenceEquals(Global, this) ? null : Global.GetService<TService>();
-            }
-            var (i, s) = Get<TService>(null);
-            if (i >= 0)
-            {
-                return s;
-            }
-            return ReferenceEquals(Global, this) ? null : Global.GetService<TService>();
+            return GetExact(null, null, name, out _);
         }
 
         /// <summary>
@@ -129,21 +95,14 @@ namespace blqw
         /// <returns></returns>
         public object GetServiceForType(Type forType, Type serviceType)
         {
-            if (serviceType == null || _services == null)
+            if (serviceType == null || Services == null)
             {
-                return ReferenceEquals(Global, this) ? null : Global.GetServiceForType(forType, serviceType);
+                return null;
             }
-            var (i, s) = Get(forType, serviceType);
-            if (i >= 0)
-            {
-                return s;
-            }
-            (i, s) = Get(null, serviceType);
-            if (i >= 0)
-            {
-                return s;
-            }
-            return ReferenceEquals(Global, this) ? null : Global.GetServiceForType(forType, serviceType);
+            return GetExact(forType, serviceType, null, out _)
+                ?? GetEnumerable(forType, serviceType)
+                ?? GetExact(null, serviceType, null, out _)
+                ?? GetEnumerable(null, serviceType);
         }
 
         /// <summary>
@@ -153,108 +112,60 @@ namespace blqw
         /// <returns></returns>
         public object GetNamedServiceForType(Type forType, string name)
         {
-            if (name == null || _services == null)
+            if (name == null || Services == null)
             {
                 return ReferenceEquals(Global, this) ? null : Global.GetNamedServiceForType(forType, name);
             }
-            var (i, s) = Get(forType, name);
-            if (i >= 0)
-            {
-                return s;
-            }
-            (i, s) = Get(null, name);
-            if (i >= 0)
-            {
-                return s;
-            }
-            return ReferenceEquals(Global, this) ? null : Global.GetNamedServiceForType(forType, name);
+            return GetExact(forType, null, name, out _) ?? GetExact(null, null, name, out _);
         }
 
         /// <summary>
-        /// 获取类型专属的标准服务
+        /// 获取服务集合
         /// </summary>
-        /// <param name="serviceType">服务类型</param>
+        private object GetEnumerable(Type forType, Type serviceType)
+        {
+            if (serviceType.IsConstructedGenericType &&
+               serviceType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+            {
+                var itemType = serviceType.GenericTypeArguments.Single();
+
+                var services = new List<object>();
+                for (var node = forType == null ? Services.First.Next : (_firstForTypeService?.Next ?? Services.Last);
+                     node != null;
+                     node = node.Next)
+                {
+                    var (t, n, v) = node.Value;
+                    if (forType == t
+                        && n == null
+                        && (serviceType == null || serviceType.IsInstanceOfType(v)))
+                    {
+                        services.Add(v);
+                    }
+                }
+                return services;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// 获取精确服务
+        /// </summary>
         /// <returns></returns>
-        public object GetServiceForType<TService>(Type forType)
+        private object GetExact(Type forType, Type serviceType, string name, out LinkedListNode<(Type, string, object)> node)
         {
-            if (_services == null)
+            for (node = forType == null ? Services.First.Next : (_firstForTypeService?.Next ?? Services.Last);
+                     node != null;
+                     node = node.Next)
             {
-                return ReferenceEquals(Global, this) ? null : Global.GetServiceForType<TService>(forType);
-            }
-            var (i, s) = Get<TService>(forType);
-            if (i >= 0)
-            {
-                return s;
-            }
-            (i, s) = Get<TService>(null);
-            if (i >= 0)
-            {
-                return s;
-            }
-            return ReferenceEquals(Global, this) ? null : Global.GetServiceForType<TService>(forType);
-        }
-
-        private (int, object) Get(Type forType, string name)
-        {
-            var start = 0;
-            var end = _boundary;
-            if (forType == null)
-            {
-                start = _boundary;
-                end = _services.Count;
-            }
-
-            for (var i = start; i < end; i++)
-            {
-                var (t, n, v) = _services[i];
-                if (forType == t && name == n)
+                var (t, n, v) = node.Value;
+                if (forType == t
+                    && n == name
+                    && (serviceType == null || serviceType.IsInstanceOfType(v)))
                 {
-                    return (i, v);
+                    return v;
                 }
             }
-            return (-1, null);
-        }
-
-        private (int, object) Get<T>(Type forType)
-        {
-            var start = 0;
-            var end = _boundary;
-            if (forType == null)
-            {
-                start = _boundary;
-                end = _services.Count;
-            }
-
-            for (var i = start; i < end; i++)
-            {
-                var (t, n, v) = _services[i];
-                if (forType == t && n == null && v is T)
-                {
-                    return (i, v);
-                }
-            }
-            return (-1, null);
-        }
-
-        private (int, object) Get(Type forType, Type serviceType)
-        {
-            var start = 0;
-            var end = _boundary;
-            if (forType == null)
-            {
-                start = _boundary;
-                end = _services.Count;
-            }
-
-            for (var i = start; i < end; i++)
-            {
-                var (t, n, v) = _services[i];
-                if (forType == t && n == null && serviceType.IsInstanceOfType(v))
-                {
-                    return (i, v);
-                }
-            }
-            return (-1, null);
+            return null;
         }
 
         /// <summary>
@@ -264,25 +175,9 @@ namespace blqw
         /// <returns></returns>
         public ConvertSettings AddService<TService>(TService service)
         {
-            if (service == null)
-            {
-                throw new ArgumentNullException(nameof(service));
-            }
-
-            if (_services == null)
-            {
-                _services = new List<(Type, string, object)>() { (null, null, service) };
-                return this;
-            }
-            var (i, s) = Get(null, typeof(TService));
-            if (i <= 0)
-            {
-                _services.Add((null, null, service));
-            }
-            else
-            {
-                _services[i] = (null, null, service);
-            }
+            CheckParams(typeof(object), "name", service);
+            GetExact(null, typeof(TService), null, out var node);
+            Services.AddAfter(node?.Previous ?? _services.First, (null, null, service));
             return this;
         }
 
@@ -294,29 +189,9 @@ namespace blqw
         /// <returns></returns>
         public ConvertSettings AddNamedService(string name, object service)
         {
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                throw new ArgumentException("message", nameof(name));
-            }
-            if (service == null)
-            {
-                throw new ArgumentNullException(nameof(service));
-            }
-
-            if (_services == null)
-            {
-                _services = new List<(Type, string, object)>() { (null, name, service) };
-                return this;
-            }
-            var (i, s) = Get(null, name);
-            if (i <= 0)
-            {
-                _services.Add((null, name, service));
-            }
-            else
-            {
-                _services[i] = (null, name, service);
-            }
+            CheckParams(typeof(object), name, service);
+            GetExact(null, null, name, out var node);
+            Services.AddAfter(node?.Previous ?? _services.First, (null, name, service));
             return this;
         }
 
@@ -328,32 +203,9 @@ namespace blqw
         /// <returns></returns>
         public ConvertSettings AddForType<TService>(Type forType, TService service)
         {
-            if (forType == null)
-            {
-                throw new ArgumentNullException(nameof(forType));
-            }
-            if (service == null)
-            {
-                throw new ArgumentNullException(nameof(service));
-            }
-
-            if (_services == null)
-            {
-                _services = new List<(Type, string, object)>() { (forType, null, service) };
-                _boundary++;
-                return this;
-            }
-            var (i, s) = Get(forType, typeof(TService));
-            if (i <= 0)
-            {
-                _services.Add((forType, null, service));
-                _boundary++;
-
-            }
-            else
-            {
-                _services[i] = (forType, null, service);
-            }
+            CheckParams(forType, "name", service);
+            GetExact(forType, typeof(TService), null, out var node);
+            Services.AddAfter(node?.Previous ?? _firstForTypeService, (forType, null, service));
             return this;
         }
 
@@ -366,36 +218,26 @@ namespace blqw
         /// <returns></returns>
         public ConvertSettings AddNamedForType(Type forType, string name, object service)
         {
+            CheckParams(forType, name, service);
+            GetExact(forType, null, name, out var node);
+            Services.AddAfter(node?.Previous ?? _firstForTypeService, (forType, name, service));
+            return this;
+        }
+
+        private void CheckParams(Type forType, string name, object service)
+        {
             if (forType == null)
             {
                 throw new ArgumentNullException(nameof(forType));
             }
             if (string.IsNullOrWhiteSpace(name))
             {
-                throw new ArgumentException("message", nameof(name));
+                throw new ArgumentNullException(nameof(name));
             }
             if (service == null)
             {
                 throw new ArgumentNullException(nameof(service));
             }
-
-            if (_services == null)
-            {
-                _services = new List<(Type, string, object)>() { (forType, name, service) };
-                _boundary++;
-                return this;
-            }
-            var (i, s) = Get(forType, name);
-            if (i <= 0)
-            {
-                _services.Add((forType, name, service));
-                _boundary++;
-            }
-            else
-            {
-                _services[i] = (forType, name, service);
-            }
-            return this;
         }
     }
 }
