@@ -47,7 +47,9 @@ namespace blqw.Convertors
             {
                 return null;
             }
-            var list = (IList)Activator.CreateInstance(OutputType);
+            var list = OutputType.IsAssignableFrom(typeof(ArrayList))
+                    ? new ArrayList()
+                    : (IList)Activator.CreateInstance(OutputType);
             while (input.MoveNext())
             {
                 var result = context.ChangeType<object>(input.Current);

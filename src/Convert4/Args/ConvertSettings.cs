@@ -129,20 +129,20 @@ namespace blqw
             {
                 var itemType = serviceType.GenericTypeArguments.Single();
 
-                var services = new List<object>();
+                var services = new ArrayList();
                 for (var node = forType == null ? Services.First.Next : (_firstForTypeService?.Next ?? Services.Last);
-                     node != null;
+                     node?.Value.Item3 != null;
                      node = node.Next)
                 {
                     var (t, n, v) = node.Value;
                     if (forType == t
                         && n == null
-                        && (serviceType == null || serviceType.IsInstanceOfType(v)))
+                        && itemType.IsInstanceOfType(v))
                     {
                         services.Add(v);
                     }
                 }
-                return services;
+                return services.ToArray(itemType);
             }
             return null;
         }
@@ -154,8 +154,8 @@ namespace blqw
         private object GetExact(Type forType, Type serviceType, string name, out LinkedListNode<(Type, string, object)> node)
         {
             for (node = forType == null ? Services.First.Next : (_firstForTypeService?.Next ?? Services.Last);
-                     node != null;
-                     node = node.Next)
+                 node?.Value.Item3 != null;
+                 node = node.Next)
             {
                 var (t, n, v) = node.Value;
                 if (forType == t
@@ -165,6 +165,7 @@ namespace blqw
                     return v;
                 }
             }
+            node = null;
             return null;
         }
 
