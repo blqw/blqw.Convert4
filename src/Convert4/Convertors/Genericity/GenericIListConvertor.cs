@@ -66,7 +66,6 @@ namespace blqw.Convertors
                     var result = context.Convert<TValue>(input.Current);
                     if (!result.Success)
                     {
-                        context.Error.AddError(result.Error);
                         return null;
                     }
                     list.Add(result.OutputValue);

@@ -90,7 +90,9 @@ namespace blqw.Convertors
                     var args = intf.GetGenericArguments();
                     if (args[1] == typeof(T))
                     {
-                        var invoker = (IInvoker)Activator.CreateInstance(typeof(Invoker<>).MakeGenericType(new Type[] { args[1], args[0] }));
+                        args[1] = args[0];
+                        args[0] = typeof(T);
+                        var invoker = (IInvoker)Activator.CreateInstance(typeof(Invoker<>).MakeGenericType(args));
                         _invokers.Add(invoker.InputType, invoker);
                         if (invoker.InputType.IsInterface)
                         {

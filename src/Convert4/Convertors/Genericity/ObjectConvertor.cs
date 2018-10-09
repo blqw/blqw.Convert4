@@ -38,7 +38,7 @@ namespace blqw.Convertors
             public T From(ConvertContext context, object input)
             {
                 var builder = new ObjectBuilder(typeof(T), context);
-                if (Mapper.Build(context, OutputType, input, builder.TryCreateInstance, builder.Add))
+                if (Mapper.Build(context, OutputType, input, builder.InstanceCreated, builder.Add))
                 {
                     return (T)builder.Instance;
                 }
@@ -64,14 +64,22 @@ namespace blqw.Convertors
                     _type = type;
                     _context = context;
                     _keyConvertor = context.GetConvertor<string>();
-                    Instance = null;
                     _propertyHandlers = PropertyHelper.GetByType(type);
+                    try
+                    {
+                        Instance = _context.CreateInstance(_type);
+                    }
+                    catch (Exception ex)
+                    {
+                        _context.Error.AddException(ex);
+                        Instance = null;
+                    }
                 }
 
                 /// <summary>
                 /// 被构造的实例
                 /// </summary>
-                public object Instance { get; private set; }
+                public object Instance { get; }
 
                 public bool Add(object key, object value)
                 {
@@ -94,22 +102,10 @@ namespace blqw.Convertors
                 }
 
                 /// <summary>
-                /// 尝试构造实例,返回是否成功
+                /// 返回是否已经实例化
                 /// </summary>
                 /// <returns> </returns>
-                public bool TryCreateInstance()
-                {
-                    try
-                    {
-                        Instance = _context.CreateInstance(_type);
-                        return true;
-                    }
-                    catch (Exception ex)
-                    {
-                        _context.Error.AddException(ex);
-                        return false;
-                    }
-                }
+                public bool InstanceCreated => Instance != null;
             }
         }
     }

@@ -208,10 +208,10 @@ namespace blqw
         internal static bool Build(ConvertContext context,
                                     Type outputType,
                                     object input,
-                                    Func<bool> create,
+                                    bool created,
                                     Func<object, object, bool> add)
         {
-            if (create() == false)
+            if (created == false)
             {
                 context.InvalidOperationException($"{outputType.GetFriendlyName()} {"创建失败"}");
                 return false;

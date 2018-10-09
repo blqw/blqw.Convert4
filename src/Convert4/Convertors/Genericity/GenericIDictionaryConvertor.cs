@@ -51,7 +51,7 @@ namespace blqw.Convertors
                 }
 
                 var builder = new DictionaryBuilder(OutputType, context);
-                if (Mapper.Build(context, OutputType, input, builder.TryCreateInstance, builder.Add))
+                if (Mapper.Build(context, OutputType, input, builder.InstanceCreated, builder.Add))
                 {
                     return (TDictionary)builder.Instance;
                 }
@@ -83,7 +83,15 @@ namespace blqw.Convertors
                     _context = context;
                     _keyConvertor = context.GetConvertor<TKey>();
                     _valueConvertor = context.GetConvertor<TValue>();
-                    Instance = null;
+                    try
+                    {
+                        Instance = (IDictionary<TKey, TValue>)_context.CreateInstance<Dictionary<TKey, TValue>>(typeof(IDictionary<TKey, TValue>));
+                    }
+                    catch (Exception ex)
+                    {
+                        _context.Error.AddException(ex);
+                        Instance = null;
+                    }
                 }
 
                 /// <summary>
@@ -119,22 +127,10 @@ namespace blqw.Convertors
                 }
 
                 /// <summary>
-                /// 尝试构造实例,返回是否成功
+                /// 返回是否已经实例化
                 /// </summary>
                 /// <returns> </returns>
-                public bool TryCreateInstance()
-                {
-                    try
-                    {
-                        Instance = (IDictionary<TKey, TValue>)_context.CreateInstance<Dictionary<TKey, TValue>>(typeof(IDictionary<TKey, TValue>));
-                        return true;
-                    }
-                    catch (Exception ex)
-                    {
-                        _context.Error.AddException(ex);
-                        return false;
-                    }
-                }
+                public bool InstanceCreated => Instance != null;
 
                 /// <summary>
                 /// 设置对象值

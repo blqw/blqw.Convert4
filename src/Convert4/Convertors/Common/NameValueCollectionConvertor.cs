@@ -28,7 +28,7 @@ namespace blqw.Convertors
             }
 
             var builder = new NVCollectiontBuilder(context, OutputType);
-            if (Mapper.Build(context, OutputType, input, builder.TryCreateInstance, builder.Add))
+            if (Mapper.Build(context, OutputType, input, builder.InstanceCreated, builder.Add))
             {
                 return builder.Instance;
             }
@@ -53,7 +53,16 @@ namespace blqw.Convertors
                 _context = context;
                 _type = type;
                 _stringConvertor = context.GetConvertor<string>();
-                Instance = null;
+
+                try
+                {
+                    Instance = (NameValueCollection)_context.CreateInstance<NameValueCollection>(_type);
+                }
+                catch (Exception ex)
+                {
+                    _context.Error.AddException(ex);
+                    Instance = null;
+                }
             }
 
             /// <summary>
@@ -62,22 +71,10 @@ namespace blqw.Convertors
             public NameValueCollection Instance { get; private set; }
 
             /// <summary>
-            /// 尝试构造实例,返回是否成功
+            /// 返回是否已经实例化
             /// </summary>
             /// <returns> </returns>
-            public bool TryCreateInstance()
-            {
-                try
-                {
-                    Instance = (NameValueCollection)_context.CreateInstance<NameValueCollection>(_type);
-                    return true;
-                }
-                catch (Exception ex)
-                {
-                    _context.Error.AddException(ex);
-                    return false;
-                }
-            }
+            public bool InstanceCreated => Instance != null;
 
             public bool Add(object key, object value)
             {
