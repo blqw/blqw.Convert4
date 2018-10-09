@@ -60,7 +60,7 @@ namespace blqw.Convertors
                 {
                     return null;
                 }
-                var list = context.CreateInstance<List<TValue>>(typeof(TList));
+                var list = (TList)context.CreateInstance<List<TValue>>(typeof(TList));
                 while (input.MoveNext())
                 {
                     var result = context.Convert<TValue>(input.Current);
