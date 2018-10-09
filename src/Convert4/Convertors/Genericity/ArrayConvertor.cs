@@ -42,7 +42,7 @@ namespace blqw.Convertors
                 {
                     try
                     {
-                        return serializer.ToObject<T[]>(input);
+                        return (T[])serializer.ToObject(input, typeof(T[]));
                     }
                     catch (Exception)
                     {

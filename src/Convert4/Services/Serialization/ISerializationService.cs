@@ -25,6 +25,6 @@ namespace blqw.ConvertServices
         /// <param name="context">转换上下文</param>
         /// <param name="value">对象实例</param>
         /// <returns></returns>
-        T ToObject<T>(string value);
+        object ToObject(string value, Type type);
     }
 }

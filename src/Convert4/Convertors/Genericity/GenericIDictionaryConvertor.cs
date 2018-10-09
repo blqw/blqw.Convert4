@@ -12,6 +12,10 @@ namespace blqw.Convertors
 
         public override IConvertor GetConvertor(Type outputType)
         {
+            if (outputType == typeof(IEnumerable))
+            {
+                return null;
+            }
             var genericArgs = outputType.GetGenericArguments(typeof(IDictionary<,>));
 
             if (genericArgs == null)

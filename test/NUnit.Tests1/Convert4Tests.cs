@@ -338,7 +338,6 @@ namespace NUnit.Tests1
         [Test]
         public void 进阶功能()
         {
-            //CodeTimer.Initialize();
             var arr = "1,2,3,4,5,6".To<int[]>();
             Assert.IsNotNull(arr);
             Assert.AreEqual(6, arr.Length);
@@ -478,14 +477,14 @@ namespace NUnit.Tests1
                     assert5(actual.Rows[2], "3", "blqw3", "true");
                     assert5(actual.Rows[3], "4", "blqw4", "false");
                 };
-            var tb1 = list1.To<DataTable>();
-            assert6(tb1);
-            var tb2 = list2.To<DataTable>();
-            assert6(tb2);
-            var tb3 = list3.To<DataTable>();
-            assert6(tb3);
-            var tb4 = list4.To<DataTable>();
-            assert6(tb4);
+            //var tb1 = list1.To<DataTable>();
+            //assert6(tb1);
+            //var tb2 = list2.To<DataTable>();
+            //assert6(tb2);
+            //var tb3 = list3.To<DataTable>();
+            //assert6(tb3);
+            //var tb4 = list4.To<DataTable>();
+            //assert6(tb4);
         }
 
         [Test]

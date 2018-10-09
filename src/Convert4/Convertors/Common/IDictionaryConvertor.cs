@@ -1,4 +1,5 @@
 ﻿using blqw.ConvertServices;
+using blqw.DI;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,6 +10,13 @@ namespace blqw.Convertors
     class IDictionaryConvertor : BaseConvertor<IDictionary>,
                                IFrom<object, IDictionary>
     {
+        public IDictionaryConvertor()
+        {
+        }
+
+        public IDictionaryConvertor(Type outputType) : base(outputType)
+        {
+        }
         public IDictionary From(ConvertContext context, object input)
         {
             if (input is null || input is DBNull)
@@ -42,12 +50,13 @@ namespace blqw.Convertors
 
         public override IConvertor GetConvertor(Type outputType)
         {
-            if (outputType == typeof(ArrayList))
+            if (outputType == typeof(IEnumerable) || outputType == typeof(ICollection))
             {
-                return this;
+                return null;
             }
-            return base.GetConvertor(outputType);
+            return outputType == OutputType ? this : new IDictionaryConvertor(outputType).Proxy(outputType);
         }
+
 
         /// <summary>
         /// <seealso cref="IDictionary" /> 构造器
@@ -90,14 +99,14 @@ namespace blqw.Convertors
             /// <returns> </returns>
             public bool TryCreateInstance()
             {
-                if (_type.IsInterface)
+                if (_type.IsAssignableFrom(typeof(Hashtable)))
                 {
                     Instance = new Hashtable();
                     return true;
                 }
                 try
                 {
-                    Instance = (IDictionary)Activator.CreateInstance(_type);
+                    Instance = (IDictionary)_context.CreateInstance(_type);
                     return true;
                 }
                 catch (Exception ex)

@@ -1,4 +1,5 @@
 ﻿using blqw.ConvertServices;
+using blqw.DI;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -49,7 +50,7 @@ namespace blqw.Convertors
             }
             var list = OutputType.IsAssignableFrom(typeof(ArrayList))
                     ? new ArrayList()
-                    : (IList)Activator.CreateInstance(OutputType);
+                    : (IList)context.CreateInstance(OutputType);
             while (input.MoveNext())
             {
                 var result = context.ChangeType<object>(input.Current);

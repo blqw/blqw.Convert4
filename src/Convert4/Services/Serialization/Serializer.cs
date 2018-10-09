@@ -18,5 +18,6 @@ namespace blqw.ConvertServices
 
         public string ToString(object value) => _toString(value);
         public T ToObject<T>(string value) => (T)_toObject(value, typeof(T));
+        public object ToObject(string value, Type type) => _toObject(value, type);
     }
 }
