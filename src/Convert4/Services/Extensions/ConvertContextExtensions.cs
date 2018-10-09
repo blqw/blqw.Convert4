@@ -14,24 +14,24 @@ namespace blqw
         /// <typeparam name="T">转换后的类型</typeparam>
         /// <param name="input">待转换的实例</param>
         /// <returns></returns>
-        /// <exception cref="ArgumentOutOfRangeException"><typeparamref name="T"/>为静态类型</exception>
-        /// <exception cref="ArgumentOutOfRangeException"><typeparamref name="T"/>为泛型定义类型</exception>
+        /// <exception cref="NotSupportedException"><typeparamref name="T"/>为静态类型</exception>
+        /// <exception cref="NotSupportedException"><typeparamref name="T"/>为泛型定义类型</exception>
         /// <exception cref="EntryPointNotFoundException">找不到<typeparamref name="T"/>类型的转换器</exception>
         public static ConvertResult<T> ChangeType<T>(this ConvertContext context, object input)
         {
             var outputType = typeof(T);
             if (outputType.IsGenericTypeDefinition)
             {
-                return new ArgumentOutOfRangeException(SR.GetString($"{"无法为"}{"泛型定义类型"}`{outputType.GetFriendlyName():!}`{"提供转换器"}"));
+                return new NotSupportedException(context.Localize($"{"无法为"}{"泛型定义类型"}`{outputType.GetFriendlyName():!}`{"提供转换器"}"));
             }
             if (outputType.IsAbstract && outputType.IsSealed)
             {
-                return new ArgumentOutOfRangeException(SR.GetString($"{"无法为"}{"静态类型"}`{outputType.GetFriendlyName():!}`{"提供转换器"}"));
+                return new NotSupportedException(context.Localize($"{"无法为"}{"静态类型"}`{outputType.GetFriendlyName():!}`{"提供转换器"}"));
             }
             var conv = context.GetConvertor<T>();
             if (conv == null)
             {
-                return new EntryPointNotFoundException(SR.GetString($"未找到适合的转换器"));
+                return new EntryPointNotFoundException(context.Localize($"未找到适合的转换器"));
             }
             return conv.ChangeType(context, input);
         }
@@ -43,21 +43,24 @@ namespace blqw
         /// <param name="context"></param>
         /// <param name="outputType">转换后的类型</param>
         /// <param name="input">待转换的实例</param>
+        /// <exception cref="NotSupportedException"><typeparamref name="T"/>为静态类型</exception>
+        /// <exception cref="NotSupportedException"><typeparamref name="T"/>为泛型定义类型</exception>
+        /// <exception cref="EntryPointNotFoundException">找不到<typeparamref name="T"/>类型的转换器</exception>
         /// <returns></returns>
         public static ConvertResult ChangeType(this ConvertContext context, Type outputType, object input)
         {
             if (outputType.IsGenericTypeDefinition)
             {
-                return new ArgumentOutOfRangeException(SR.GetString($"{"无法为"}{"泛型定义类型"}`{outputType.GetFriendlyName():!}`{"提供转换器"}"));
+                return new NotSupportedException(context.Localize($"{"无法为"}{"泛型定义类型"}`{outputType.GetFriendlyName():!}`{"提供转换器"}"));
             }
             if (outputType.IsAbstract && outputType.IsSealed)
             {
-                return new ArgumentOutOfRangeException(SR.GetString($"{"无法为"}{"静态类型"}`{outputType.GetFriendlyName():!}`{"提供转换器"}"));
+                return new NotSupportedException(context.Localize($"{"无法为"}{"静态类型"}`{outputType.GetFriendlyName():!}`{"提供转换器"}"));
             }
             var conv = context.GetConvertor(outputType);
             if (conv == null)
             {
-                return new EntryPointNotFoundException(SR.GetString($"未找到适合的转换器"));
+                return new EntryPointNotFoundException(context.Localize($"未找到适合的转换器"));
             }
             return conv.ChangeType(context, input);
         }

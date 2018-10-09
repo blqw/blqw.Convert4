@@ -270,7 +270,12 @@ namespace blqw.Convertors
                     case TypeCode.Single:
                         return InvokeIForm(this, context, v0.ToSingle(context.GetCultureInfo()));
                     case TypeCode.String:
-                        return InvokeIForm(this, context, v0.ToString(context.GetCultureInfo()));
+                        var s = v0.ToString(context.GetCultureInfo());
+                        if (s != input as string)
+                        {
+                            return InvokeIForm(this, context, v0.ToString(context.GetCultureInfo()));
+                        }
+                        break;
                     case TypeCode.UInt16:
                         return InvokeIForm(this, context, v0.ToUInt16(context.GetCultureInfo()));
                     case TypeCode.UInt32:

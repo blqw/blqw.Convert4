@@ -103,7 +103,7 @@ namespace blqw.Convertors
                     {
                         if(p.SetValue(_context, Instance, value) == false)
                         {
-                            _context.InvalidOperationException($"{_type.GetFriendlyName():!} {"构造"}{"失败"},{"原因:"}{"成员"}:{p.Name}{"转换失败"}");
+                            _context.InvalidOperationException($"{_type.GetFriendlyName():!} {"构造"}{"失败"},{"原因:"}{"成员"}{p.Name}{"转换失败"}");
                             return false;
                         }
                     }

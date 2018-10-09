@@ -66,10 +66,6 @@ namespace blqw
                 {
                     return null;
                 }
-                if (_exceptions.Count == 1)
-                {
-                    return _exceptions[0];
-                }
                 return new AggregateException(Message, _exceptions);
             }
         }

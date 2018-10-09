@@ -544,33 +544,43 @@ namespace NUnit.Tests1
         [Test]
         public void 优化错误信息()
         {
-            var x = 123456;
+            var test = 123456;
 
             try
             {
-                var a = x.ChangeType(typeof(Convert));
+                var a = test.ChangeType(typeof(Convert));
+                Assert.Fail();
             }
-            catch (Exception ex)
+            catch (AggregateException ex)
             {
                 if (ex.Message?.StartsWith("无法为静态类型") != true &&
                     ex.Message?.EndsWith("提供转换器") != true)
                 {
                     Assert.Fail(ex.Message);
                 }
+                var messages = ex.InnerExceptions.Select(x => x.Message).ToList();
+                messages.Add("-----------------------------");
+                messages.Add(ex.ToString());
+                Assert.Pass(string.Join(Environment.NewLine, messages.ToArray()));
             }
 
 
             try
             {
-                var a = x.ChangeType(typeof(List<>));
+                var a = test.ChangeType(typeof(List<>));
+                Assert.Fail();
             }
-            catch (Exception ex)
+            catch (AggregateException ex)
             {
                 if (ex.Message?.StartsWith("无法为泛型定义类型") != true &&
                     ex.Message?.EndsWith("提供转换器") != true)
                 {
                     Assert.Fail(ex.Message);
                 }
+                var messages = ex.InnerExceptions.Select(x => x.Message).ToList();
+                messages.Add("-----------------------------");
+                messages.Add(ex.ToString());
+                Assert.Pass(string.Join(Environment.NewLine, messages.ToArray()));
             }
         }
 
