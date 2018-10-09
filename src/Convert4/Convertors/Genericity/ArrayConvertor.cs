@@ -72,7 +72,6 @@ namespace blqw.Convertors
                     context.InvalidCastException(input, TypeFriendlyName);
                     return null;
                 }
-                context.ClearException();
                 return result.OutputValue.ToArray();
             }
         }

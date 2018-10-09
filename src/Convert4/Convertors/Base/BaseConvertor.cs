@@ -178,18 +178,25 @@ namespace blqw.Convertors
         {
             if (input is T t)
             {
+                context.ClearException();
                 return new ConvertResult<T>(t);
             }
             //空值转换
             if (input == null)
             {
-                using (var scope = context.Error.CreateScope())
+                if (this is IFromNull<T> conv)
                 {
-                    if (this is IFromNull<T> conv)
+                    T result;
+                    using (var scope = context.Error.CreateScope())
                     {
-                        var result = conv.FromNull(context);
-                        return !scope.HasError ? new ConvertResult<T>(result) : (ConvertResult<T>)context.Exception;
+                        result = conv.FromNull(context);
+                        if (scope.HasError)
+                        {
+                            return context.Error;
+                        }
                     }
+                    context.ClearException();
+                    return new ConvertResult<T>(result);
                 }
                 return context.GetInvalidCastException("null", TypeFriendlyName);
             }
@@ -243,8 +250,11 @@ namespace blqw.Convertors
                     case TypeCode.DBNull:
                         if (this is IFromNull<T> conv)
                         {
-                            var result = conv.FromDBNull(context);
-                            return context.Exception ?? new ConvertResult<T>(result);
+                            using (var scope = context.Error.CreateScope())
+                            {
+                                var result = conv.FromDBNull(context);
+                                return scope.HasError ? (ConvertResult<T>)context.Error : new ConvertResult<T>(result);
+                            }
                         }
                         return context.GetInvalidCastException("DBNull", TypeFriendlyName);
                     case TypeCode.Boolean:
@@ -320,11 +330,17 @@ namespace blqw.Convertors
             {
                 if (conv is IFrom<TInput, T> from)
                 {
+                    T result;
                     using (var scope = context.Error.CreateScope())
                     {
-                        var result = from.From(context, input);
-                        return scope.HasError ? (ConvertResult<T>)context.Exception : new ConvertResult<T>(result);
+                        result = from.From(context, input);
+                        if (scope.HasError)
+                        {
+                            return context.Error;
+                        }
                     }
+                    context.ClearException();
+                    return new ConvertResult<T>(result);
                 }
                 if (input is IObjectReference refObj)
                 {

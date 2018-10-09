@@ -76,6 +76,15 @@ namespace blqw
             var e = new ConvertError(exception);
             return new ConvertResult<T>(false, default, e);
         }
+
+        public static implicit operator ConvertResult<T>(ConvertError error)
+        {
+            if (error == null)
+            {
+                throw new ArgumentNullException(nameof(error));
+            }
+            return new ConvertResult<T>(false, default, error.Clone());
+        }
         #endregion
     }
 }

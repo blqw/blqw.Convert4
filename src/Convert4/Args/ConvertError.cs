@@ -7,7 +7,7 @@ namespace blqw
     /// <summary>
     /// 转换错误实体
     /// </summary>
-    internal sealed class ConvertError
+    public sealed class ConvertError
     {
         /// <summary>
         /// 初始化异常
@@ -84,7 +84,9 @@ namespace blqw
 
 
         internal Scope CreateScope() => new Scope(this);
+
         private int _scopeMark = 0;
+
         public struct Scope : IDisposable
         {
             private readonly ConvertError _convertError;
@@ -138,5 +140,12 @@ namespace blqw
 
 
         #endregion
+
+        public ConvertError Clone()
+        {
+            var error = new ConvertError(null);
+            error._exceptions.AddRange(_exceptions);
+            return error;
+        }
     }
 }

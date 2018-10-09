@@ -72,7 +72,6 @@ namespace blqw.Convertors
                     }
                     list.Add(result.OutputValue);
                 }
-                context.ClearException();
                 return (TList)list;
             }
 
