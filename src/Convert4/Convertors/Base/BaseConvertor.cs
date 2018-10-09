@@ -145,12 +145,6 @@ namespace blqw.Convertors
         }
 
         /// <summary>
-        /// 创造一个返回值实例
-        /// </summary>
-        protected virtual T CreateOutputInstance(Type type) =>
-            (T)Activator.CreateInstance(type);
-
-        /// <summary>
         /// 输出类型
         /// </summary>
         public virtual Type OutputType { get; }

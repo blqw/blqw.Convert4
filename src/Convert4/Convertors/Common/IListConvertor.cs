@@ -48,16 +48,13 @@ namespace blqw.Convertors
             {
                 return null;
             }
-            var list = OutputType.IsAssignableFrom(typeof(ArrayList))
-                    ? new ArrayList()
-                    : (IList)context.CreateInstance(OutputType);
+            var list = (IList)context.CreateInstance<ArrayList>(OutputType);
             while (input.MoveNext())
             {
                 var result = context.Convert<object>(input.Current);
                 if (!result.Success)
                 {
                     context.Error.AddError(result.Error);
-                    context.InvalidCastException(input, TypeFriendlyName);
                     return null;
                 }
                 list.Add(input.Current);

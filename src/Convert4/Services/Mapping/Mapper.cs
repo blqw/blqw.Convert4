@@ -180,29 +180,62 @@ namespace blqw
             switch (_index)
             {
                 case 1:
-                     _reader.Reset();
+                    _reader.Reset();
                     break;
                 case 2:
-                     _nv.Reset();
+                    _nv.Reset();
                     break;
                 case 3:
-                     _row.Reset();
+                    _row.Reset();
                     break;
                 case 4:
-                     _dataSet.Reset();
+                    _dataSet.Reset();
                     break;
                 case 5:
-                     _enumerator.Reset();
+                    _enumerator.Reset();
                     break;
                 case 6:
-                     _pair.Reset();
+                    _pair.Reset();
                     break;
                 case 7:
-                     _property.Reset();
+                    _property.Reset();
                     break;
                 default:
                     throw new NotSupportedException();
             }
         }
+
+        internal static bool Build(ConvertContext context,
+                                    Type outputType,
+                                    object input,
+                                    Func<bool> create,
+                                    Func<object, object, bool> add)
+        {
+            if (create() == false)
+            {
+                context.InvalidOperationException($"{outputType.GetFriendlyName()} {"创建失败"}");
+                return false;
+            }
+
+            var mapper = new Mapper(input);
+
+            if (mapper.Error != null)
+            {
+                context.InvalidCastException(mapper.Error);
+                return false;
+            }
+
+            while (mapper.MoveNext())
+            {
+                if (add(mapper.Key, mapper.Value) == false)
+                {
+                    context.InvalidOperationException($"{outputType.GetFriendlyName()} {"填充成员失败"}");
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
     }
 }

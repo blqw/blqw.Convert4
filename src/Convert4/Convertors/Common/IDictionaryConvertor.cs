@@ -17,6 +17,7 @@ namespace blqw.Convertors
         public IDictionaryConvertor(Type outputType) : base(outputType)
         {
         }
+
         public IDictionary From(ConvertContext context, object input)
         {
             if (input is null || input is DBNull)
@@ -25,27 +26,11 @@ namespace blqw.Convertors
             }
 
             var builder = new DictionaryBuilder(OutputType, context);
-            if (builder.TryCreateInstance() == false)
+            if (Mapper.Build(context, OutputType, input, builder.TryCreateInstance, builder.Add))
             {
-                return null;
+                return builder.Instance;
             }
-
-            var mapper = new Mapper(input);
-
-            if (mapper.Error != null)
-            {
-                context.InvalidCastException(mapper.Error);
-                return null;
-            }
-
-            while (mapper.MoveNext())
-            {
-                if (builder.Add(mapper.Key, mapper.Value) == false)
-                {
-                    return null;
-                }
-            }
-            return builder.Instance;
+            return null;
         }
 
         public override IConvertor GetConvertor(Type outputType)
@@ -88,7 +73,6 @@ namespace blqw.Convertors
                 catch (Exception ex)
                 {
                     _context.Error.AddException(ex);
-                    _context.InvalidOperationException($"{"向"} {_type.GetFriendlyName():!} {"中添加元素"} {key:!} {"失败"},{"原因:"}{ex.Message}");
                     return false;
                 }
             }
@@ -99,30 +83,17 @@ namespace blqw.Convertors
             /// <returns> </returns>
             public bool TryCreateInstance()
             {
-                if (_type.IsAssignableFrom(typeof(Hashtable)))
-                {
-                    Instance = new Hashtable();
-                    return true;
-                }
                 try
                 {
-                    Instance = (IDictionary)_context.CreateInstance(_type);
+                    Instance = (IDictionary)_context.CreateInstance<Hashtable>(_type);
                     return true;
                 }
                 catch (Exception ex)
                 {
                     _context.Error.AddException(ex);
-                    _context.InvalidOperationException($"{"创建"} {_type.GetFriendlyName()} {"失败"},{"原因"}:{ex.Message}");
                     return false;
                 }
             }
-
-            /// <summary>
-            /// 设置对象值
-            /// </summary>
-            /// <param name="obj"> 待设置的值 </param>
-            /// <returns> </returns>
-            public bool Set(DictionaryEntry obj) => Add(obj.Key, obj.Value);
         }
     }
 }

@@ -11,9 +11,9 @@ namespace blqw.Convertors
     {
         public override IConvertor GetConvertor(Type outputType)
         {
-            if (outputType == null)
+            if (outputType == typeof(object))
             {
-                throw new ArgumentNullException(nameof(outputType));
+                return this;
             }
 
             var args = new Type[] { outputType };
@@ -38,27 +38,11 @@ namespace blqw.Convertors
             public T From(ConvertContext context, object input)
             {
                 var builder = new ObjectBuilder(typeof(T), context);
-                if (builder.TryCreateInstance() == false)
+                if (Mapper.Build(context, OutputType, input, builder.TryCreateInstance, builder.Add))
                 {
-                    return default;
+                    return (T)builder.Instance;
                 }
-
-                var mapper = new Mapper(input);
-
-                if (mapper.Error != null)
-                {
-                    context.InvalidCastException(mapper.Error);
-                    return default;
-                }
-
-                while (mapper.MoveNext())
-                {
-                    if (builder.Add(mapper.Key, mapper.Value) == false)
-                    {
-                        return default;
-                    }
-                }
-                return (T)builder.Instance;
+                return default;
             }
 
 
@@ -89,13 +73,12 @@ namespace blqw.Convertors
                 /// </summary>
                 public object Instance { get; private set; }
 
-
                 public bool Add(object key, object value)
                 {
                     var propName = _keyConvertor.ChangeType(_context, key);
                     if (propName.Success == false)
                     {
-                        _context.InvalidOperationException($"{_type.GetFriendlyName():!} {"构造"}{"失败"},{"原因:"}{"成员名称"}{"转换失败"}");
+                        _context.InvalidCastException($"{"属性名"}{"转换失败"}");
                         return false;
                     }
                     var p = _propertyHandlers.FirstOrDefault(x => x.Name.Equals(propName.OutputValue, StringComparison.OrdinalIgnoreCase));
@@ -103,7 +86,7 @@ namespace blqw.Convertors
                     {
                         if(p.SetValue(_context, Instance, value) == false)
                         {
-                            _context.InvalidOperationException($"{_type.GetFriendlyName():!} {"构造"}{"失败"},{"原因:"}{"成员"}{p.Name}{"转换失败"}");
+                            _context.InvalidCastException($"{"属性"} {propName.OutputValue:!} {"转换失败"}");
                             return false;
                         }
                     }
@@ -124,7 +107,6 @@ namespace blqw.Convertors
                     catch (Exception ex)
                     {
                         _context.Error.AddException(ex);
-                        _context.InvalidOperationException($"{"创建"} {_type.GetFriendlyName()} {"失败"},{"原因"}:{ex.Message}");
                         return false;
                     }
                 }

@@ -1,6 +1,7 @@
 ﻿using blqw.ConvertServices;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using blqw.DI;
 
 namespace blqw
 {
@@ -231,5 +232,9 @@ namespace blqw
             }
             return SR.GetString(this.GetCultureInfo(), str);
         }
+
+        public object CreateInstance<defaultT>(Type outputType)
+            where defaultT : new() =>
+            outputType.IsAssignableFrom(typeof(defaultT)) ? new defaultT() : this.CreateInstance(outputType);
     }
 }

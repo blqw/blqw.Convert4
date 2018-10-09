@@ -51,27 +51,11 @@ namespace blqw.Convertors
                 }
 
                 var builder = new DictionaryBuilder(OutputType, context);
-                if (builder.TryCreateInstance() == false)
+                if (Mapper.Build(context, OutputType, input, builder.TryCreateInstance, builder.Add))
                 {
-                    return null;
+                    return (TDictionary)builder.Instance;
                 }
-
-                var mapper = new Mapper(input);
-
-                if (mapper.Error != null)
-                {
-                    context.InvalidCastException(mapper.Error);
-                    return null;
-                }
-
-                while (mapper.MoveNext())
-                {
-                    if (builder.Add(mapper.Key, mapper.Value) == false)
-                    {
-                        return null;
-                    }
-                }
-                return (TDictionary)builder.Instance;
+                return null;
             }
 
 
@@ -112,14 +96,14 @@ namespace blqw.Convertors
                     var rkey = _keyConvertor.ChangeType(_context, key);
                     if (rkey.Success == false)
                     {
-                        _context.InvalidOperationException($"{"向"} {_type.GetFriendlyName():!} {"中添加元素"}{"失败"},{"原因:"}Key{"转换失败"}");
+                        _context.InvalidCastException($"Key{"转换失败"}");
                         return false;
                     }
 
                     var rval = _valueConvertor.ChangeType(_context, value);
                     if (rval.Success == false)
                     {
-                        _context.InvalidOperationException($"{"向"} {_type.GetFriendlyName():!} {"中添加元素"} {key:!} {"失败"},{"原因:"}Value{"转换失败"}");
+                        _context.InvalidCastException($"{rkey.OutputValue:!} {"转换失败"}");
                         return false;
                     }
                     try
@@ -130,7 +114,6 @@ namespace blqw.Convertors
                     catch (Exception ex)
                     {
                         _context.Error.AddException(ex);
-                        _context.InvalidOperationException($"{"向"} {_type.GetFriendlyName():!} {"中添加元素"} {key:!} {"失败"},{"原因:"}{ex.Message}");
                         return false;
                     }
                 }
@@ -141,20 +124,14 @@ namespace blqw.Convertors
                 /// <returns> </returns>
                 public bool TryCreateInstance()
                 {
-                    if (_type.IsInterface)
-                    {
-                        Instance = new Dictionary<TKey, TValue>();
-                        return true;
-                    }
                     try
                     {
-                        Instance = (IDictionary<TKey, TValue>)Activator.CreateInstance(_type);
+                        Instance = (IDictionary<TKey, TValue>)_context.CreateInstance<Dictionary<TKey, TValue>>(typeof(IDictionary<TKey, TValue>));
                         return true;
                     }
                     catch (Exception ex)
                     {
                         _context.Error.AddException(ex);
-                        _context.InvalidOperationException($"{"创建"} {_type.GetFriendlyName()} {"失败"},{"原因"}:{ex.Message}");
                         return false;
                     }
                 }

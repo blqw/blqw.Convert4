@@ -1,4 +1,5 @@
 ﻿using blqw.ConvertServices;
+using blqw.DI;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -42,8 +43,7 @@ namespace blqw.Convertors
             {
                 if (string.IsNullOrEmpty(input))
                 {
-                    var list = OutputType.IsInterface ? new List<TValue>() : (IList<TValue>)CreateOutputInstance(OutputType);
-                    return (TList)list;
+                    var list = context.CreateInstance<List<TValue>>(typeof(TList));
                 }
                 var separator = context.GetStringSeparators();
 
@@ -60,19 +60,18 @@ namespace blqw.Convertors
                 {
                     return null;
                 }
-                var list = OutputType.IsInterface ? new List<TValue>() : (IList<TValue>)CreateOutputInstance(OutputType);
+                var list = context.CreateInstance<List<TValue>>(typeof(TList));
                 while (input.MoveNext())
                 {
                     var result = context.Convert<TValue>(input.Current);
                     if (!result.Success)
                     {
                         context.Error.AddError(result.Error);
-                        context.InvalidCastException(input.Current, TypeFriendlyName);
                         return null;
                     }
                     list.Add(result.OutputValue);
                 }
-                return (TList)list;
+                return list;
             }
 
             public override IConvertor GetConvertor(Type outputType) => _parent.GetConvertor(outputType);
