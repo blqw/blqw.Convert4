@@ -63,7 +63,7 @@ namespace blqw.Convertors
                 var list = OutputType.IsInterface ? new List<TValue>() : (IList<TValue>)CreateOutputInstance(OutputType);
                 while (input.MoveNext())
                 {
-                    var result = context.ChangeType<TValue>(input.Current);
+                    var result = context.Convert<TValue>(input.Current);
                     if (!result.Success)
                     {
                         context.Error.AddError(result.Error);

@@ -2,6 +2,7 @@
 using System;
 using System.Globalization;
 using static System.UInt64;
+using blqw.ConvertServices;
 
 namespace blqw.Convertors
 {
@@ -94,7 +95,7 @@ namespace blqw.Convertors
                 context.InvalidCastException(input, TypeFriendlyName);
                 return default;
             }
-            return BitConverter.ToUInt64(input.Fill(sizeof(ulong)), 0);
+            return BitConverter.ToUInt64(input.Slice(sizeof(ulong)), 0);
         }
     }
 }

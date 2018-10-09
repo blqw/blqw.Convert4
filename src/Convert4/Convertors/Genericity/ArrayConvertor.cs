@@ -65,7 +65,7 @@ namespace blqw.Convertors
                 {
                     return null;
                 }
-                var result = context.ChangeType<List<T>>(input);
+                var result = context.Convert<List<T>>(input);
                 if (!result.Success)
                 {
                     context.Error.AddError(result.Error);

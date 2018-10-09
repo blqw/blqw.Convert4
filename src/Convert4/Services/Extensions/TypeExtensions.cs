@@ -11,7 +11,7 @@ namespace blqw.ConvertServices
     /// <summary>
     /// 关于类型 <seealso cref="Type"/> 的扩展方法
     /// </summary>
-    public static class TypeExtensions
+    internal static class TypeExtensions
     {
         /// <summary>
         /// 安全的获取程序集中可以被导出的类型
@@ -139,7 +139,7 @@ namespace blqw.ConvertServices
         /// <summary>
         /// 元组类型的接口,通过这个接口判断类型是否是元组类型
         /// </summary>
-        private static readonly Type _system_IValueTupleInternal_Type = Type.GetType("System.IValueTupleInternal", false, false);
+        private static readonly Type _valueTupleType = Type.GetType("System.IValueTupleInternal", false, false);
 
         /// <summary>
         /// 获取类型名称的友好展现形式
@@ -190,7 +190,7 @@ namespace blqw.ConvertServices
                     }
 
                     //这个表示元组类型
-                    if ((_system_IValueTupleInternal_Type?.IsAssignableFrom(t) ?? false))
+                    if ((_valueTupleType?.IsAssignableFrom(t) ?? false))
                     {
                         return "(" + string.Join(", ", generic) + ")";
                     }

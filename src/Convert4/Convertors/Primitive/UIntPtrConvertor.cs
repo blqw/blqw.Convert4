@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using blqw.ConvertServices;
 
 namespace blqw.Convertors
 {
@@ -13,7 +12,7 @@ namespace blqw.Convertors
         public UIntPtr From(ConvertContext context, uint input) => new UIntPtr(input);
         public UIntPtr From(ConvertContext context, object input)
         {
-            var result = context.ChangeType<ulong>(input);
+            var result = context.Convert<ulong>(input);
             if (!result.Success)
             {
                 context.Error.AddError(result.Error);

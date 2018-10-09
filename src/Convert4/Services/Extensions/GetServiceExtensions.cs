@@ -11,7 +11,7 @@ namespace blqw.ConvertServices
     /// <summary>
     /// 获取服务的扩展方法
     /// </summary>
-    public static class GetServiceExtensions
+    internal static class GetServiceExtensions
     {
         /// <summary>
         /// 获取 区域对象 <seealso cref="CultureInfo"/>, 默认返回当前区域 <seealso cref="CultureInfo.CurrentCulture"/>
@@ -145,5 +145,16 @@ namespace blqw.ConvertServices
             }
             return provider.GetService(typeof(IFormatProvider)) as IFormatProvider;
         }
+
+        /// <summary>
+        /// 获取指定类型的服务, 如果获取失败, 返回 <paramref name="defaultValue"/>
+        /// </summary>
+        /// <typeparam name="T">服务类型</typeparam>
+        /// <param name="provider"></param>
+        /// <param name="defaultValue">默认服务</param>
+        /// <returns></returns>
+        public static T GetService<T>(this IServiceProvider provider, T defaultValue = default) =>
+            provider?.GetService(typeof(T)) is T t ? t : defaultValue;
+
     }
 }

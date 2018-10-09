@@ -2,6 +2,7 @@
 using System;
 using System.Globalization;
 using static System.Int16;
+using blqw.ConvertServices;
 
 namespace blqw.Convertors
 {
@@ -110,7 +111,7 @@ namespace blqw.Convertors
                 context.InvalidCastException(input, TypeFriendlyName);
                 return default;
             }
-            return BitConverter.ToInt16(input.Fill(sizeof(short)), 0);
+            return BitConverter.ToInt16(input.Slice(sizeof(short)), 0);
         }
     }
 }

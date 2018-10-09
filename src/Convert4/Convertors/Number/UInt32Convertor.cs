@@ -1,4 +1,4 @@
-﻿using System.Security.Cryptography;
+﻿using blqw.ConvertServices;
 using System;
 using System.Globalization;
 using static System.UInt32;
@@ -110,7 +110,7 @@ namespace blqw.Convertors
                 context.InvalidCastException(input, TypeFriendlyName);
                 return default;
             }
-            return BitConverter.ToUInt32(input.Fill(sizeof(uint)), 0);
+            return BitConverter.ToUInt32(input.Slice(sizeof(uint)), 0);
         }
     }
 }

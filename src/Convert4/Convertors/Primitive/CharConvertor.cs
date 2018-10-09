@@ -1,5 +1,6 @@
 ﻿using System;
 using static System.Char;
+using blqw.ConvertServices;
 
 namespace blqw.Convertors
 {
@@ -123,7 +124,7 @@ namespace blqw.Convertors
                 context.InvalidCastException(input, TypeFriendlyName);
                 return default;
             }
-            return BitConverter.ToChar(input.Fill(sizeof(char)), 0);
+            return BitConverter.ToChar(input.Slice(sizeof(char)), 0);
         }
     }
 }

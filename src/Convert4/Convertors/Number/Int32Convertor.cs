@@ -102,7 +102,7 @@ namespace blqw.Convertors
                 context.InvalidCastException(input, TypeFriendlyName);
                 return default;
             }
-            return BitConverter.ToInt32(input.Fill(sizeof(int)), 0);
+            return BitConverter.ToInt32(input.Slice(sizeof(int)), 0);
         }
     }
 }

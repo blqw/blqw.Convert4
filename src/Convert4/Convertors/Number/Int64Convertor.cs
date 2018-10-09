@@ -1,4 +1,4 @@
-﻿using System.Security.Cryptography;
+﻿using blqw.ConvertServices;
 using System;
 using System.Globalization;
 using static System.Int64;
@@ -94,7 +94,7 @@ namespace blqw.Convertors
                 context.InvalidCastException(input, TypeFriendlyName);
                 return default;
             }
-            return BitConverter.ToInt64(input.Fill(sizeof(long)), 0);
+            return BitConverter.ToInt64(input.Slice(sizeof(long)), 0);
         }
     }
 }

@@ -39,7 +39,7 @@ namespace blqw.Convertors
                 {
                     return new ConvertResult<TValue?>(null);
                 }
-                var result = context.ChangeType<TValue>(input);
+                var result = context.Convert<TValue>(input);
                 return result.Cast<TValue?>();
             }
 
@@ -49,7 +49,7 @@ namespace blqw.Convertors
                 {
                     return new ConvertResult(null);
                 }
-                return context.ChangeType<TValue>(input);
+                return context.Convert<TValue>(input);
             }
 
         }

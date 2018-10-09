@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using static System.Single;
+using blqw.ConvertServices;
 
 namespace blqw.Convertors
 {
@@ -102,7 +103,7 @@ namespace blqw.Convertors
                 context.InvalidCastException(input, TypeFriendlyName);
                 return default;
             }
-            return BitConverter.ToSingle(input.Fill(sizeof(float)), 0);
+            return BitConverter.ToSingle(input.Slice(sizeof(float)), 0);
         }
     }
 }

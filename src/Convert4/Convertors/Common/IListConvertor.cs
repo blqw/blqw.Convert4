@@ -53,7 +53,7 @@ namespace blqw.Convertors
                     : (IList)context.CreateInstance(OutputType);
             while (input.MoveNext())
             {
-                var result = context.ChangeType<object>(input.Current);
+                var result = context.Convert<object>(input.Current);
                 if (!result.Success)
                 {
                     context.Error.AddError(result.Error);

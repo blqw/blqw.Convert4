@@ -58,7 +58,7 @@ namespace blqw
         /// <returns></returns>
         public bool SetValue(ConvertContext context, object target, object value)
         {
-            var result = context.ChangeType(PropertyType, value);
+            var result = context.Convert(PropertyType, value);
             if (result.Success == false)
             {
                 context.InvalidCastException($"{"属性"}{Property.Name:!}{"值"}{"转换失败"}");

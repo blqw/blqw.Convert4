@@ -72,7 +72,7 @@ namespace blqw.Convertors
             {
                 return null;
             }
-            var s = context.ChangeType<string>(input.Current);
+            var s = context.Convert<string>(input.Current);
             if (!s.Success)
             {
                 context.Error.AddError(s.Error);
@@ -84,7 +84,7 @@ namespace blqw.Convertors
             do
             {
                 sb.Append(separator);
-                s = context.ChangeType<string>(input.Current);
+                s = context.Convert<string>(input.Current);
                 if (!s.Success)
                 {
                     context.Error.AddError(s.Error);

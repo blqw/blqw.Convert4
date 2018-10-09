@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using static System.Double;
+using blqw.ConvertServices;
 
 namespace blqw.Convertors
 {
@@ -53,7 +54,7 @@ namespace blqw.Convertors
                 context.InvalidCastException(input, TypeFriendlyName);
                 return default;
             }
-            return BitConverter.ToDouble(input.Fill(sizeof(double)), 0);
+            return BitConverter.ToDouble(input.Slice(sizeof(double)), 0);
         }
     }
 }

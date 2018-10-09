@@ -1,4 +1,5 @@
-﻿using System;
+﻿using blqw.ConvertServices;
+using System;
 using System.Globalization;
 using static System.Decimal;
 
@@ -54,7 +55,7 @@ namespace blqw.Convertors
                 context.InvalidCastException(input, TypeFriendlyName);
                 return default;
             }
-            var bytes = input.Fill(sizeof(decimal));
+            var bytes = input.Slice(sizeof(decimal));
             var arr2 = new int[4];
             Buffer.BlockCopy(bytes, 0, arr2, 0, sizeof(decimal));
             return new decimal(arr2);

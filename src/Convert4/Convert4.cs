@@ -16,7 +16,7 @@ namespace blqw
         {
             using (var context = new ConvertContext(settings))
             {
-                return context.ChangeType<T>(input);
+                return context.Convert<T>(input);
             }
         }
 
@@ -24,7 +24,7 @@ namespace blqw
         {
             using (var context = new ConvertContext(settings))
             {
-                return context.ChangeType(outputType, input);
+                return context.Convert(outputType, input);
             }
         }
 

@@ -303,7 +303,7 @@ namespace blqw.Convertors
                 || input is IPAddress
                 || input is IFormattable)
             {
-                var result = context.ChangeType<string>(input);
+                var result = context.Convert<string>(input);
                 if (result.Success)
                 {
                     return InvokeIForm(this, context, result.OutputValue);
