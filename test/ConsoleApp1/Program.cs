@@ -11,7 +11,7 @@ namespace ConsoleApp1
         static void Main(string[] args)
         {
             CodeTimer.Initialize();
-            var count = 10000;
+            var count = 100000;
             {
                 var s = int.MaxValue.ToString();
                 CodeTimer.Time("系统方式转型性能1", count, () => int.TryParse(s, out var j));

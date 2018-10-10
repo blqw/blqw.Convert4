@@ -87,6 +87,8 @@ namespace blqw
         private ConvertError _error;
         internal ConvertError Error => _error ?? (_error = new ConvertError(null));
 
+        public IConvertorSelector ConvertorSelector => _convertorSelector;
+
         public void ClearException() => _error?.Clear();
 
         /// <summary>

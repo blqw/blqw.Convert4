@@ -27,36 +27,20 @@ namespace blqw
 
         private static readonly object _unSet = new object();
 
-        private LinkedList<(Type, string, object)> _services;
-        private LinkedListNode<(Type, string, object)> _firstForTypeService;
+        private Dictionary<(Type, string), object> _services;
+
 
         public object DefaultValue { get; set; } = _unSet;
 
         public bool Throwable => ReferenceEquals(DefaultValue, _unSet);
-
-        public LinkedList<(Type, string, object)> Services
-        {
-            get
-            {
-                if (_services != null)
-                {
-                    return _services;
-                }
-                var services = new LinkedList<(Type, string, object)>();
-                services.AddFirst((null, null, null));
-                _firstForTypeService = services.AddLast((null, null, null));
-                return _services = services;
-            }
-        }
-
 
         /// <summary>
         /// 获取设置
         /// </summary>
         public T Get<T>(Type forType, string name)
         {
-            var value = Get(forType, name ?? typeof(T).GetFriendlyName(), out _)
-                     ?? Get(null, name ?? typeof(T).GetFriendlyName(), out _);
+            var value = Get(forType, name ?? typeof(T).GetFriendlyName())
+                     ?? Get(null, name ?? typeof(T).GetFriendlyName());
             return value is T t ? t : (default);
         }
 
@@ -69,21 +53,7 @@ namespace blqw
         /// 获取设置
         /// </summary>
         /// <returns></returns>
-        private object Get(Type forType, string name, out LinkedListNode<(Type, string, object)> node)
-        {
-            for (node = forType == null ? Services.First.Next : (_firstForTypeService?.Next ?? Services.Last);
-                 node?.Value.Item3 != null;
-                 node = node.Next)
-            {
-                var (t, n, v) = node.Value;
-                if (forType == t && n == name)
-                {
-                    return v;
-                }
-            }
-            node = null;
-            return null;
-        }
+        private object Get(Type forType, string name) => _services != null && _services.TryGetValue((forType, name), out var value) ? value : null;
 
 
         public ConvertSettings Set<T>(object value, Type forType = null) =>
@@ -96,25 +66,20 @@ namespace blqw
                 throw new ArgumentNullException(nameof(name));
             }
 
-            Get(forType, name, out var node);
             if (value == null)
             {
-                if (node != null)
+                _services?.Remove((forType, name));
+            }
+            else if (_services == null)
+            {
+                _services = new Dictionary<(Type, string), object>()
                 {
-                    Services.Remove(node);
-                }
-            }
-            else if (node != null)
-            {
-                Services.AddAfter(node.Previous, (forType, name, value));
-            }
-            else if (forType == null)
-            {
-                Services.AddAfter(_services.First, (forType, name, value));
+                    [(forType, name)] = value
+                };
             }
             else
             {
-                Services.AddAfter(_firstForTypeService, (forType, name, value));
+                _services[(forType, name)] = value;
             }
             return this;
         }

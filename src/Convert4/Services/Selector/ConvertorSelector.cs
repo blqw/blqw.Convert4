@@ -61,12 +61,12 @@ namespace blqw
                 return null;
             }
 
-            //优先使用注入的服务
-            //var selector = context.GetService<IConvertorSelector>();
-            //if (!ReferenceEquals(selector, this))
-            //{
-            //    return selector.Get(outputType, context);
-            //}
+            // 优先使用注入的服务
+            var selector = context.ConvertorSelector;
+            if (!ReferenceEquals(selector, this))
+            {
+                return selector.Get(outputType, context);
+            }
 
             if (_convertors.TryGetValue(outputType, out var conv) || _spawnable == false)
             {
