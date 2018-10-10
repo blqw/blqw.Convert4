@@ -13,19 +13,15 @@ namespace blqw
         /// <summary>
         /// 服务提供程序
         /// </summary>
-        private readonly IServiceProvider _serviceProvider;
-        /// <summary>
-        /// 服务范围
-        /// </summary>
-        private readonly IServiceScope _serviceScope;
+        private IServiceProvider _serviceProvider;
         /// <summary>
         /// 转换器选择器
         /// </summary>
-        private readonly IConvertorSelector _convertorSelector;
+        private IConvertorSelector _convertorSelector;
         /// <summary>
         /// 转换设置
         /// </summary>
-        private readonly ConvertSettings _settings;
+        private ConvertSettings _settings;
 
         /// <summary>
         /// 使用 <seealso cref="ConvertConfig.Current"/> 创建上下文并提供服务提供程序
@@ -53,8 +49,7 @@ namespace blqw
             var provider = settings.ServiceProvider as AggregateServicesProvider
                             ?? settings.ServiceProvider.Aggregate(ConvertSettings.Global.ServiceProvider);
 
-            _serviceScope = provider.CreateScope();
-            _serviceProvider = _serviceScope.ServiceProvider;
+            _serviceProvider = provider;
             _convertorSelector = _serviceProvider.GetService<IConvertorSelector>();
             _settings = settings;
         }
@@ -77,7 +72,12 @@ namespace blqw
         /// <summary>
         /// 施放资源
         /// </summary>
-        public void Dispose() => _serviceScope?.Dispose();
+        public void Dispose()
+        {
+            _serviceProvider = null;
+            _convertorSelector = null;
+            _settings = null;
+        }
 
         /// <summary>
         /// 异常
@@ -100,7 +100,7 @@ namespace blqw
             {
                 return _settings;
             }
-            return _settings?.GetService(serviceType) ?? _serviceProvider?.GetService(serviceType);
+            return _serviceProvider?.GetService(serviceType);
         }
 
         /// <summary>
@@ -123,7 +123,7 @@ namespace blqw
             {
                 return new NotSupportedException(this.Localize($"{"无法为"}{"静态类型"}`{outputType.GetFriendlyName():!}`{"提供转换器"}"));
             }
-            var conv = this.GetConvertor<T>();
+            var conv = GetConvertor<T>();
             if (conv == null)
             {
                 return new EntryPointNotFoundException(this.Localize($"未找到适合的转换器"));

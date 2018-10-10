@@ -10,13 +10,6 @@ namespace blqw
         /// <summary>
         /// 获取指定类型的转换器
         /// </summary>
-        /// <typeparam name="T">指定类型</typeparam>
-        /// <param name="context">转换上下文</param>
-        /// <returns></returns>
-        IConvertor<T> Get<T>(ConvertContext context);
-        /// <summary>
-        /// 获取指定类型的转换器
-        /// </summary>
         /// <param name="outputType">指定类型</param>
         /// <param name="context">转换上下文</param>
         /// <returns></returns>

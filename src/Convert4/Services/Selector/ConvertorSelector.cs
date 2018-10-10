@@ -15,7 +15,7 @@ namespace blqw
         /// <summary>
         /// 转换器字典
         /// </summary>
-        private Dictionary<Type, IConvertor> _convertors;
+        private readonly ConcurrentDictionary<Type, IConvertor> _convertors;
         /// <summary>
         /// <seealso cref="IConvertor{object}"/> 转换器
         /// </summary>
@@ -33,7 +33,7 @@ namespace blqw
         public ConvertorSelector(IEnumerable<IConvertor> convertors = null, IComparer<Type> typeComparer = null, bool spawnable = true)
         {
             TypeComparer = typeComparer ?? ConvertServices.TypeComparer.Instance;
-            _convertors = new Dictionary<Type, IConvertor>();
+            _convertors = new ConcurrentDictionary<Type, IConvertor>();
             foreach (var convertor in convertors)
             {
                 //同类型转换器只保留优先级最高的, 优先级相同保留顺序靠后的
@@ -46,18 +46,6 @@ namespace blqw
             _convertors.TryGetValue(typeof(object), out _objectConvertor);
             _spawnable = spawnable;
         }
-        /// <summary>
-        /// 获取指定类型的转换器
-        /// </summary>
-        /// <typeparam name="T">指定类型</typeparam>
-        /// <param name="context">转换上下文</param>
-        /// <returns></returns>
-        public IConvertor<T> Get<T>(ConvertContext context) =>
-            (IConvertor<T>)Get(typeof(T), context);
-
-
-
-
 
         /// <summary>
         /// 获取指定类型的转换器
@@ -67,43 +55,37 @@ namespace blqw
         /// <returns></returns>
         public IConvertor Get(Type outputType, ConvertContext context)
         {
-            //优先使用注入的服务
-            var selector = context.GetService<IConvertorSelector>();
-            if (selector != this)
-            {
-                var conv0 = selector.Get(outputType, context);
-                if (conv0 != null)
-                {
-                    return conv0;
-                }
-            }
-
-
-            var convs = _convertors;
-            if (convs.TryGetValue(outputType, out var conv) || _spawnable == false)
-            {
-                return conv;
-            }
             if (outputType.IsGenericTypeDefinition || outputType.IsAbstract && outputType.IsSealed)
             {
                 return null;
             }
+
+            //优先使用注入的服务
+            var selector = context.GetService<IConvertorSelector>();
+            if (ReferenceEquals(selector, this))
+            {
+                return selector.Get(outputType, context);
+            }
+
+            if (_convertors.TryGetValue(outputType, out var conv) || _spawnable == false)
+            {
+                // 获取已存在的转换器
+                return conv;
+            }
+
             var ee = Match(outputType);
             while (ee.MoveNext())
             {
                 conv = ee.Current;
-                if (ee.Current != null && ee.Current.OutputType != outputType)
+                if (conv.OutputType != outputType)
                 {
                     conv = ee.Current.GetConvertor(outputType);
-                }
-                if (conv != null)
-                {
-                    _convertors = new Dictionary<Type, IConvertor>(convs)
+                    if (conv == null)
                     {
-                        [outputType] = conv
-                    };
-                    return conv;
+                        continue;
+                    }
                 }
+                return _convertors.GetOrAdd(outputType, conv);
             }
             return null;
         }

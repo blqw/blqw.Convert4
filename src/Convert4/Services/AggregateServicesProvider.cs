@@ -33,6 +33,11 @@ namespace blqw.ConvertServices
             {
                 return this;
             }
+            if (serviceType.IsGenericType && serviceType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
+            {
+                var itemServiceType = serviceType.GetGenericArguments().Single();
+                return _serviceProviders.SelectMany(x => x.GetServices(itemServiceType)).ToList();
+            }
             return _serviceProviders.Select(x => x.GetService(serviceType)).FirstOrDefault(x => x != null);
         }
 
@@ -48,21 +53,17 @@ namespace blqw.ConvertServices
         /// </summary>
         private class Scope : IServiceScope
         {
-            public Scope(IServiceProvider provider) => ServiceProvider = provider;
+            private IServiceProvider _serviceProvider;
 
-            public IServiceProvider ServiceProvider { get; }
+            public Scope(IServiceProvider provider) => _serviceProvider = provider;
 
-            public void Dispose() => (ServiceProvider as IDisposable)?.Dispose();
+            public IServiceProvider ServiceProvider => _serviceProvider;
+            public void Dispose() => DisposeHelper.DisposeAndRemove(ref _serviceProvider);
         }
 
         /// <summary>
         /// 施放资源
         /// </summary>
-        public void Dispose()
-        {
-            var providers = _serviceProviders;
-            _serviceProviders = null;
-            providers.SafeForEach<IDisposable>(x => x.Dispose());
-        }
+        public void Dispose() => DisposeHelper.DisposeAndRemove(ref _serviceProviders);
     }
 }

@@ -7,13 +7,20 @@ namespace blqw.ConvertServices
 {
     internal static class InternalExtensions
     {
-        public static IServiceProvider Aggregate(this IServiceProvider provider, IServiceProvider provider2)
+        public static IServiceProvider Aggregate(this IServiceProvider provider,params IServiceProvider[] providers)
         {
-            if (provider == null || provider2 == null)
+            if (providers == null || providers.Length == 0)
             {
-                return provider ?? provider2;
+                return provider;
             }
-            return new AggregateServicesProvider(provider, provider2);
+            if (provider != null)
+            {
+                var arr = new IServiceProvider[providers.Length + 1];
+                Array.Copy(providers, 0, arr, 1, providers.Length);
+                arr[0] = provider;
+                providers = arr;
+            }
+            return new AggregateServicesProvider(providers);
         }
 
         /// <summary>

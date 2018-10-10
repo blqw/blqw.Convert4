@@ -11,7 +11,7 @@ namespace blqw
     /// <summary>
     /// 转换器设置参数
     /// </summary>
-    public sealed class ConvertSettings : IServiceProvider
+    public sealed class ConvertSettings
     {
         /// <summary>
         /// 服务提供程序
@@ -25,7 +25,7 @@ namespace blqw
 
 
         public ConvertSettings(IServiceProvider provider = null) =>
-            ServiceProvider = provider ?? Global.ServiceProvider;
+            ServiceProvider = provider ?? Global?.ServiceProvider;
 
         private static readonly object _unSet = new object();
 

@@ -17,9 +17,9 @@ namespace blqw.ConvertServices
         public static IServiceCollection AddConvert4(this IServiceCollection services)
         {
             var types = typeof(Convert4).Assembly.SafeGetTypes();
-            types.Where(x => x.IsClass && x.Instantiable() && typeof(IConvertor).IsAssignableFrom(x))
+            types.Where(x => typeof(IConvertor).IsAssignableFrom(x) && x.IsClass && x.Instantiable())
                  .ForEach(x => services.AddSingleton(typeof(IConvertor), x));
-            services.AddSingleton(typeof(IConvertorSelector), typeof(ConvertorSelector));
+            services.AddSingleton<IConvertorSelector, ConvertorSelector>();
             services.AddSingleton<ConvertSettings>();
             return services;
         }

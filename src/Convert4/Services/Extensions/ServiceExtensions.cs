@@ -11,7 +11,7 @@ namespace blqw.ConvertServices
     /// <summary>
     /// 获取服务的扩展方法
     /// </summary>
-    internal static class GetServiceExtensions
+    internal static class ServiceExtensions
     {
         /// <summary>
         /// 获取 区域对象 <seealso cref="CultureInfo"/>, 默认返回当前区域 <seealso cref="CultureInfo.CurrentCulture"/>
@@ -107,7 +107,7 @@ namespace blqw.ConvertServices
                 var contract = settings.GetNamedService(SERIALIZATION_CONTRACT) as string;
                 if (string.IsNullOrWhiteSpace(contract))
                 {
-                    return settings.GetService<ISerializationService>();
+                    return (ISerializationService)settings.GetService(typeof(ISerializationService));
                 }
                 return provider.GetServices<ISerializationService>().FirstOrDefault(x => x.Contract == contract);
             }
@@ -156,5 +156,14 @@ namespace blqw.ConvertServices
         public static T GetService<T>(this IServiceProvider provider, T defaultValue = default) =>
             provider?.GetService(typeof(T)) is T t ? t : defaultValue;
 
+
+        /// <summary>
+        /// 获取指定类型的转换器
+        /// </summary>
+        /// <typeparam name="T">指定类型</typeparam>
+        /// <param name="context">转换上下文</param>
+        /// <returns></returns>
+        public static IConvertor<T> Get<T>(this IConvertorSelector selector, ConvertContext context) =>
+            (IConvertor<T>)selector.Get(typeof(T), context);
     }
 }
