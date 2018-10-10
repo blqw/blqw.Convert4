@@ -4,6 +4,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace blqw
 {
@@ -62,7 +63,7 @@ namespace blqw
 
             //优先使用注入的服务
             var selector = context.GetService<IConvertorSelector>();
-            if (ReferenceEquals(selector, this))
+            if (!ReferenceEquals(selector, this))
             {
                 return selector.Get(outputType, context);
             }
@@ -83,6 +84,10 @@ namespace blqw
                     if (conv == null)
                     {
                         continue;
+                    }
+                    if (conv.OutputType != outputType)
+                    {
+                        conv = conv.Proxy(outputType);
                     }
                 }
                 return _convertors.GetOrAdd(outputType, conv);

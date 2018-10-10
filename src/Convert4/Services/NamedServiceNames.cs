@@ -18,6 +18,6 @@
         /// <summary>
         /// 序列化协议
         /// </summary>
-        public const string SERIALIZATION_CONTRACT = nameof(SERIALIZATION_CONTRACT);
+        public const string SERIALIZATION_PROTOCOL = nameof(SERIALIZATION_PROTOCOL);
     }
 }

@@ -236,5 +236,24 @@ namespace blqw
         public object CreateInstance<defaultT>(Type outputType)
             where defaultT : new() =>
             outputType.IsAssignableFrom(typeof(defaultT)) ? new defaultT() : this.CreateInstance(outputType);
+
+        /// <summary>
+        /// 获取设置或服务
+        /// </summary>
+        public T GetSettingOrService<T>(Type forType = null) =>
+           _settings.Get<object>(forType, typeof(T).GetFriendlyName()) is T value ? value :
+            (GetService(typeof(T)) is T val ? val : default);
+
+        /// <summary>
+        /// 获取设置
+        /// </summary>
+        public T GetSetting<T>(Type forType = null, string name = null) =>
+            _settings.Get<T>(forType, name);
+
+        /// <summary>
+        /// 获取设置
+        /// </summary>
+        public T GetSetting<T>(string name) =>
+            _settings.Get<T>(null, name);
     }
 }

@@ -7,7 +7,7 @@ namespace blqw.ConvertServices
 {
     internal static class InternalExtensions
     {
-        public static IServiceProvider Aggregate(this IServiceProvider provider,params IServiceProvider[] providers)
+        public static IServiceProvider Aggregate(this IServiceProvider provider, params IServiceProvider[] providers)
         {
             if (providers == null || providers.Length == 0)
             {
@@ -148,5 +148,23 @@ namespace blqw.ConvertServices
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// 获取指定类型的转换器
+        /// </summary>
+        /// <typeparam name="T">指定类型</typeparam>
+        /// <param name="context">转换上下文</param>
+        /// <returns></returns>
+        public static IConvertor<T> Get<T>(this IConvertorSelector selector, ConvertContext context)
+        {
+            var conv = selector.Get(typeof(T), context);
+            try
+            {
+                return (IConvertor<T>)conv;
+            }
+            catch (Exception e)
+            {
+                throw new InvalidCastException(conv.GetType().GetFriendlyName() + " 无法转为 " + typeof(IConvertor<T>).GetFriendlyName());
+            }
+        }
     }
 }

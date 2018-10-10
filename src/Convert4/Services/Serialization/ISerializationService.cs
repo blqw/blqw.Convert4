@@ -10,7 +10,7 @@ namespace blqw.ConvertServices
         /// <summary>
         /// 序列化协议
         /// </summary>
-        string Contract { get; }
+        string Protocol { get; }
         /// <summary>
         /// 对象转为字符串
         /// </summary>
