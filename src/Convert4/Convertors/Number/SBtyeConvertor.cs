@@ -12,73 +12,64 @@ namespace blqw.Convertors
                                 , IFromConvertible<sbyte>
                                 , IFrom<object, sbyte>
     {
-        public sbyte From(ConvertContext context, bool input) => input ? (sbyte)1 : (sbyte)0;
-        public sbyte From(ConvertContext context, char input) => (sbyte)input;
-        public sbyte From(ConvertContext context, sbyte input) => (sbyte)input;
-        public sbyte From(ConvertContext context, byte input) => (sbyte)input;
-        public sbyte From(ConvertContext context, short input) => (sbyte)input;
-        public sbyte From(ConvertContext context, ushort input) => (sbyte)input;
-        public sbyte From(ConvertContext context, int input) => (sbyte)input;
-        public sbyte From(ConvertContext context, uint input)
+        public ConvertResult<sbyte> From(ConvertContext context, bool input) => input ? (sbyte)1 : (sbyte)0;
+        public ConvertResult<sbyte> From(ConvertContext context, char input) => (sbyte)input;
+        public ConvertResult<sbyte> From(ConvertContext context, sbyte input) => (sbyte)input;
+        public ConvertResult<sbyte> From(ConvertContext context, byte input) => (sbyte)input;
+        public ConvertResult<sbyte> From(ConvertContext context, short input) => (sbyte)input;
+        public ConvertResult<sbyte> From(ConvertContext context, ushort input) => (sbyte)input;
+        public ConvertResult<sbyte> From(ConvertContext context, int input) => (sbyte)input;
+        public ConvertResult<sbyte> From(ConvertContext context, uint input)
         {
             if (input > MaxValue)
             {
-                context.OverflowException($"{input} > {MaxValue}");
-                return default;
+                return context.OverflowException($"{input} > {MaxValue}");
             }
             return (sbyte)input;
         }
-        public sbyte From(ConvertContext context, long input)
+        public ConvertResult<sbyte> From(ConvertContext context, long input)
         {
             if ((input < MinValue) || (input > MaxValue))
             {
-                context.OverflowException(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}");
-                return 0;
+                return context.OverflowException(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}");
             }
             return (sbyte)input;
         }
-        public sbyte From(ConvertContext context, ulong input)
+        public ConvertResult<sbyte> From(ConvertContext context, ulong input)
         {
             if (input > (int)MaxValue)
             {
-                context.OverflowException($"{input} > {MaxValue}");
-                return 0;
+                return context.OverflowException($"{input} > {MaxValue}");
             }
             return (sbyte)input;
         }
-        public sbyte From(ConvertContext context, float input)
+        public ConvertResult<sbyte> From(ConvertContext context, float input)
         {
             if ((input < MinValue) || (input > MaxValue))
             {
-                context.OverflowException(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}");
-                return 0;
+                return context.OverflowException(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}");
             }
             return (sbyte)input;
         }
-        public sbyte From(ConvertContext context, double input)
+        public ConvertResult<sbyte> From(ConvertContext context, double input)
         {
             if ((input < MinValue) || (input > MaxValue))
             {
-                context.OverflowException(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}");
-                return 0;
+                return context.OverflowException(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}");
             }
             return (sbyte)input;
         }
-        public sbyte From(ConvertContext context, decimal input)
+        public ConvertResult<sbyte> From(ConvertContext context, decimal input)
         {
             if ((input < MinValue) || (input > MaxValue))
             {
-                context.OverflowException(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}");
-                return 0;
+                return context.OverflowException(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}");
             }
             return decimal.ToSByte(input);
         }
-        public sbyte From(ConvertContext context, DateTime input)
-        {
-            context.InvalidCastException(input, TypeFriendlyName);
-            return default;
-        }
-        public sbyte From(ConvertContext context, string input)
+        public ConvertResult<sbyte> From(ConvertContext context, DateTime input) => context.InvalidCastException(input, TypeFriendlyName);
+
+        public ConvertResult<sbyte> From(ConvertContext context, string input)
         {
             var s = input?.Trim() ?? "";
             if (string.IsNullOrWhiteSpace(s))
@@ -94,13 +85,8 @@ namespace blqw.Convertors
             {
                 return result;
             }
-            context.InvalidCastException(input, TypeFriendlyName);
-            return default;
+            return context.InvalidCastException(input, TypeFriendlyName);
         }
-        public sbyte From(ConvertContext context, object input)
-        {
-            context.InvalidCastException(input, TypeFriendlyName);
-            return default;
-        }
+        public ConvertResult<sbyte> From(ConvertContext context, object input) => context.InvalidCastException(input, TypeFriendlyName);
     }
 }

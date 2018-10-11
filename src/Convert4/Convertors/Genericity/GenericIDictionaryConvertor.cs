@@ -43,19 +43,16 @@ namespace blqw.Convertors
 
             public override IConvertor GetConvertor(Type outputType) => _parent.GetConvertor(outputType);
 
-            public TDictionary From(ConvertContext context, object input)
+            public ConvertResult<TDictionary> From(ConvertContext context, object input)
             {
                 if (input is null || input is DBNull)
                 {
-                    return null;
+                    return default;
                 }
 
                 var builder = new DictionaryBuilder(OutputType, context);
-                if (Mapper.Build(context, OutputType, input, builder.InstanceCreated, builder.Add))
-                {
-                    return (TDictionary)builder.Instance;
-                }
-                return null;
+                var ex = builder.Exception + Mapper.Build(context, OutputType, input, builder.InstanceCreated, builder.Add);
+                return ex ?? Result(builder.Instance);
             }
 
 
@@ -85,44 +82,44 @@ namespace blqw.Convertors
                     _valueConvertor = context.GetConvertor<TValue>();
                     try
                     {
-                        Instance = (IDictionary<TKey, TValue>)_context.CreateInstance<Dictionary<TKey, TValue>>(typeof(IDictionary<TKey, TValue>));
+                        Instance = (TDictionary)_context.CreateInstance<Dictionary<TKey, TValue>>(_type);
+                        Exception = null;
                     }
                     catch (Exception ex)
                     {
-                        _context.Error.AddException(ex);
-                        Instance = null;
+                        Instance = default;
+                        Exception = ex as ConvertException ?? new ConvertException(ex);
                     }
                 }
+
+                public ConvertException Exception { get; }
 
                 /// <summary>
                 /// 被构造的实例
                 /// </summary>
-                public IDictionary<TKey, TValue> Instance { get; private set; }
+                public TDictionary Instance { get; }
 
-                public bool Add(object key, object value)
+                public ConvertException Add(object key, object value)
                 {
                     var rkey = _keyConvertor.ChangeType(_context, key);
                     if (rkey.Success == false)
                     {
-                        _context.InvalidCastException($"Key{"转换失败"}");
-                        return false;
+                        return rkey.Exception + _context.InvalidCastException($"Key{"转换失败"}");
                     }
 
                     var rval = _valueConvertor.ChangeType(_context, value);
                     if (rval.Success == false)
                     {
-                        _context.InvalidCastException($"{rkey.OutputValue:!} {"转换失败"}");
-                        return false;
+                        return rval.Exception + _context.InvalidCastException($"Key={rkey.OutputValue:!} {"值"}{"转换失败"}");
                     }
                     try
                     {
                         Instance.Add(rkey.OutputValue, rval.OutputValue);
-                        return true;
+                        return null;
                     }
                     catch (Exception ex)
                     {
-                        _context.Error.AddException(ex);
-                        return false;
+                        return ex as ConvertException ?? new ConvertException(ex);
                     }
                 }
 
@@ -131,13 +128,6 @@ namespace blqw.Convertors
                 /// </summary>
                 /// <returns> </returns>
                 public bool InstanceCreated => Instance != null;
-
-                /// <summary>
-                /// 设置对象值
-                /// </summary>
-                /// <param name="obj"> 待设置的值 </param>
-                /// <returns> </returns>
-                public bool Set(DictionaryEntry obj) => Add(obj.Key, obj.Value);
             }
         }
     }

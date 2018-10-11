@@ -13,6 +13,10 @@ namespace blqw.ConvertServices
             {
                 return provider;
             }
+            if (providers.Length == 1)
+            {
+                return providers[0];
+            }
             if (provider != null)
             {
                 var arr = new IServiceProvider[providers.Length + 1];
@@ -163,8 +167,11 @@ namespace blqw.ConvertServices
             }
             catch (Exception e)
             {
-                throw new InvalidCastException(conv.GetType().GetFriendlyName() + " 无法转为 " + typeof(IConvertor<T>).GetFriendlyName());
+                throw new InvalidCastException(conv.GetType().GetFriendlyName() + " 无法转为 " + typeof(IConvertor<T>).GetFriendlyName(), e);
             }
         }
+
+
+        public static ConvertResult<T> ConvertResult<T>(this T value) => new ConvertResult<T>(value);
     }
 }

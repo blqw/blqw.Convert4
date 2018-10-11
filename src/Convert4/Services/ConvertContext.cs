@@ -79,17 +79,9 @@ namespace blqw
             _settings = null;
         }
 
-        /// <summary>
-        /// 异常
-        /// </summary>
-        public Exception Exception => Error.Exception;
-
-        private ConvertError _error;
-        internal ConvertError Error => _error ?? (_error = new ConvertError(null));
-
         public IConvertorSelector ConvertorSelector => _convertorSelector;
 
-        public void ClearException() => _error?.Clear();
+        public IServiceProvider ServiceProvider => _serviceProvider;
 
         /// <summary>
         /// 获取服务
@@ -119,16 +111,16 @@ namespace blqw
             var outputType = typeof(T);
             if (outputType.IsGenericTypeDefinition)
             {
-                return new NotSupportedException(this.Localize($"{"无法为"}{"泛型定义类型"}`{outputType.GetFriendlyName():!}`{"提供转换器"}"));
+                return new NotSupportedException(Localize($"{"无法为"}{"泛型定义类型"}`{outputType.GetFriendlyName():!}`{"提供转换器"}"));
             }
             if (outputType.IsAbstract && outputType.IsSealed)
             {
-                return new NotSupportedException(this.Localize($"{"无法为"}{"静态类型"}`{outputType.GetFriendlyName():!}`{"提供转换器"}"));
+                return new NotSupportedException(Localize($"{"无法为"}{"静态类型"}`{outputType.GetFriendlyName():!}`{"提供转换器"}"));
             }
-            var conv = GetConvertor<T>();
+            var conv = _convertorSelector.Get<T>(this);
             if (conv == null)
             {
-                return new EntryPointNotFoundException(this.Localize($"未找到适合的转换器"));
+                return new EntryPointNotFoundException(Localize($"未找到适合的转换器"));
             }
             return conv.ChangeType(this, input);
         }
@@ -161,7 +153,7 @@ namespace blqw
         }
 
 
-        internal Exception GetInvalidCastException(object value, string outputTypeName)
+        public InvalidCastException InvalidCastException(object value, string outputTypeName)
         {
             var text = (value as IConvertible)?.ToString(null)
                        ?? (value as IFormattable)?.ToString(null, null);
@@ -182,14 +174,6 @@ namespace blqw
         }
 
 
-        /// <summary>
-        /// 返回转换无效的异常
-        /// </summary>
-        /// <param name="value">待转换的值</param>
-        /// <param name="outputTypeName">转换后的类型</param>
-        /// <returns></returns>
-        public void InvalidCastException(object value, string outputTypeName) =>
-            Error.AddException(GetInvalidCastException(value, outputTypeName));
 
 
         /// <summary>
@@ -197,29 +181,30 @@ namespace blqw
         /// </summary>
         /// <param name="str">格式化消息文本</param>
         /// <returns></returns>
-        public void InvalidCastException(FormattableString str)
+        public InvalidCastException InvalidCastException(FormattableString str)
         {
             if (str == null)
             {
                 throw new ArgumentNullException(nameof(str));
             }
-            Error.AddException(new InvalidCastException(Localize(str)));
+            return new InvalidCastException(Localize(str));
         }
 
-        public void InvalidOperationException(FormattableString str)
+        public InvalidOperationException InvalidOperationException(FormattableString str)
         {
             if (str == null)
             {
                 throw new ArgumentNullException(nameof(str));
             }
-            Error.AddException(new InvalidOperationException(Localize(str)));
+            return new InvalidOperationException(Localize(str));
         }
+
 
         /// <summary>
         /// 值超过限制
         /// </summary>
-        public void OverflowException(string value) =>
-          Error.AddException(new OverflowException(Localize($"{"值超过限制"}:{value:!}")));
+        public OverflowException OverflowException(string value) =>
+           new OverflowException(Localize($"{"值超过限制"}:{value:!}"));
 
         /// <summary>
         /// 本地化字符串

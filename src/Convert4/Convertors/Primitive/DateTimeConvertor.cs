@@ -29,17 +29,16 @@ namespace blqw.Convertors
             "yyyy-MM-dd HH:mm:ss:ffffff" ,
             "yyyy-MM-dd HH:mm:ss.ffffff" , };
 
-        public DateTime From(ConvertContext context, IConvertible input)
+        public ConvertResult<DateTime> From(ConvertContext context, IConvertible input)
         {
             if (input?.GetTypeCode() == TypeCode.DateTime)
             {
                 return input.ToDateTime(context.GetFormatProvider(typeof(DateTime)));
             }
-            context.InvalidCastException(input, TypeFriendlyName);
-            return default;
+            return context.InvalidCastException(input, TypeFriendlyName);
         }
 
-        public DateTime From(ConvertContext context, string input)
+        public ConvertResult<DateTime> From(ConvertContext context, string input)
         {
             var s = input?.Trim() ?? "";
             if (DateTime.TryParse(s, out var result))
@@ -57,8 +56,7 @@ namespace blqw.Convertors
                     break;
                 }
             }
-            context.InvalidCastException(input, TypeFriendlyName);
-            return default;
+            return context.InvalidCastException(input, TypeFriendlyName);
         }
     }
 }

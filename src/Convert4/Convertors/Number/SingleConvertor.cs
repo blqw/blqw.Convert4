@@ -13,66 +13,57 @@ namespace blqw.Convertors
                                 , IFrom<object, float>
                                 , IFrom<byte[], float>
     {
-        public float From(ConvertContext context, bool input) => input ? (float)1 : (float)0;
-        public float From(ConvertContext context, char input) => (float)input;
-        public float From(ConvertContext context, sbyte input) => (float)input;
-        public float From(ConvertContext context, byte input) => (float)input;
-        public float From(ConvertContext context, short input) => (float)input;
-        public float From(ConvertContext context, ushort input) => (float)input;
-        public float From(ConvertContext context, int input) => (float)input;
+        public ConvertResult<float> From(ConvertContext context, bool input) => input ? (float)1 : (float)0;
+        public ConvertResult<float> From(ConvertContext context, char input) => (float)input;
+        public ConvertResult<float> From(ConvertContext context, sbyte input) => (float)input;
+        public ConvertResult<float> From(ConvertContext context, byte input) => (float)input;
+        public ConvertResult<float> From(ConvertContext context, short input) => (float)input;
+        public ConvertResult<float> From(ConvertContext context, ushort input) => (float)input;
+        public ConvertResult<float> From(ConvertContext context, int input) => (float)input;
 
-        public float From(ConvertContext context, uint input)
+        public ConvertResult<float> From(ConvertContext context, uint input)
         {
             if (input > MaxValue)
             {
-                context.OverflowException($"{input} > {MaxValue}");
-                return default;
+                return context.OverflowException($"{input} > {MaxValue}");
             }
             return (float)input;
         }
-        public float From(ConvertContext context, long input)
+        public ConvertResult<float> From(ConvertContext context, long input)
         {
             if ((input < MinValue) || (input > MaxValue))
             {
-                context.OverflowException(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}");
-                return 0;
+                return context.OverflowException(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}");
             }
             return (float)input;
         }
-        public float From(ConvertContext context, ulong input)
+        public ConvertResult<float> From(ConvertContext context, ulong input)
         {
             if (input > MaxValue)
             {
-                context.OverflowException($"{input} > {MaxValue}");
-                return 0;
+                return context.OverflowException($"{input} > {MaxValue}");
             }
             return (float)input;
         }
-        public float From(ConvertContext context, float input)
+        public ConvertResult<float> From(ConvertContext context, float input)
         {
             if ((input < MinValue) || (input > MaxValue))
             {
-                context.OverflowException(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}");
-                return 0;
+                return context.OverflowException(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}");
             }
             return (float)input;
         }
-        public float From(ConvertContext context, double input)
+        public ConvertResult<float> From(ConvertContext context, double input)
         {
             if ((input < MinValue) || (input > MaxValue))
             {
-                context.OverflowException(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}");
-                return 0;
+                return context.OverflowException(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}");
             }
             return (float)input;
         }
-        public float From(ConvertContext context, decimal input) => decimal.ToSingle(input);
-        public float From(ConvertContext context, DateTime input)
-        {
-            context.InvalidCastException(input, TypeFriendlyName);
-            return default;
-        }
-        public float From(ConvertContext context, string input)
+        public ConvertResult<float> From(ConvertContext context, decimal input) => decimal.ToSingle(input);
+        public ConvertResult<float> From(ConvertContext context, DateTime input) => context.InvalidCastException(input, TypeFriendlyName);
+        public ConvertResult<float> From(ConvertContext context, string input)
         {
             var s = input?.Trim() ?? "";
             if (string.IsNullOrWhiteSpace(s))
@@ -88,20 +79,16 @@ namespace blqw.Convertors
             {
                 return result;
             }
-            context.InvalidCastException(input, TypeFriendlyName);
-            return default;
+            return context.InvalidCastException(input, TypeFriendlyName);
         }
-        public float From(ConvertContext context, object input)
-        {
-            context.InvalidCastException(input, TypeFriendlyName);
-            return default;
-        }
-        public float From(ConvertContext context, byte[] input)
+
+        public ConvertResult<float> From(ConvertContext context, object input) => context.InvalidCastException(input, TypeFriendlyName);
+
+        public ConvertResult<float> From(ConvertContext context, byte[] input)
         {
             if (input == null || input.Length > sizeof(float))
             {
-                context.InvalidCastException(input, TypeFriendlyName);
-                return default;
+                return context.InvalidCastException(input, TypeFriendlyName);
             }
             return BitConverter.ToSingle(input.Slice(sizeof(float)), 0);
         }

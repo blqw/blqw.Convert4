@@ -7,6 +7,6 @@
     /// <typeparam name="TInput"></typeparam>
     public interface IFrom<TInput, TOutput>
     {
-        TOutput From(ConvertContext context, TInput input);
+        ConvertResult<TOutput> From(ConvertContext context, TInput input);
     }
 }

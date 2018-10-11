@@ -56,23 +56,21 @@ namespace blqw
         /// <param name="target">属性实例对象</param>
         /// <param name="value">属性值</param>
         /// <returns></returns>
-        public bool SetValue(ConvertContext context, object target, object value)
+        public ConvertException SetValue(ConvertContext context, object target, object value)
         {
             var result = context.Convert(PropertyType, value);
             if (result.Success == false)
             {
-                context.InvalidCastException($"{"属性"}{Property.Name:!}{"值"}{"转换失败"}");
-                return false;
+                return result.Exception + context.InvalidCastException($"{"属性"}{Property.Name:!}{"值"}{"转换失败"}");
             }
             try
             {
                 Set(target, result.OutputValue);
-                return true;
+                return null;
             }
             catch (Exception ex)
             {
-                context.Error.AddException(ex);
-                return false;
+                return ex as ConvertException ?? new ConvertException(ex);
             }
         }
     }

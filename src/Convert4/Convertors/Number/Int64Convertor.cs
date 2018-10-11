@@ -13,57 +13,49 @@ namespace blqw.Convertors
                                 , IFrom<object, long>
                                 , IFrom<byte[], long>
     {
-        public long From(ConvertContext context, bool input) => input ? (long)1 : (long)0;
-        public long From(ConvertContext context, char input) => (long)input;
-        public long From(ConvertContext context, sbyte input) => (long)input;
-        public long From(ConvertContext context, byte input) => (long)input;
-        public long From(ConvertContext context, short input) => (long)input;
-        public long From(ConvertContext context, ushort input) => (long)input;
-        public long From(ConvertContext context, int input) => (long)input;
-        public long From(ConvertContext context, uint input) => (long)input;
-        public long From(ConvertContext context, long input) => (long)input;
-        public long From(ConvertContext context, ulong input)
+        public ConvertResult<long> From(ConvertContext context, bool input) => input ? (long)1 : (long)0;
+        public ConvertResult<long> From(ConvertContext context, char input) => (long)input;
+        public ConvertResult<long> From(ConvertContext context, sbyte input) => (long)input;
+        public ConvertResult<long> From(ConvertContext context, byte input) => (long)input;
+        public ConvertResult<long> From(ConvertContext context, short input) => (long)input;
+        public ConvertResult<long> From(ConvertContext context, ushort input) => (long)input;
+        public ConvertResult<long> From(ConvertContext context, int input) => (long)input;
+        public ConvertResult<long> From(ConvertContext context, uint input) => (long)input;
+        public ConvertResult<long> From(ConvertContext context, long input) => (long)input;
+        public ConvertResult<long> From(ConvertContext context, ulong input)
         {
             if (input > MaxValue)
             {
-                context.OverflowException($"{input} > {MaxValue}");
-                return 0;
+                return context.OverflowException($"{input} > {MaxValue}");
             }
             return (long)input;
         }
-        public long From(ConvertContext context, float input)
+        public ConvertResult<long> From(ConvertContext context, float input)
         {
             if ((input < MinValue) || (input > MaxValue))
             {
-                context.OverflowException(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}");
-                return 0;
+                return context.OverflowException(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}");
             }
             return (long)input;
         }
-        public long From(ConvertContext context, double input)
+        public ConvertResult<long> From(ConvertContext context, double input)
         {
             if ((input < MinValue) || (input > MaxValue))
             {
-                context.OverflowException(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}");
-                return 0;
+                return context.OverflowException(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}");
             }
             return (long)input;
         }
-        public long From(ConvertContext context, decimal input)
+        public ConvertResult<long> From(ConvertContext context, decimal input)
         {
             if ((input < MinValue) || (input > MaxValue))
             {
-                context.OverflowException(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}");
-                return 0;
+                return context.OverflowException(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}");
             }
             return decimal.ToInt64(input);
         }
-        public long From(ConvertContext context, DateTime input)
-        {
-            context.InvalidCastException(input, TypeFriendlyName);
-            return default;
-        }
-        public long From(ConvertContext context, string input)
+        public ConvertResult<long> From(ConvertContext context, DateTime input) => context.InvalidCastException(input, TypeFriendlyName);
+        public ConvertResult<long> From(ConvertContext context, string input)
         {
             var s = input?.Trim() ?? "";
             if (string.IsNullOrWhiteSpace(s))
@@ -79,20 +71,14 @@ namespace blqw.Convertors
             {
                 return result;
             }
-            context.InvalidCastException(input, TypeFriendlyName);
-            return default;
+            return context.InvalidCastException(input, TypeFriendlyName);
         }
-        public long From(ConvertContext context, object input)
-        {
-            context.InvalidCastException(input, TypeFriendlyName);
-            return default;
-        }
-        public long From(ConvertContext context, byte[] input)
+        public ConvertResult<long> From(ConvertContext context, object input) => context.InvalidCastException(input, TypeFriendlyName);
+        public ConvertResult<long> From(ConvertContext context, byte[] input)
         {
             if (input == null || input.Length > sizeof(long))
             {
-                context.InvalidCastException(input, TypeFriendlyName);
-                return default;
+                return context.InvalidCastException(input, TypeFriendlyName);
             }
             return BitConverter.ToInt64(input.Slice(sizeof(long)), 0);
         }

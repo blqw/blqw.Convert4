@@ -9,11 +9,11 @@ namespace blqw.Convertors
     /// </summary>
     class UriConvertor : BaseConvertor<Uri>, IFrom<string, Uri>
     {
-        public Uri From(ConvertContext context, string input)
+        public ConvertResult<Uri> From(ConvertContext context, string input)
         {
             if (input == null)
             {
-                return null;
+                return default;
             }
             Uri result;
             input = input.TrimStart();
@@ -30,8 +30,7 @@ namespace blqw.Convertors
                 return result;
             }
 
-            context.OverflowException($"{input:!} {"不是一个有效的url"}");
-            return null;
+            return context.OverflowException($"{input:!} {"不是一个有效的url"}");
         }
     }
 }

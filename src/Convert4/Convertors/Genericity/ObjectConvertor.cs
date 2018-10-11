@@ -24,25 +24,21 @@ namespace blqw.Convertors
                                 , IFrom<string, T>
                                 , IFrom<object, T>
         {
-            public T From(ConvertContext context, string input)
+            public ConvertResult<T> From(ConvertContext context, string input)
             {
                 var serializer = context.GetSerializer();
                 if (serializer == null)
                 {
-                    context.InvalidOperationException($"缺少序列化服务");
-                    return default;
+                    return context.InvalidOperationException($"缺少序列化服务");
                 }
                 return (T)serializer.ToObject(input, typeof(T));
             }
 
-            public T From(ConvertContext context, object input)
+            public ConvertResult<T> From(ConvertContext context, object input)
             {
-                var builder = new ObjectBuilder(typeof(T), context);
-                if (Mapper.Build(context, OutputType, input, builder.InstanceCreated, builder.Add))
-                {
-                    return (T)builder.Instance;
-                }
-                return default;
+                var builder = new ObjectBuilder(context);
+                var ex = builder.Exception + Mapper.Build(context, OutputType, input, builder.InstanceCreated, builder.Add);
+                return ex ?? Result(builder.Instance);
             }
 
 
@@ -59,53 +55,49 @@ namespace blqw.Convertors
                 /// </summary>
                 private readonly IConvertor<string> _keyConvertor;
 
-                public ObjectBuilder(Type type, ConvertContext context)
+                public ObjectBuilder(ConvertContext context)
                 {
-                    _type = type;
+                    _type = typeof(T);
                     _context = context;
                     _keyConvertor = context.GetConvertor<string>();
-                    _propertyHandlers = PropertyHelper.GetByType(type);
+                    _propertyHandlers = PropertyHelper.GetByType(_type);
                     try
                     {
-                        Instance = _context.CreateInstance(_type);
+                        Instance = (T)_context.CreateInstance(_type);
+                        Exception = null;
                     }
                     catch (Exception ex)
                     {
-                        _context.Error.AddException(ex);
-                        Instance = null;
+                        Instance = default;
+                        Exception = ex as ConvertException ?? new ConvertException(ex);
                     }
                 }
-
+                public ConvertException Exception { get; }
                 /// <summary>
                 /// 被构造的实例
                 /// </summary>
-                public object Instance { get; }
+                public T Instance { get; }
 
-                public bool Add(object key, object value)
+                public bool InstanceCreated => Exception == null;
+
+                public ConvertException Add(object key, object value)
                 {
-                    var propName = _keyConvertor.ChangeType(_context, key);
-                    if (propName.Success == false)
+                    var prop = _keyConvertor.ChangeType(_context, key);
+                    if (prop.Success == false)
                     {
-                        _context.InvalidCastException($"{"属性名"}{"转换失败"}");
-                        return false;
+                        return prop.Exception + _context.InvalidCastException($"{"属性名"}{"转换失败"}");
                     }
-                    var p = _propertyHandlers.FirstOrDefault(x => x.Name.Equals(propName.OutputValue, StringComparison.OrdinalIgnoreCase));
+                    var p = _propertyHandlers.FirstOrDefault(x => x.Name.Equals(prop.OutputValue, StringComparison.OrdinalIgnoreCase));
                     if (p != null)
                     {
-                        if(p.SetValue(_context, Instance, value) == false)
+                        var ex = p.SetValue(_context, Instance, value);
+                        if (ex != null)
                         {
-                            _context.InvalidCastException($"{"属性"} {propName.OutputValue:!} {"转换失败"}");
-                            return false;
+                            return ex;
                         }
                     }
-                    return true;
+                    return null;
                 }
-
-                /// <summary>
-                /// 返回是否已经实例化
-                /// </summary>
-                /// <returns> </returns>
-                public bool InstanceCreated => Instance != null;
             }
         }
     }

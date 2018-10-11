@@ -84,6 +84,8 @@ namespace blqw
             }
         }
 
+
+
         /// <summary>
         /// 异常文本
         /// </summary>
@@ -205,36 +207,33 @@ namespace blqw
             }
         }
 
-        internal static bool Build(ConvertContext context,
+        internal static Exception Build(ConvertContext context,
                                     Type outputType,
                                     object input,
                                     bool created,
-                                    Func<object, object, bool> add)
+                                    Func<object, object, ConvertException> add)
         {
             if (created == false)
             {
-                context.InvalidOperationException($"{outputType.GetFriendlyName()} {"创建失败"}");
-                return false;
+                return context.InvalidOperationException($"{outputType.GetFriendlyName()} {"创建失败"}");
             }
 
             var mapper = new Mapper(input);
 
             if (mapper.Error != null)
             {
-                context.InvalidCastException(mapper.Error);
-                return false;
+                return context.InvalidOperationException(mapper.Error);
             }
 
             while (mapper.MoveNext())
             {
-                if (add(mapper.Key, mapper.Value) == false)
+                if (add(mapper.Key, mapper.Value) is ConvertException ex)
                 {
-                    context.InvalidOperationException($"{outputType.GetFriendlyName()} {"填充成员失败"}");
-                    return false;
+                    return ex + context.InvalidOperationException($"{outputType.GetFriendlyName()} {"填充成员失败"}");
                 }
             }
 
-            return true;
+            return null;
         }
 
     }

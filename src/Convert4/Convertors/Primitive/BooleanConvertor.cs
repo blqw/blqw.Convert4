@@ -8,25 +8,21 @@ namespace blqw.Convertors
     /// </summary>
     public class BooleanConvertor : BaseConvertor<bool>, IFromConvertible<bool>, IFrom<object, bool>
     {
-        public bool From(ConvertContext context, bool input) => input;
-        public bool From(ConvertContext context, char input) => input != 0;
-        public bool From(ConvertContext context, sbyte input) => input != 0;
-        public bool From(ConvertContext context, byte input) => input != 0;
-        public bool From(ConvertContext context, short input) => input != 0;
-        public bool From(ConvertContext context, ushort input) => input != 0;
-        public bool From(ConvertContext context, int input) => input != 0;
-        public bool From(ConvertContext context, uint input) => input != 0;
-        public bool From(ConvertContext context, long input) => input != 0;
-        public bool From(ConvertContext context, ulong input) => input != 0;
-        public bool From(ConvertContext context, float input) => input != 0;
-        public bool From(ConvertContext context, double input) => input != 0;
-        public bool From(ConvertContext context, decimal input) => input != 0;
-        public bool From(ConvertContext context, DateTime input)
-        {
-            context.InvalidCastException(input, TypeFriendlyName);
-            return default;
-        }
-        public bool From(ConvertContext context, string input)
+        public ConvertResult<bool> From(ConvertContext context, bool input) => input;
+        public ConvertResult<bool> From(ConvertContext context, char input) => input != 0;
+        public ConvertResult<bool> From(ConvertContext context, sbyte input) => input != 0;
+        public ConvertResult<bool> From(ConvertContext context, byte input) => input != 0;
+        public ConvertResult<bool> From(ConvertContext context, short input) => input != 0;
+        public ConvertResult<bool> From(ConvertContext context, ushort input) => input != 0;
+        public ConvertResult<bool> From(ConvertContext context, int input) => input != 0;
+        public ConvertResult<bool> From(ConvertContext context, uint input) => input != 0;
+        public ConvertResult<bool> From(ConvertContext context, long input) => input != 0;
+        public ConvertResult<bool> From(ConvertContext context, ulong input) => input != 0;
+        public ConvertResult<bool> From(ConvertContext context, float input) => input != 0;
+        public ConvertResult<bool> From(ConvertContext context, double input) => input != 0;
+        public ConvertResult<bool> From(ConvertContext context, decimal input) => input != 0;
+        public ConvertResult<bool> From(ConvertContext context, DateTime input) => context.InvalidCastException(input, TypeFriendlyName);
+        public ConvertResult<bool> From(ConvertContext context, string input)
         {
             var s = input?.Trim() ?? "";
             switch (s.Length)
@@ -77,9 +73,8 @@ namespace blqw.Convertors
                 default:
                     break;
             }
-            context.InvalidCastException(input, TypeFriendlyName);
-            return default;
+            return context.InvalidCastException(input, TypeFriendlyName);
         }
-        public bool From(ConvertContext context, object input) => input != null;
+        public ConvertResult<bool> From(ConvertContext context, object input) => input != null;
     }
 }

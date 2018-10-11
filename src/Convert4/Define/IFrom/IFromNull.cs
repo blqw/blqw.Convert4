@@ -10,12 +10,12 @@
         /// 将 <seealso cref="null"/> 转为指定类型
         /// </summary>
         /// <param name="context">转换上下文</param>
-        T FromNull(ConvertContext context);
+        ConvertResult<T> FromNull(ConvertContext context);
 
         /// <summary>
         /// 将 <seealso cref="DBNull"/> 转为指定类型
         /// </summary>
         /// <param name="context">转换上下文</param>
-        T FromDBNull(ConvertContext context);
+        ConvertResult<T> FromDBNull(ConvertContext context);
     }
 }

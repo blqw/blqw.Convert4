@@ -21,6 +21,8 @@ namespace blqw
         /// <seealso cref="IConvertor{object}"/> 转换器
         /// </summary>
         private readonly IConvertor _objectConvertor;
+        private readonly IServiceProvider _provider;
+
         /// <summary>
         /// 知否允许衍生新的转换器
         /// </summary>
@@ -31,8 +33,9 @@ namespace blqw
         /// </summary>
         /// <param name="convertors">基础转换器</param>
         /// <param name="spawnable">是否允许衍生新的转换器</param>
-        public ConvertorSelector(IEnumerable<IConvertor> convertors = null, IComparer<Type> typeComparer = null, bool spawnable = true)
+        public ConvertorSelector(IServiceProvider provider, IEnumerable<IConvertor> convertors = null, IComparer<Type> typeComparer = null, bool spawnable = true)
         {
+            _provider = provider;
             TypeComparer = typeComparer ?? ConvertServices.TypeComparer.Instance;
             _convertors = new ConcurrentDictionary<Type, IConvertor>();
             foreach (var convertor in convertors)
@@ -61,11 +64,14 @@ namespace blqw
                 return null;
             }
 
-            // 优先使用注入的服务
-            var selector = context.ConvertorSelector;
-            if (!ReferenceEquals(selector, this))
+            if (!_provider.Equals(context.ServiceProvider))
             {
-                return selector.Get(outputType, context);
+                // 优先使用注入的服务
+                var selector = context.ConvertorSelector;
+                if (!ReferenceEquals(selector, this))
+                {
+                    return selector.Get(outputType, context);
+                }
             }
 
             if (_convertors.TryGetValue(outputType, out var conv) || _spawnable == false)

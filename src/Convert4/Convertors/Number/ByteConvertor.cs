@@ -10,105 +10,94 @@ namespace blqw.Convertors
     /// </summary>
     public class ByteConvertor : BaseConvertor<byte>, IFromConvertible<byte>
     {
-        public byte From(ConvertContext context, bool input) => input ? (byte)1 : (byte)0;
-        public byte From(ConvertContext context, char input) => (byte)input;
-        public byte From(ConvertContext context, sbyte input)
+        public ConvertResult<byte> From(ConvertContext context, bool input) => input ? (byte)1 : (byte)0;
+        public ConvertResult<byte> From(ConvertContext context, char input) => (byte)input;
+        public ConvertResult<byte> From(ConvertContext context, sbyte input)
         {
             if (input < MinValue)
             {
-                context.InvalidCastException(input, TypeFriendlyName);
-                return default;
+                return context.InvalidCastException(input, TypeFriendlyName);
             }
             return (byte)input;
         }
-        public byte From(ConvertContext context, byte input) => input;
-        public byte From(ConvertContext context, short input)
+        public ConvertResult<byte> From(ConvertContext context, byte input) => input;
+        public ConvertResult<byte> From(ConvertContext context, short input)
         {
             if (input < MinValue || input > MaxValue)
             {
-                context.InvalidCastException(input, TypeFriendlyName);
-                return default;
+                return context.InvalidCastException(input, TypeFriendlyName);
             }
             return (byte)input;
         }
-        public byte From(ConvertContext context, ushort input)
+        public ConvertResult<byte> From(ConvertContext context, ushort input)
         {
             if (input < MinValue || input > MaxValue)
             {
-                context.InvalidCastException(input, TypeFriendlyName);
-                return default;
+                return context.InvalidCastException(input, TypeFriendlyName);
             }
             return (byte)input;
         }
-        public byte From(ConvertContext context, int input)
+        public ConvertResult<byte> From(ConvertContext context, int input)
         {
             if (input < MinValue || input > MaxValue)
             {
-                context.InvalidCastException(input, TypeFriendlyName);
-                return default;
+                return context.InvalidCastException(input, TypeFriendlyName);
             }
             return (byte)input;
         }
-        public byte From(ConvertContext context, uint input)
+        public ConvertResult<byte> From(ConvertContext context, uint input)
         {
             if (input < MinValue || input > MaxValue)
             {
-                context.InvalidCastException(input, TypeFriendlyName);
-                return default;
+                return context.InvalidCastException(input, TypeFriendlyName);
             }
             return (byte)input;
         }
-        public byte From(ConvertContext context, long input)
+        public ConvertResult<byte> From(ConvertContext context, long input)
         {
             if (input < MinValue || input > MaxValue)
             {
-                context.InvalidCastException(input, TypeFriendlyName);
-                return default;
+                return context.InvalidCastException(input, TypeFriendlyName);
             }
             return (byte)input;
         }
-        public byte From(ConvertContext context, ulong input)
+        public ConvertResult<byte> From(ConvertContext context, ulong input)
         {
             if (input < MinValue || input > MaxValue)
             {
-                context.InvalidCastException(input, TypeFriendlyName);
-                return default;
+                return context.InvalidCastException(input, TypeFriendlyName);
             }
             return (byte)input;
         }
-        public byte From(ConvertContext context, float input)
+        public ConvertResult<byte> From(ConvertContext context, float input)
         {
             if (input < MinValue || input > MaxValue)
             {
-                context.InvalidCastException(input, TypeFriendlyName);
-                return default;
+                return context.InvalidCastException(input, TypeFriendlyName);
             }
             return (byte)input;
         }
-        public byte From(ConvertContext context, double input)
+        public ConvertResult<byte> From(ConvertContext context, double input)
         {
             if (input < MinValue || input > MaxValue)
             {
-                context.InvalidCastException(input, TypeFriendlyName);
-                return default;
+                return context.InvalidCastException(input, TypeFriendlyName);
             }
             return (byte)input;
         }
-        public byte From(ConvertContext context, decimal input)
+        public ConvertResult<byte> From(ConvertContext context, decimal input)
         {
             if (input < MinValue || input > MaxValue)
             {
-                context.InvalidCastException(input, TypeFriendlyName);
-                return default;
+                return context.InvalidCastException(input, TypeFriendlyName);
             }
             return (byte)input;
         }
-        public byte From(ConvertContext context, DateTime input)
+        public ConvertResult<byte> From(ConvertContext context, DateTime input)
         {
-            context.InvalidCastException(input, TypeFriendlyName);
-            return default;
+            return context.InvalidCastException(input, TypeFriendlyName);
         }
-        public byte From(ConvertContext context, string input)
+        public ConvertResult<byte> From(ConvertContext context, string input)
         {
             var s = input?.Trim() ?? "";
             if (TryParse(s, out var result))
@@ -120,9 +109,7 @@ namespace blqw.Convertors
             {
                 return result;
             }
-            context.InvalidCastException(input, TypeFriendlyName);
-            return default;
+            return context.InvalidCastException(input, TypeFriendlyName);
         }
-
     }
 }

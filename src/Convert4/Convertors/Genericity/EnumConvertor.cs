@@ -34,7 +34,7 @@ namespace blqw.Convertors
 
             public override IConvertor GetConvertor(Type outputType) => _parent.GetConvertor(outputType);
 
-            public T From(ConvertContext context, string input)
+            public ConvertResult<T> From(ConvertContext context, string input)
             {
                 if (string.IsNullOrWhiteSpace(input))
                 {
@@ -47,8 +47,7 @@ namespace blqw.Convertors
                 }
                 catch (Exception ex)
                 {
-                    context.Error.AddException(ex);
-                    return default;
+                    return ex;
                 }
 
                 if (result.Equals(default(T)))
@@ -66,11 +65,10 @@ namespace blqw.Convertors
                         return result;
                     }
                 }
-                context.OverflowException($"{result:!} {"不是有效的枚举值"}");
-                return default;
+                return context.OverflowException($"{result:!} {"不是有效的枚举值"}");
             }
 
-            public T From(ConvertContext context, IConvertible input)
+            public ConvertResult<T> From(ConvertContext context, IConvertible input)
             {
                 T result;
                 switch (input.GetTypeCode())
@@ -117,8 +115,7 @@ namespace blqw.Convertors
                         return result;
                     }
                 }
-                context.OverflowException($"{result:!} {"不是有效的枚举值"}");
-                return default;
+                return context.OverflowException($"{result:!} {"不是有效的枚举值"}");
             }
         }
     }

@@ -122,7 +122,7 @@ namespace blqw.Dynamic
             {
                 return false;
             }
-            return p.SetValue(_emptyContext, _entity, value);
+            return p.SetValue(_emptyContext, _entity, value) != null;
         }
     }
 }

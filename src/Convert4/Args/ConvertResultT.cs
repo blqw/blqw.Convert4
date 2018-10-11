@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 
 namespace blqw
 {
@@ -11,30 +12,28 @@ namespace blqw
         /// 转换成功
         /// </summary>
         /// <param name="value">返回值</param>
-        public ConvertResult(T value)
-        {
-            Success = true;
-            OutputValue = value;
-            Error = null;
-        }
+        public ConvertResult(T value) : this(true, value, null) { }
+
         /// <summary>
         /// 转换成功
         /// </summary>
         /// <param name="success">是否成功</param>
         /// <param name="value">返回值</param>
         /// <param name="ex">错误对象</param>
-        private ConvertResult(bool success, T value, ConvertError ex)
+        private ConvertResult(bool success, T value, ConvertException ex)
         {
-            Success = success;
+            _fail = !success;
             OutputValue = value;
-            Error = ex;
+            Exception = ex;
         }
+
+        private readonly bool _fail;
 
         /// <summary>
         /// 是否成功
         /// </summary>
         /// <returns></returns>
-        public bool Success { get; }
+        public bool Success => !_fail;
         /// <summary>
         /// 转换后的输出结果
         /// </summary>
@@ -44,18 +43,18 @@ namespace blqw
         /// 如果失败,则返回异常
         /// </summary>
         /// <returns></returns>
-        internal ConvertError Error { get; }
+        internal ConvertException Exception { get; private set; }
         /// <summary>
         /// 如果有异常则抛出异常
         /// </summary>
         /// <exception cref="AggregateException"> 发生一个或多个转换错误问题 </exception>
-        public void ThrowIfExceptional() => Error?.TryThrow();
+        public void ThrowIfExceptional() => Exception?.TryThrow();
 
         internal ConvertResult<T0> Cast<T0>()
         {
             if (!Success)
             {
-                return new ConvertResult<T0>(false, default, Error);
+                return new ConvertResult<T0>(false, default, Exception);
             }
             if (OutputValue is T0 v)
             {
@@ -65,26 +64,36 @@ namespace blqw
         }
 
         #region 隐式转换
-        public static implicit operator ConvertResult(ConvertResult<T> value) => new ConvertResult(value.Success, value.OutputValue, value.Error);
-        public static implicit operator ConvertResult<T>(ConvertResult value) => new ConvertResult<T>(value.Success, value.OutputValue is T t ? t : default, value.Error);
+        public static implicit operator ConvertResult<T>(T value) => new ConvertResult<T>(true, value, null);
+        public static implicit operator ConvertResult(ConvertResult<T> value) => new ConvertResult(value.Success, value.OutputValue, value.Exception);
+        public static implicit operator ConvertResult<T>(ConvertResult value) => new ConvertResult<T>(value.Success, value.OutputValue is T t ? t : default, value.Exception);
         public static implicit operator ConvertResult<T>(Exception exception)
         {
             if (exception == null)
             {
                 throw new ArgumentNullException(nameof(exception));
             }
-            var e = new ConvertError(exception);
+            var e = new ConvertException(exception);
             return new ConvertResult<T>(false, default, e);
         }
-
-        public static implicit operator ConvertResult<T>(ConvertError error)
+        public static implicit operator ConvertResult<T>(ConvertException exception)
         {
-            if (error == null)
+            if (exception == null)
             {
-                throw new ArgumentNullException(nameof(error));
+                throw new ArgumentNullException(nameof(exception));
             }
-            return new ConvertResult<T>(false, default, error.Clone());
+            return new ConvertResult<T>(false, default, exception);
         }
+
+        public static ConvertResult<T> operator &(ConvertException ex, ConvertResult<T> result)
+        {
+            if (ex != null && !result.Success)
+            {
+                result.Exception = ex + result.Exception;
+            }
+            return result;
+        }
+
         #endregion
     }
 }

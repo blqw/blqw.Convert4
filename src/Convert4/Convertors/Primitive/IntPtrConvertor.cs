@@ -8,16 +8,14 @@ namespace blqw.Convertors
                                  , IFrom<long, IntPtr>
                                  , IFrom<object, IntPtr>
     {
-        public IntPtr From(ConvertContext context, long input) => new IntPtr(input);
-        public IntPtr From(ConvertContext context, int input) => new IntPtr(input);
-        public IntPtr From(ConvertContext context, object input)
+        public ConvertResult<IntPtr> From(ConvertContext context, long input) => new IntPtr(input);
+        public ConvertResult<IntPtr> From(ConvertContext context, int input) => new IntPtr(input);
+        public ConvertResult<IntPtr> From(ConvertContext context, object input)
         {
             var result = context.Convert<long>(input);
             if (!result.Success)
             {
-                context.Error.AddError(result.Error);
-                context.InvalidCastException(input, TypeFriendlyName);
-                return default;
+                return result.Exception;
             }
             return new IntPtr(result.OutputValue);
         }

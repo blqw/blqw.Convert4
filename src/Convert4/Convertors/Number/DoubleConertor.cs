@@ -10,25 +10,21 @@ namespace blqw.Convertors
     /// </summary>
     public class DoubleConertor : BaseConvertor<double>, IFromConvertible<double>, IFrom<byte[], double>
     {
-        public double From(ConvertContext context, bool input) => input ? 1 : 0;
-        public double From(ConvertContext context, char input) => input;
-        public double From(ConvertContext context, sbyte input) => input;
-        public double From(ConvertContext context, byte input) => input;
-        public double From(ConvertContext context, short input) => input;
-        public double From(ConvertContext context, ushort input) => input;
-        public double From(ConvertContext context, int input) => input;
-        public double From(ConvertContext context, uint input) => input;
-        public double From(ConvertContext context, long input) => input;
-        public double From(ConvertContext context, ulong input) => input;
-        public double From(ConvertContext context, float input) => input;
-        public double From(ConvertContext context, double input) => input;
-        public double From(ConvertContext context, decimal input) => decimal.ToDouble(input);
-        public double From(ConvertContext context, DateTime input)
-        {
-            context.InvalidCastException(input, TypeFriendlyName);
-            return default;
-        }
-        public double From(ConvertContext context, string input)
+        public ConvertResult<double> From(ConvertContext context, bool input) => input ? 1 : 0;
+        public ConvertResult<double> From(ConvertContext context, char input) => input;
+        public ConvertResult<double> From(ConvertContext context, sbyte input) => input;
+        public ConvertResult<double> From(ConvertContext context, byte input) => input;
+        public ConvertResult<double> From(ConvertContext context, short input) => input;
+        public ConvertResult<double> From(ConvertContext context, ushort input) => input;
+        public ConvertResult<double> From(ConvertContext context, int input) => input;
+        public ConvertResult<double> From(ConvertContext context, uint input) => input;
+        public ConvertResult<double> From(ConvertContext context, long input) => input;
+        public ConvertResult<double> From(ConvertContext context, ulong input) => input;
+        public ConvertResult<double> From(ConvertContext context, float input) => input;
+        public ConvertResult<double> From(ConvertContext context, double input) => input;
+        public ConvertResult<double> From(ConvertContext context, decimal input) => decimal.ToDouble(input);
+        public ConvertResult<double> From(ConvertContext context, DateTime input) => context.InvalidCastException(input, TypeFriendlyName);
+        public ConvertResult<double> From(ConvertContext context, string input)
         {
             var s = input?.Trim() ?? "";
             if (string.IsNullOrWhiteSpace(s))
@@ -44,15 +40,13 @@ namespace blqw.Convertors
             {
                 return result;
             }
-            context.InvalidCastException(input, TypeFriendlyName);
-            return default;
+            return context.InvalidCastException(input, TypeFriendlyName);
         }
-        public double From(ConvertContext context, byte[] input)
+        public ConvertResult<double> From(ConvertContext context, byte[] input)
         {
             if (input == null || input.Length > sizeof(double))
             {
-                context.InvalidCastException(input, TypeFriendlyName);
-                return default;
+                return context.InvalidCastException(input, TypeFriendlyName);
             }
             return BitConverter.ToDouble(input.Slice(sizeof(double)), 0);
         }

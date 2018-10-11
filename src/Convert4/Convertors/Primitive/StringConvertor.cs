@@ -25,37 +25,37 @@ namespace blqw.Convertors
         IFrom<IEnumerable, string>,
         IFromNull<string>
     {
-        public string From(ConvertContext context, Type input) =>
+        public ConvertResult<string> From(ConvertContext context, Type input) =>
             input.GetFriendlyName();
-        public string FromNull(ConvertContext context) => null;
+        public ConvertResult<string> FromNull(ConvertContext context) => default;
 
-        public string FromDBNull(ConvertContext context) => null;
+        public ConvertResult<string> FromDBNull(ConvertContext context) => default;
 
-        public string From(ConvertContext context, IConvertible input) =>
+        public ConvertResult<string> From(ConvertContext context, IConvertible input) =>
             input?.ToString(context.GetFormatProvider(input?.GetType()));
 
-        public string From(ConvertContext context, IFormattable input) =>
+        public ConvertResult<string> From(ConvertContext context, IFormattable input) =>
             input?.ToString(context.GetFormat(input.GetType()), context.GetFormatProvider(input.GetType()));
 
-        public string From(ConvertContext context, byte[] input) =>
+        public ConvertResult<string> From(ConvertContext context, byte[] input) =>
             context.GetEncoding().GetString(input);
-        public string From(ConvertContext context, bool input) => input ? "true" : "false";
+        public ConvertResult<string> From(ConvertContext context, bool input) => input ? "true" : "false";
 
         private string ToString(ConvertContext context, object input) =>
             context.GetSerializer()?.ToString(input) ?? input?.ToString();
 
-        public string From(ConvertContext context, IDataReader input) => ToString(context, input);
+        public ConvertResult<string> From(ConvertContext context, IDataReader input) => ToString(context, input);
 
-        public string From(ConvertContext context, IDataRecord input) => ToString(context, input);
+        public ConvertResult<string> From(ConvertContext context, IDataRecord input) => ToString(context, input);
 
-        public string From(ConvertContext context, DataRow input) => ToString(context, input);
+        public ConvertResult<string> From(ConvertContext context, DataRow input) => ToString(context, input);
 
-        public string From(ConvertContext context, DataTable input) => ToString(context, input);
+        public ConvertResult<string> From(ConvertContext context, DataTable input) => ToString(context, input);
 
-        public string From(ConvertContext context, IEnumerable input) =>
+        public ConvertResult<string> From(ConvertContext context, IEnumerable input) =>
             context.GetSerializer()?.ToString(input) ?? From(context, input?.GetEnumerator());
 
-        public string From(ConvertContext context, object input)
+        public ConvertResult<string> From(ConvertContext context, object input)
         {
             if (input.GetType().GetProperties().Length > 0)
             {
@@ -64,20 +64,18 @@ namespace blqw.Convertors
             return input.ToString();
         }
 
-        public string From(ConvertContext context, Uri input) => input?.ToString();
-        public string From(ConvertContext context, StringBuilder input) => input?.ToString();
-        public string From(ConvertContext context, IEnumerator input)
+        public ConvertResult<string> From(ConvertContext context, Uri input) => input?.ToString();
+        public ConvertResult<string> From(ConvertContext context, StringBuilder input) => input?.ToString();
+        public ConvertResult<string> From(ConvertContext context, IEnumerator input)
         {
             if(input?.MoveNext() ?? false)
             {
-                return null;
+                return default;
             }
             var s = context.Convert<string>(input.Current);
             if (!s.Success)
             {
-                context.Error.AddError(s.Error);
-                context.InvalidCastException(input, TypeFriendlyName);
-                return null;
+                return s;
             }
             var separator = context.GetStringSeparator() ?? ",";
             var sb = new StringBuilder(s.OutputValue);
@@ -87,15 +85,13 @@ namespace blqw.Convertors
                 s = context.Convert<string>(input.Current);
                 if (!s.Success)
                 {
-                    context.Error.AddError(s.Error);
-                    context.InvalidCastException(input, TypeFriendlyName);
-                    return null;
+                    return s;
                 }
             } while (input.MoveNext());
 
             return sb.ToString() ;
         }
 
-        public string From(ConvertContext context, IPAddress input) => input.ToString();
+        public ConvertResult<string> From(ConvertContext context, IPAddress input) => input.ToString();
     }
 }

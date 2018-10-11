@@ -30,7 +30,7 @@ namespace blqw.Convertors
 
             public override IConvertor GetConvertor(Type outputType) => _parent.GetConvertor(outputType);
 
-            public T[] From(ConvertContext context, string input)
+            public ConvertResult<T[]> From(ConvertContext context, string input)
             {
                 if (string.IsNullOrEmpty(input))
                 {
@@ -59,18 +59,16 @@ namespace blqw.Convertors
                 return From(context, arr.GetEnumerator());
             }
 
-            public T[] From(ConvertContext context, IEnumerator input)
+            public ConvertResult<T[]> From(ConvertContext context, IEnumerator input)
             {
                 if (input == null)
                 {
-                    return null;
+                    return default;
                 }
                 var result = context.Convert<List<T>>(input);
                 if (!result.Success)
                 {
-                    context.Error.AddError(result.Error);
-                    context.InvalidCastException(input, TypeFriendlyName);
-                    return null;
+                    return result.Exception + context.InvalidCastException(input, TypeFriendlyName);
                 }
                 return result.OutputValue.ToArray();
             }

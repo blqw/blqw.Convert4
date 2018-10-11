@@ -20,19 +20,16 @@ namespace blqw.Convertors
             return outputType == OutputType ? this : new IListConvertor(outputType).Proxy(outputType);
         }
 
-        public NameValueCollection From(ConvertContext context, object input)
+        public ConvertResult<NameValueCollection> From(ConvertContext context, object input)
         {
             if (input is null || input is DBNull)
             {
-                return null;
+                return default;
             }
 
             var builder = new NVCollectiontBuilder(context, OutputType);
-            if (Mapper.Build(context, OutputType, input, builder.InstanceCreated, builder.Add))
-            {
-                return builder.Instance;
-            }
-            return null;
+            var ex = builder.Exception + Mapper.Build(context, OutputType, input, builder.InstanceCreated, builder.Add);
+            return ex ?? Result(builder.Instance);
         }
 
 
@@ -57,14 +54,16 @@ namespace blqw.Convertors
                 try
                 {
                     Instance = (NameValueCollection)_context.CreateInstance<NameValueCollection>(_type);
+                    Exception = null;
                 }
                 catch (Exception ex)
                 {
-                    _context.Error.AddException(ex);
-                    Instance = null;
+                    Instance = default;
+                    Exception = ex as ConvertException ?? new ConvertException(ex);
                 }
             }
 
+            public ConvertException Exception { get; }
             /// <summary>
             /// 被构造的实例
             /// </summary>
@@ -74,32 +73,29 @@ namespace blqw.Convertors
             /// 返回是否已经实例化
             /// </summary>
             /// <returns> </returns>
-            public bool InstanceCreated => Instance != null;
+            public bool InstanceCreated => Exception == null;
 
-            public bool Add(object key, object value)
+            public ConvertException Add(object key, object value)
             {
                 var conv = _context.GetConvertor<string>();
                 var rkey = conv.ChangeType(_context, key);
                 if (rkey.Success == false)
                 {
-                    _context.InvalidCastException($"Key{"转换失败"}");
-                    return false;
+                    return rkey.Exception + _context.InvalidCastException($"Key{"转换失败"}");
                 }
                 var rval = conv.ChangeType(_context, value);
                 if (rval.Success == false)
                 {
-                    _context.InvalidCastException($"{rkey.OutputValue:!} {"转换失败"}");
-                    return false;
+                    return rval.Exception + _context.InvalidCastException($"Key={rkey.OutputValue:!} {"转换失败"}");
                 }
                 try
                 {
                     Instance.Add(rkey.OutputValue, rval.OutputValue);
-                    return true;
+                    return null;
                 }
                 catch (Exception ex)
                 {
-                    _context.Error.AddException(ex);
-                    return false;
+                    return ex as ConvertException ?? new ConvertException(ex);
                 }
             }
         }

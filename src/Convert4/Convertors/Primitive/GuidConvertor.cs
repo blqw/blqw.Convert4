@@ -8,22 +8,20 @@ namespace blqw.Convertors
     /// </summary>
     public class GuidConvertor : BaseConvertor<Guid>, IFrom<string, Guid>, IFrom<byte[], Guid>, IFrom<decimal, Guid>
     {
-        public Guid From(ConvertContext context, string input)
+        public ConvertResult<Guid> From(ConvertContext context, string input)
         {
             if (input.Length == 0)
             {
-                context.InvalidCastException(input, TypeFriendlyName);
-                return default;
+                return context.InvalidCastException(input, TypeFriendlyName);
             }
             if (Guid.TryParse(input, out var result))
             {
                 return result;
             }
-            context.InvalidCastException(input, TypeFriendlyName);
-            return default;
+            return context.InvalidCastException(input, TypeFriendlyName);
         }
 
-        public Guid From(ConvertContext context, decimal input)
+        public ConvertResult<Guid> From(ConvertContext context, decimal input)
         {
             var arr = decimal.GetBits(input);
             var bytes = new byte[16];
@@ -31,14 +29,13 @@ namespace blqw.Convertors
             return new Guid(bytes);
         }
 
-        public Guid From(ConvertContext context, byte[] input)
+        public ConvertResult<Guid> From(ConvertContext context, byte[] input)
         {
             if (input?.Length == 16)
             {
                 return new Guid(input);
             }
-            context.InvalidCastException(input, TypeFriendlyName);
-            return default;
+            return context.InvalidCastException(input, TypeFriendlyName);
         }
     }
 }

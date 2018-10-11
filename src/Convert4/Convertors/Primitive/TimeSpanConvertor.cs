@@ -21,7 +21,7 @@ namespace blqw.Convertors
             "hh:mm:ss.ffffff",
         };
 
-        public TimeSpan From(ConvertContext context, string input)
+        public ConvertResult<TimeSpan> From(ConvertContext context, string input)
         {
             var s = input?.Trim() ?? "";
             if (TimeSpan.TryParse(s, out var result))
@@ -39,19 +39,17 @@ namespace blqw.Convertors
                     break;
                 }
             }
-            context.InvalidCastException(input, TypeFriendlyName);
-            return default;
+            return context.InvalidCastException(input, TypeFriendlyName);
         }
 
-        public TimeSpan From(ConvertContext context, IConvertible input)
+        public ConvertResult<TimeSpan> From(ConvertContext context, IConvertible input)
         {
             if (input?.GetTypeCode() == TypeCode.DateTime)
             {
                 var time = input.ToDateTime(context.GetFormatProvider(typeof(DateTime)));
                 return new TimeSpan(time.Hour, time.Minute, time.Second, time.Millisecond);
             }
-            context.InvalidCastException(input, TypeFriendlyName);
-            return default;
+            return context.InvalidCastException(input, TypeFriendlyName);
         }
     }
 }

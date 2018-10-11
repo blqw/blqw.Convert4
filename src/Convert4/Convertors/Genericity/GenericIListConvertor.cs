@@ -39,11 +39,11 @@ namespace blqw.Convertors
 
             public InnerConvertor(GenericIListConvertor parent) => _parent = parent;
 
-            public TList From(ConvertContext context, string input)
+            public ConvertResult<TList> From(ConvertContext context, string input)
             {
                 if (string.IsNullOrEmpty(input))
                 {
-                    var list = context.CreateInstance<List<TValue>>(typeof(TList));
+                    var list = context.CreateInstance<List<TValue>>(OutputType);
                 }
                 var separator = context.GetStringSeparators();
 
@@ -54,19 +54,19 @@ namespace blqw.Convertors
                 return From(context, arr.GetEnumerator());
             }
 
-            public TList From(ConvertContext context, IEnumerator input)
+            public ConvertResult<TList> From(ConvertContext context, IEnumerator input)
             {
                 if (input == null)
                 {
-                    return null;
+                    return default;
                 }
-                var list = (TList)context.CreateInstance<List<TValue>>(typeof(TList));
+                var list = (TList)context.CreateInstance<List<TValue>>(OutputType);
                 while (input.MoveNext())
                 {
                     var result = context.Convert<TValue>(input.Current);
                     if (!result.Success)
                     {
-                        return null;
+                        return result.Exception + context.InvalidOperationException($"{OutputType.GetFriendlyName()} {"填充元素失败"}");
                     }
                     list.Add(result.OutputValue);
                 }

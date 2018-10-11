@@ -26,7 +26,7 @@ namespace blqw.Convertors
         {
         }
 
-        public IList From(ConvertContext context, string input)
+        public ConvertResult<IList> From(ConvertContext context, string input)
         {
             if (string.IsNullOrEmpty(input))
             {
@@ -42,11 +42,11 @@ namespace blqw.Convertors
             return From(context, arr.GetEnumerator());
         }
 
-        public IList From(ConvertContext context, IEnumerator input)
+        public ConvertResult<IList> From(ConvertContext context, IEnumerator input)
         {
             if (input is null)
             {
-                return null;
+                return default;
             }
             var list = (IList)context.CreateInstance<ArrayList>(OutputType);
             while (input.MoveNext())
@@ -54,12 +54,11 @@ namespace blqw.Convertors
                 var result = context.Convert<object>(input.Current);
                 if (!result.Success)
                 {
-                    context.Error.AddError(result.Error);
-                    return null;
+                    return result.Exception + context.InvalidOperationException($"{OutputType.GetFriendlyName()} {"填充元素失败"}");
                 }
                 list.Add(input.Current);
             }
-            return list;
+            return Result(list);
         }
     }
 }

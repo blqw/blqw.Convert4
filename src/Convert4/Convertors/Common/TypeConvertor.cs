@@ -31,22 +31,22 @@ namespace blqw.Convertors
             ["ulong"] = "System.UInt64",
         };
 
-        public Type From(ConvertContext context, string input)
+        public ConvertResult<Type> From(ConvertContext context, string input)
         {
             if (input == null)
             {
-                return null;
+                return default;
             }
             var result = Type.GetType(_keywords[input] ?? input, false, false) ??
                          Type.GetType("System." + input, false, false);
 
             if (result == null)
             {
-                context.Error.AddException(new TypeLoadException($"{input:!} {"并不是一个类型"}"));
+                return context.InvalidCastException($"{input:!} {"并不是一个类型"}");
             }
             return result;
         }
 
-        public Type From(ConvertContext context, object input) => input?.GetType();
+        public ConvertResult<Type> From(ConvertContext context, object input) => input?.GetType();
     }
 }

@@ -174,7 +174,6 @@ namespace blqw.Convertors
         {
             if (input is T t)
             {
-                context.ClearException();
                 return new ConvertResult<T>(t);
             }
             //空值转换
@@ -182,20 +181,12 @@ namespace blqw.Convertors
             {
                 if (this is IFromNull<T> conv)
                 {
-                    T result;
-                    using (var scope = context.Error.CreateScope())
-                    {
-                        result = conv.FromNull(context);
-                        if (scope.HasError)
-                        {
-                            return context.Error;
-                        }
-                    }
-                    context.ClearException();
-                    return new ConvertResult<T>(result);
+                    return conv.FromNull(context);
                 }
-                return context.GetInvalidCastException("null", TypeFriendlyName);
+                return context.InvalidCastException("null", TypeFriendlyName);
             }
+
+            ConvertException exception = null;
 
             //获取指定输入类型的转换方法调用器
             var invoker = GetInvoker(input.GetType());
@@ -206,7 +197,8 @@ namespace blqw.Convertors
                 {
                     return result;
                 }
-                //这里就算异常了,下面还可以尝试其他方案
+                //如果异常,下面还可以尝试其他方案
+                exception = result.Exception;
             }
             else if (input is IObjectReference refObj)
             {
@@ -234,7 +226,8 @@ namespace blqw.Convertors
                     {
                         return result;
                     }
-                    context.Error.AddError(result.Error);
+                    //如果异常,下面还可以尝试其他方案
+                    exception = result.Exception;
                 }
             }
 
@@ -246,48 +239,44 @@ namespace blqw.Convertors
                     case TypeCode.DBNull:
                         if (this is IFromNull<T> conv)
                         {
-                            using (var scope = context.Error.CreateScope())
-                            {
-                                var result = conv.FromDBNull(context);
-                                return scope.HasError ? (ConvertResult<T>)context.Error : new ConvertResult<T>(result);
-                            }
+                            return exception & conv.FromDBNull(context);
                         }
-                        return context.GetInvalidCastException("DBNull", TypeFriendlyName);
+                        return exception + context.InvalidCastException("DBNull", TypeFriendlyName);
                     case TypeCode.Boolean:
-                        return InvokeIForm(this, context, v0.ToBoolean(context.GetCultureInfo()));
+                        return exception & InvokeIForm(this, context, v0.ToBoolean(context.GetCultureInfo()));
                     case TypeCode.Byte:
-                        return InvokeIForm(this, context, v0.ToByte(context.GetCultureInfo()));
+                        return exception & InvokeIForm(this, context, v0.ToByte(context.GetCultureInfo()));
                     case TypeCode.Char:
-                        return InvokeIForm(this, context, v0.ToChar(context.GetCultureInfo()));
+                        return exception & InvokeIForm(this, context, v0.ToChar(context.GetCultureInfo()));
                     case TypeCode.DateTime:
-                        return InvokeIForm(this, context, v0.ToDateTime(context.GetCultureInfo()));
+                        return exception & InvokeIForm(this, context, v0.ToDateTime(context.GetCultureInfo()));
                     case TypeCode.Decimal:
-                        return InvokeIForm(this, context, v0.ToDecimal(context.GetCultureInfo()));
+                        return exception & InvokeIForm(this, context, v0.ToDecimal(context.GetCultureInfo()));
                     case TypeCode.Double:
-                        return InvokeIForm(this, context, v0.ToDouble(context.GetCultureInfo()));
+                        return exception & InvokeIForm(this, context, v0.ToDouble(context.GetCultureInfo()));
                     case TypeCode.Int16:
-                        return InvokeIForm(this, context, v0.ToInt16(context.GetCultureInfo()));
+                        return exception & InvokeIForm(this, context, v0.ToInt16(context.GetCultureInfo()));
                     case TypeCode.Int32:
-                        return InvokeIForm(this, context, v0.ToInt32(context.GetCultureInfo()));
+                        return exception & InvokeIForm(this, context, v0.ToInt32(context.GetCultureInfo()));
                     case TypeCode.Int64:
-                        return InvokeIForm(this, context, v0.ToInt64(context.GetCultureInfo()));
+                        return exception & InvokeIForm(this, context, v0.ToInt64(context.GetCultureInfo()));
                     case TypeCode.SByte:
-                        return InvokeIForm(this, context, v0.ToSByte(context.GetCultureInfo()));
+                        return exception & InvokeIForm(this, context, v0.ToSByte(context.GetCultureInfo()));
                     case TypeCode.Single:
-                        return InvokeIForm(this, context, v0.ToSingle(context.GetCultureInfo()));
+                        return exception & InvokeIForm(this, context, v0.ToSingle(context.GetCultureInfo()));
                     case TypeCode.String:
                         var s = v0.ToString(context.GetCultureInfo());
                         if (s != input as string)
                         {
-                            return InvokeIForm(this, context, v0.ToString(context.GetCultureInfo()));
+                            return exception & InvokeIForm(this, context, v0.ToString(context.GetCultureInfo()));
                         }
                         break;
                     case TypeCode.UInt16:
-                        return InvokeIForm(this, context, v0.ToUInt16(context.GetCultureInfo()));
+                        return exception & InvokeIForm(this, context, v0.ToUInt16(context.GetCultureInfo()));
                     case TypeCode.UInt32:
-                        return InvokeIForm(this, context, v0.ToUInt32(context.GetCultureInfo()));
+                        return exception & InvokeIForm(this, context, v0.ToUInt32(context.GetCultureInfo()));
                     case TypeCode.UInt64:
-                        return InvokeIForm(this, context, v0.ToUInt64(context.GetCultureInfo()));
+                        return exception & InvokeIForm(this, context, v0.ToUInt64(context.GetCultureInfo()));
                     default:
                         break;
                 }
@@ -299,17 +288,17 @@ namespace blqw.Convertors
                 || input is IPAddress
                 || input is IFormattable)
             {
-                var result = context.Convert<string>(input);
+                var result = exception & context.Convert<string>(input);
                 if (result.Success)
                 {
                     return InvokeIForm(this, context, result.OutputValue);
                 }
-                context.Error.AddError(result.Error);
                 //这里失败了 继续尝试object转换方案
+                exception = result.Exception;
             }
 
+            return exception & InvokeIForm(this, context, input);
 
-            return InvokeIForm(this, context, input);
         }
 
         /// <summary>
@@ -326,17 +315,7 @@ namespace blqw.Convertors
             {
                 if (conv is IFrom<TInput, T> from)
                 {
-                    T result;
-                    using (var scope = context.Error.CreateScope())
-                    {
-                        result = from.From(context, input);
-                        if (scope.HasError)
-                        {
-                            return context.Error;
-                        }
-                    }
-                    context.ClearException();
-                    return new ConvertResult<T>(result);
+                    return from.From(context, input);
                 }
                 if (input is IObjectReference refObj)
                 {
@@ -352,7 +331,7 @@ namespace blqw.Convertors
                 return e;
             }
 
-            return context.GetInvalidCastException(input, (conv as BaseConvertor<T>).TypeFriendlyName ?? conv.OutputType.GetFriendlyName());
+            return context.InvalidCastException(input, (conv as BaseConvertor<T>)?.TypeFriendlyName ?? conv.OutputType.GetFriendlyName());
         }
 
         /// <summary>
@@ -390,5 +369,8 @@ namespace blqw.Convertors
         /// 优先级 默认0
         /// </summary>
         public virtual uint Priority { get; } = 0;
+
+
+        protected ConvertResult<T> Result(T value) => new ConvertResult<T>(value);
     }
 }

@@ -7,75 +7,65 @@ namespace blqw.Convertors
 {
     class Int32Convertor : BaseConvertor<int>, IFromConvertible<int>, IFrom<object, int>, IFrom<byte[], int>
     {
-        public int From(ConvertContext context, bool input) => input ? 1 : 0;
-        public int From(ConvertContext context, char input) => input;
-        public int From(ConvertContext context, sbyte input) => input;
-        public int From(ConvertContext context, byte input) => input;
-        public int From(ConvertContext context, short input) => input;
-        public int From(ConvertContext context, ushort input) => input;
-        public int From(ConvertContext context, int input) => input;
-        public int From(ConvertContext context, uint input)
+        public ConvertResult<int> From(ConvertContext context, bool input) => input ? 1 : 0;
+        public ConvertResult<int> From(ConvertContext context, char input) => input;
+        public ConvertResult<int> From(ConvertContext context, sbyte input) => input;
+        public ConvertResult<int> From(ConvertContext context, byte input) => input;
+        public ConvertResult<int> From(ConvertContext context, short input) => input;
+        public ConvertResult<int> From(ConvertContext context, ushort input) => input;
+        public ConvertResult<int> From(ConvertContext context, int input) => input;
+        public ConvertResult<int> From(ConvertContext context, uint input)
         {
             if (input > MaxValue)
             {
-                context.OverflowException($"{input} > {MaxValue}");
-                return 0;
+                return context.OverflowException($"{input} > {MaxValue}");
             }
             return (int)input;
         }
 
-        public int From(ConvertContext context, long input)
+        public ConvertResult<int> From(ConvertContext context, long input)
         {
             if ((input < MinValue) || (input > MaxValue))
             {
-                context.OverflowException(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}");
-                return 0;
+                return context.OverflowException(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}");
             }
             return (int)input;
         }
 
-        public int From(ConvertContext context, ulong input)
+        public ConvertResult<int> From(ConvertContext context, ulong input)
         {
             if (input > MaxValue)
             {
-                context.OverflowException($"{input} > {MaxValue}");
-                return 0;
+                return context.OverflowException($"{input} > {MaxValue}");
             }
             return (int)input;
         }
-        public int From(ConvertContext context, float input)
+        public ConvertResult<int> From(ConvertContext context, float input)
         {
             if ((input < MinValue) || (input > MaxValue))
             {
-                context.OverflowException(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}");
-                return 0;
+                return context.OverflowException(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}");
             }
             return (int)input;
         }
-        public int From(ConvertContext context, double input)
+        public ConvertResult<int> From(ConvertContext context, double input)
         {
             if ((input < MinValue) || (input > MaxValue))
             {
-                context.OverflowException(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}");
-                return 0;
+                return context.OverflowException(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}");
             }
             return (int)input;
         }
-        public int From(ConvertContext context, decimal input)
+        public ConvertResult<int> From(ConvertContext context, decimal input)
         {
             if ((input < MinValue) || (input > MaxValue))
             {
-                context.OverflowException(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}");
-                return 0;
+                return context.OverflowException(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}");
             }
             return decimal.ToInt32(input);
         }
-        public int From(ConvertContext context, DateTime input)
-        {
-            context.InvalidCastException(input, TypeFriendlyName);
-            return default;
-        }
-        public int From(ConvertContext context, string input)
+        public ConvertResult<int> From(ConvertContext context, DateTime input) => context.InvalidCastException(input, TypeFriendlyName);
+        public ConvertResult<int> From(ConvertContext context, string input)
         {
             var s = input?.Trim() ?? "";
             if (string.IsNullOrWhiteSpace(s))
@@ -91,16 +81,14 @@ namespace blqw.Convertors
             {
                 return result;
             }
-            context.InvalidCastException(input, TypeFriendlyName);
-            return 0;
+            return context.InvalidCastException(input, TypeFriendlyName);
         }
-        public int From(ConvertContext context, object input) => input?.GetHashCode() ?? default;
-        public int From(ConvertContext context, byte[] input)
+        public ConvertResult<int> From(ConvertContext context, object input) => input?.GetHashCode() ?? default;
+        public ConvertResult<int> From(ConvertContext context, byte[] input)
         {
             if (input == null || input.Length > sizeof(int))
             {
-                context.InvalidCastException(input, TypeFriendlyName);
-                return default;
+                return context.InvalidCastException(input, TypeFriendlyName);
             }
             return BitConverter.ToInt32(input.Slice(sizeof(int)), 0);
         }

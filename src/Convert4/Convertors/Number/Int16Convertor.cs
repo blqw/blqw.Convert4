@@ -14,73 +14,63 @@ namespace blqw.Convertors
                                 , IFrom<object, short>
                                 , IFrom<byte[], short>
     {
-        public short From(ConvertContext context, bool input) => input ? (short)1 : (short)0;
-        public short From(ConvertContext context, char input) => (short)input;
-        public short From(ConvertContext context, sbyte input) => (short)input;
-        public short From(ConvertContext context, byte input) => (short)input;
-        public short From(ConvertContext context, short input) => (short)input;
-        public short From(ConvertContext context, ushort input) => (short)input;
-        public short From(ConvertContext context, int input) => (short)input;
-        public short From(ConvertContext context, uint input)
+        public ConvertResult<short> From(ConvertContext context, bool input) => input ? (short)1 : (short)0;
+        public ConvertResult<short> From(ConvertContext context, char input) => (short)input;
+        public ConvertResult<short> From(ConvertContext context, sbyte input) => (short)input;
+        public ConvertResult<short> From(ConvertContext context, byte input) => (short)input;
+        public ConvertResult<short> From(ConvertContext context, short input) => (short)input;
+        public ConvertResult<short> From(ConvertContext context, ushort input) => (short)input;
+        public ConvertResult<short> From(ConvertContext context, int input) => (short)input;
+        public ConvertResult<short> From(ConvertContext context, uint input)
         {
             if (input > MaxValue)
             {
-                context.OverflowException($"{input} > {MaxValue}");
-                return default;
+                return context.OverflowException($"{input} > {MaxValue}");
             }
             return (short)input;
         }
-        public short From(ConvertContext context, long input)
+        public ConvertResult<short> From(ConvertContext context, long input)
         {
             if ((input < MinValue) || (input > MaxValue))
             {
-                context.OverflowException(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}");
-                return 0;
+                return context.OverflowException(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}");
             }
             return (short)input;
         }
-        public short From(ConvertContext context, ulong input)
+        public ConvertResult<short> From(ConvertContext context, ulong input)
         {
             if (input > (int)MaxValue)
             {
-                context.OverflowException($"{input} > {MaxValue}");
-                return 0;
+                return context.OverflowException($"{input} > {MaxValue}");
             }
             return (short)input;
         }
-        public short From(ConvertContext context, float input)
+        public ConvertResult<short> From(ConvertContext context, float input)
         {
             if ((input < MinValue) || (input > MaxValue))
             {
-                context.OverflowException(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}");
-                return 0;
+                return context.OverflowException(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}");
             }
             return (short)input;
         }
-        public short From(ConvertContext context, double input)
+        public ConvertResult<short> From(ConvertContext context, double input)
         {
             if ((input < MinValue) || (input > MaxValue))
             {
-                context.OverflowException(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}");
-                return 0;
+                return context.OverflowException(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}");
             }
             return (short)input;
         }
-        public short From(ConvertContext context, decimal input)
+        public ConvertResult<short> From(ConvertContext context, decimal input)
         {
             if ((input < MinValue) || (input > MaxValue))
             {
-                context.OverflowException(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}");
-                return 0;
+                return context.OverflowException(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}");
             }
             return decimal.ToInt16(input);
         }
-        public short From(ConvertContext context, DateTime input)
-        {
-            context.InvalidCastException(input, TypeFriendlyName);
-            return default;
-        }
-        public short From(ConvertContext context, string input)
+        public ConvertResult<short> From(ConvertContext context, DateTime input) => context.InvalidCastException(input, TypeFriendlyName);
+        public ConvertResult<short> From(ConvertContext context, string input)
         {
             var s = input?.Trim() ?? "";
             if (string.IsNullOrWhiteSpace(s))
@@ -96,20 +86,14 @@ namespace blqw.Convertors
             {
                 return result;
             }
-            context.InvalidCastException(input, TypeFriendlyName);
-            return default;
+            return context.InvalidCastException(input, TypeFriendlyName);
         }
-        public short From(ConvertContext context, object input)
-        {
-            context.InvalidCastException(input, TypeFriendlyName);
-            return default;
-        }
-        public short From(ConvertContext context, byte[] input)
+        public ConvertResult<short> From(ConvertContext context, object input) => context.InvalidCastException(input, TypeFriendlyName);
+        public ConvertResult<short> From(ConvertContext context, byte[] input)
         {
             if (input == null || input.Length > sizeof(short))
             {
-                context.InvalidCastException(input, TypeFriendlyName);
-                return default;
+                return context.InvalidCastException(input, TypeFriendlyName);
             }
             return BitConverter.ToInt16(input.Slice(sizeof(short)), 0);
         }

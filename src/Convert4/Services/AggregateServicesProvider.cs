@@ -65,5 +65,38 @@ namespace blqw.ConvertServices
         /// 施放资源
         /// </summary>
         public void Dispose() => DisposeHelper.DisposeAndRemove(ref _serviceProviders);
+
+        public override bool Equals(object obj)
+        {
+            if (obj is AggregateServicesProvider aggregate)
+            {
+                if (aggregate._serviceProviders.Length != _serviceProviders.Length)
+                {
+                    return false;
+                }
+                for (var i = 0; i < _serviceProviders.Length; i++)
+                {
+                    if (_serviceProviders[i] != aggregate._serviceProviders[i])
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hash = 0;
+                foreach (var provider in _serviceProviders)
+                {
+                    hash = (hash << 1) ^ provider.GetHashCode();
+                }
+                return hash;
+            }
+        }
     }
 }

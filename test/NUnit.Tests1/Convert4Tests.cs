@@ -530,12 +530,9 @@ namespace NUnit.Tests1
                 dataset.To<Dictionary<string, List<user>>>();
                 Assert.Fail();
             }
-            catch (AggregateException ex)
+            catch (ConvertException ex)
             {
-                var messages = ex.InnerExceptions.Select(x => x.Message).ToList();
-                messages.Add("-----------------------------");
-                messages.Add(ex.ToString());
-                Assert.Pass(string.Join(Environment.NewLine, messages.ToArray()));
+                Assert.Pass(Environment.NewLine + ex.Messages);
             }
         }
 
@@ -550,17 +547,14 @@ namespace NUnit.Tests1
                 var a = test.ChangeType(typeof(Convert));
                 Assert.Fail();
             }
-            catch (AggregateException ex)
+            catch (ConvertException ex)
             {
                 if (ex.Message?.StartsWith("无法为静态类型") != true &&
                     ex.Message?.EndsWith("提供转换器") != true)
                 {
                     Assert.Fail(ex.Message);
                 }
-                var messages = ex.InnerExceptions.Select(x => x.Message).ToList();
-                messages.Add("-----------------------------");
-                messages.Add(ex.ToString());
-                Assert.Pass(string.Join(Environment.NewLine, messages.ToArray()));
+                Assert.Pass(Environment.NewLine + ex.Messages);
             }
 
 

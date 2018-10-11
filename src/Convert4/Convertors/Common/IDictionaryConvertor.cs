@@ -18,19 +18,16 @@ namespace blqw.Convertors
         {
         }
 
-        public IDictionary From(ConvertContext context, object input)
+        public ConvertResult<IDictionary> From(ConvertContext context, object input)
         {
             if (input is null || input is DBNull)
             {
-                return null;
+                return default;
             }
 
             var builder = new DictionaryBuilder(OutputType, context);
-            if (Mapper.Build(context, OutputType, input, builder.InstanceCreated, builder.Add))
-            {
-                return builder.Instance;
-            }
-            return null;
+            var ex = builder.Exception + Mapper.Build(context, OutputType, input, builder.InstanceCreated, builder.Add);
+            return ex ?? Result(builder.Instance);
         }
 
         public override IConvertor GetConvertor(Type outputType)
@@ -58,38 +55,39 @@ namespace blqw.Convertors
                 try
                 {
                     Instance = (IDictionary)_context.CreateInstance<Hashtable>(_type);
+                    Exception = null;
                 }
                 catch (Exception ex)
                 {
-                    _context.Error.AddException(ex);
-                    Instance = null;
+                    Instance = default;
+                    Exception = ex as ConvertException ?? new ConvertException(ex);
                 }
             }
-
+            public ConvertException Exception { get; }
             /// <summary>
             /// 被构造的实例
             /// </summary>
-            public IDictionary Instance { get; }
-
-            public bool Add(object key, object value)
-            {
-                try
-                {
-                    Instance.Add(key, value);
-                    return true;
-                }
-                catch (Exception ex)
-                {
-                    _context.Error.AddException(ex);
-                    return false;
-                }
-            }
+            public IDictionary Instance { get; private set; }
 
             /// <summary>
             /// 返回是否已经实例化
             /// </summary>
             /// <returns> </returns>
-            public bool InstanceCreated => Instance != null;
+            public bool InstanceCreated => Exception == null;
+
+            public ConvertException Add(object key, object value)
+            {
+                try
+                {
+                    Instance.Add(key, value);
+                    return null;
+                }
+                catch (Exception ex)
+                {
+                    return ex as ConvertException ?? new ConvertException(ex);
+                }
+            }
+
         }
     }
 }
