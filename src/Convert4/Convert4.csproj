@@ -9,16 +9,18 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Product>blqw.Convert4</Product>
     <Copyright>blqw Copyright 2019</Copyright>
-    <AssemblyVersion>0.0.5.0</AssemblyVersion>
+    <AssemblyVersion>0.0.9.0</AssemblyVersion>
     <NeutralLanguage></NeutralLanguage>
-    <FileVersion>0.0.5.0</FileVersion>
-    <Version>0.0.5-beta</Version>
+    <FileVersion>0.0.9.0</FileVersion>
+    <Version>0.0.9-beta</Version>
     <PackageProjectUrl>https://github.com/blqw/blqw.convert4</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/blqw/blqw.Convert4/blob/master/LICENSE</PackageLicenseUrl>
     <PackageIconUrl>https://avatars3.githubusercontent.com/u/9656154?s=80&amp;v=4</PackageIconUrl>
     <RepositoryUrl>https://github.com/blqw/blqw.convert4</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageReleaseNotes>0.0.5 修复动态类型转换的bug</PackageReleaseNotes>
+    <PackageReleaseNotes>v0.0.9 [2019.01.31]
+即将发布
+v0.0.5 修复动态类型转换的bug</PackageReleaseNotes>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <LangVersion>latest</LangVersion>
@@ -36,7 +38,7 @@
     <None Remove="Define\Base\**" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="blqw.DI.ExtensionMethods" Version="1.0.0" />
+    <PackageReference Include="blqw.DI.ExtensionMethods" Version="1.0.0.3" />
     <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
   </ItemGroup>
