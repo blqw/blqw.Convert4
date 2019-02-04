@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace blqw.Convertors
 {
-    class ObjectConvertor : BaseConvertor<object>
+    class ObjectConvertor : BaseConvertor<object>, IFromNull<object>
     {
         public override IConvertor GetConvertor(Type outputType)
         {
@@ -100,5 +100,8 @@ namespace blqw.Convertors
                 }
             }
         }
+
+        public ConvertResult<object> FromNull(ConvertContext context) => new ConvertResult<object>(null);
+        public ConvertResult<object> FromDBNull(ConvertContext context) => DBNull.Value;
     }
 }
