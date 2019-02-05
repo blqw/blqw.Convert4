@@ -1,4 +1,5 @@
-﻿using System;
+﻿using blqw.ConvertServices;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Dynamic;
@@ -14,7 +15,7 @@ namespace blqw.Dynamic
     /// 基于系统原始类型的动态类型
     /// </summary>
     public class DynamicPrimitive : DynamicObject, IEquatable<object>, IComparable,
-        IComparable<object>, IObjectReference//, IObjectHandle
+        IComparable<object>, IObjectReference, IConvertible, IFormattable
     {
         /// <summary>
         /// 表示一个null的动态类型
@@ -238,8 +239,6 @@ namespace blqw.Dynamic
         }
 
         #region 运算符重载
-#pragma warning disable 1591
-        // ReSharper disable MissingXmlDoc
         public static bool operator >(DynamicPrimitive a, object b) => Compare(a, b) > 0;
 
         public static bool operator <(DynamicPrimitive a, object b) => Compare(a, b) < 0;
@@ -251,8 +250,84 @@ namespace blqw.Dynamic
         public static bool operator >=(DynamicPrimitive a, object b) => Compare(a, b) >= 0;
 
         public static bool operator <=(DynamicPrimitive a, object b) => Compare(a, b) <= 0;
-#pragma warning restore 1591
-        // ReSharper restore MissingXmlDoc
         #endregion
+
+        T ConvertTo<T>(IFormatProvider provider)
+        {
+            var settings = new ConvertSettings();
+            if (provider != null)
+            {
+                settings.Set<IFormatProvider>(provider, _value?.GetType());
+            }
+            var result = _value.Convert<T>(settings);
+            result.ThrowIfExceptional();
+            return result.OutputValue;
+        }
+        TypeCode IConvertible.GetTypeCode() =>
+            (_value as IConvertible)?.GetTypeCode() ?? TypeCode.Object;
+        bool IConvertible.ToBoolean(IFormatProvider provider) =>
+            (_value as IConvertible)?.ToBoolean(provider) ?? ConvertTo<bool>(provider);
+        byte IConvertible.ToByte(IFormatProvider provider) =>
+            (_value as IConvertible)?.ToByte(provider) ?? ConvertTo<byte>(provider);
+        char IConvertible.ToChar(IFormatProvider provider) =>
+            (_value as IConvertible)?.ToChar(provider) ?? ConvertTo<char>(provider);
+        DateTime IConvertible.ToDateTime(IFormatProvider provider) =>
+            (_value as IConvertible)?.ToDateTime(provider) ?? ConvertTo<DateTime>(provider);
+        decimal IConvertible.ToDecimal(IFormatProvider provider) =>
+            (_value as IConvertible)?.ToDecimal(provider) ?? ConvertTo<decimal>(provider);
+        double IConvertible.ToDouble(IFormatProvider provider) =>
+            (_value as IConvertible)?.ToDouble(provider) ?? ConvertTo<double>(provider);
+        short IConvertible.ToInt16(IFormatProvider provider) =>
+            (_value as IConvertible)?.ToInt16(provider) ?? ConvertTo<short>(provider);
+        int IConvertible.ToInt32(IFormatProvider provider) =>
+            (_value as IConvertible)?.ToInt32(provider) ?? ConvertTo<int>(provider);
+        long IConvertible.ToInt64(IFormatProvider provider) =>
+            (_value as IConvertible)?.ToInt64(provider) ?? ConvertTo<long>(provider);
+        sbyte IConvertible.ToSByte(IFormatProvider provider) =>
+            (_value as IConvertible)?.ToSByte(provider) ?? ConvertTo<sbyte>(provider);
+        float IConvertible.ToSingle(IFormatProvider provider) =>
+            (_value as IConvertible)?.ToSingle(provider) ?? ConvertTo<float>(provider);
+        string IConvertible.ToString(IFormatProvider provider) =>
+            (_value as IConvertible)?.ToString(provider) ?? ConvertTo<string>(provider);
+        object IConvertible.ToType(Type conversionType, IFormatProvider provider)
+        {
+            if (_value is IConvertible conv)
+            {
+                return conv.ToType(conversionType, provider);
+            }
+            var settings = new ConvertSettings();
+            if (provider != null)
+            {
+                settings.Set<IFormatProvider>(provider, _value?.GetType());
+            }
+            var result = _value.Convert(conversionType, settings);
+            result.ThrowIfExceptional();
+            return result.OutputValue;
+        }
+        ushort IConvertible.ToUInt16(IFormatProvider provider) =>
+            (_value as IConvertible)?.ToUInt16(provider) ?? ConvertTo<ushort>(provider);
+        uint IConvertible.ToUInt32(IFormatProvider provider) =>
+            (_value as IConvertible)?.ToUInt32(provider) ?? ConvertTo<uint>(provider);
+        ulong IConvertible.ToUInt64(IFormatProvider provider) =>
+            (_value as IConvertible)?.ToUInt64(provider) ?? ConvertTo<ulong>(provider);
+        string IFormattable.ToString(string format, IFormatProvider provider)
+        {
+            if (_value is IFormattable formattable)
+            {
+                return formattable.ToString(format, provider);
+            }
+            var settings = new ConvertSettings();
+            if (provider != null)
+            {
+                settings.Set<IFormatProvider>(provider, _value?.GetType());
+            }
+            if (!string.IsNullOrWhiteSpace(format))
+            {
+                settings.Set(NamedServiceNames.FORMAT, format, _value?.GetType());
+            }
+            var result = _value.Convert<string>(settings);
+            result.ThrowIfExceptional();
+            return result.OutputValue;
+        }
     }
 }
