@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>blqw.Kanai</RootNamespace>
+    <AssemblyName>blqw.Kanai</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="obj\**" />
+    <EmbeddedResource Remove="obj\**" />
+    <None Remove="obj\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="AggregateConvertor.cs" />
+    <Compile Remove="IConvertorFactory.cs" />
+    <Compile Remove="InstantiatedConvertorFactory.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="blqw.DI.StartupAttribute" Version="1.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.0.0" />
+  </ItemGroup>
+
+</Project>
