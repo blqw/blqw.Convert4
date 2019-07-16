@@ -5,7 +5,7 @@ namespace blqw.Kanai
     /// <summary>
     /// 转换器接口
     /// </summary>
-    public interface IConvertor<T>
+    public interface IConvertor<T> : IConvertor
     {
         /// <summary>
         /// 优先级
@@ -18,5 +18,10 @@ namespace blqw.Kanai
         /// <param name="context"> 上下文 </param>
         /// <param name="input"> 需要转换类型的对象 </param>
         ConvertResult<T> ChangeType(ConvertContext context, object input);
+    }
+
+    public interface IConvertor
+    {
+
     }
 }

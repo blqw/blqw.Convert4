@@ -9,7 +9,7 @@ namespace blqw.Kanai
     /// <summary>
     /// 转换器选择器
     /// </summary>
-    public class ConvertorSelector : IConvertorSelector
+    internal class ConvertorSelector : IConvertorSelector
     {
         private readonly IEnumerable<IConvertorFactory> _factories;
 

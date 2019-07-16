@@ -5,19 +5,10 @@ using System.Collections.Concurrent;
 namespace blqw.Kanai
 {
     /// <summary>
-    /// 超级转换器v5
+    /// 超级转换器
     /// </summary>
-    public static class Convert
+    public static partial class Convert
     {
-        public static ConvertResult<T> Cast<T>(this object input, ConvertSettings settings)
-        {
-            using (var context = new ConvertContext(settings))
-            {
-                return context.ChangeType<T>(input);
-            }
-        }
-
-
         private readonly static ConcurrentDictionary<Type, Func<object, ConvertSettings, ConvertResult<object>>> _cache =
             new ConcurrentDictionary<Type, Func<object, ConvertSettings, ConvertResult<object>>>();
 
@@ -43,5 +34,14 @@ namespace blqw.Kanai
                 return cast(input, settings);
             }
         }
+
+        public static ConvertResult<T> Cast<T>(this object input, ConvertSettings settings)
+        {
+            using (var context = new ConvertContext(settings))
+            {
+                return context.ChangeType<T>(input);
+            }
+        }
+
     }
 }

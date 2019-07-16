@@ -6,6 +6,9 @@ namespace blqw.Kanai.Factories
     {
         private readonly IConvertor<outputT> _convertor;
 
+        public InstantiatedConvertorFactory(IConvertor<outputT> convertor) => 
+            _convertor = convertor ?? throw new ArgumentNullException(nameof(convertor));
+
         public IConvertor<T> Build<T>()
         {
             if (!CanBuild<T>())
@@ -17,7 +20,5 @@ namespace blqw.Kanai.Factories
 
         public bool CanBuild<T>() =>
             typeof(outputT).IsAssignableFrom(typeof(T));
-
-
     }
 }

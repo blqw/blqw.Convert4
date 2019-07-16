@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="blqw.DI.ExtensionMethods" Version="1.0.0.3" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Kanai\Kanai.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="blqw.DI.Startup">
+      <HintPath>..\..\..\blqw.DI\src\blqw.DI.Startup\bin\Debug\netstandard2.0\blqw.DI.Startup.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
