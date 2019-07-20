@@ -1,5 +1,9 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Collections;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Globalization;
 
 namespace blqw.Kanai
 {
@@ -10,9 +14,14 @@ namespace blqw.Kanai
     {
         private ConvertSettings _settings;
 
+        public CultureInfo CultureInfo { get; }
+        public IEnumerable<ITranslator> Translators { get; }
+
         public ConvertContext(ConvertSettings settings)
         {
             _settings = settings ?? ConvertSettings.Global;
+            Translators = _settings.GetServices<ITranslator>();
+            CultureInfo = _settings.GetService<CultureInfo>() ?? CultureInfo.CurrentCulture;
         }
 
         public void Dispose()
@@ -27,6 +36,19 @@ namespace blqw.Kanai
             return convertor.ChangeType(this, input);
         }
 
-
+        public IEnumerable<object> Translate(object input)
+        {
+            var type = input.GetType(); 
+            if (Translators != null)
+            {
+                foreach (var translator in Translators)
+                {
+                    if (translator.InputType.IsAssignableFrom(type))
+                    {
+                        yield return translator.Translate(input);
+                    }
+                }
+            }
+        }
     }
 }

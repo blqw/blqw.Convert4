@@ -1,11 +1,14 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
 
 namespace blqw.Kanai
 {
     /// <summary>
     /// 转换器设置参数
     /// </summary>
-    public sealed class ConvertSettings
+    public sealed class ConvertSettings : HybridDictionary, IServiceProvider
     {
         /// <summary>
         /// 服务提供程序
@@ -17,7 +20,7 @@ namespace blqw.Kanai
         /// </summary>
         public static ConvertSettings Global { get; private set; }
 
-        public static void Injection(IServiceProvider provider) => 
+        public static void Injection(IServiceProvider provider) =>
             Global = new ConvertSettings(provider);
 
         public ConvertSettings()
@@ -34,5 +37,8 @@ namespace blqw.Kanai
         public ConvertSettings(IServiceProvider provider = null)
             : this(Global) =>
             ServiceProvider = provider ?? Global?.ServiceProvider;
+
+        public object GetService(Type serviceType)
+            => this[serviceType] ?? ServiceProvider.GetService(serviceType);
     }
 }

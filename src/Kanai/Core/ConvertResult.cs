@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Runtime.Serialization;
 
 namespace blqw.Kanai
 {
     /// <summary>
     /// 转换结果
     /// </summary>
-    public struct ConvertResult<T>
+    public struct ConvertResult<T> : IObjectReference
     {
         /// <summary>
         /// 转换成功
@@ -19,7 +20,7 @@ namespace blqw.Kanai
         /// <param name="success">是否成功</param>
         /// <param name="value">返回值</param>
         /// <param name="ex">错误对象</param>
-        internal ConvertResult(bool success, T value, ConvertException ex)
+        internal ConvertResult(bool success, T value, Exception ex)
         {
             _fail = !success;
             OutputValue = value;
@@ -42,7 +43,7 @@ namespace blqw.Kanai
         /// 如果失败,则返回异常
         /// </summary>
         /// <returns></returns>
-        internal ConvertException Exception { get; }
+        public Exception Exception { get; }
 
         public void ThrowIfExceptional()
         {
@@ -54,7 +55,7 @@ namespace blqw.Kanai
 
         #region 隐式转换
 
-        public static implicit operator ConvertResult<T>(ConvertException exception)
+        public static implicit operator ConvertResult<T>(Exception exception)
         {
             if (exception == null)
             {
@@ -63,7 +64,12 @@ namespace blqw.Kanai
             return new ConvertResult<T>(false, default, exception);
         }
 
-        #endregion
+        object IObjectReference.GetRealObject(StreamingContext context)
+        {
+            ThrowIfExceptional();
+            return OutputValue;
+        }
 
+        #endregion
     }
 }

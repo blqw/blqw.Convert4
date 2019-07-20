@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace blqw.Kanai
 {
@@ -13,17 +14,30 @@ namespace blqw.Kanai
     [Serializable]
     public class ConvertException : AggregateException
     {
-        public ConvertException(Type outputType, object origin, IEnumerable<Exception> exceptions) :
-            base(GetMessage(outputType, origin, null), exceptions)
+        public ConvertException(Type outputType, object origin, IEnumerable<Exception> exceptions, CultureInfo cultureInfo)
+            : base(GetMessage(outputType.GetFriendlyName(), origin, cultureInfo), exceptions)
         {
         }
 
-        private static string GetMessage(Type outputType, object origin, CultureInfo cultureInfo)
+        public ConvertException(string outputTypeName, object origin, IEnumerable<Exception> exceptions, CultureInfo cultureInfo)
+            : base(GetMessage(outputTypeName, origin, cultureInfo), exceptions)
         {
-            if (outputType == null)
+        }
+
+        public static InvalidCastException InvalidCast(Type outputType, object origin, CultureInfo cultureInfo)
+            => new InvalidCastException(GetMessage(outputType.GetFriendlyName(), origin, cultureInfo));
+
+        public static InvalidCastException InvalidCast(string outputTypeName, object origin, CultureInfo cultureInfo)
+            => new InvalidCastException(GetMessage(outputTypeName, origin, cultureInfo));
+
+
+        private static string GetMessage(string outputTypeName, object origin, CultureInfo cultureInfo)
+        {
+            if (outputTypeName == null)
             {
-                throw new ArgumentNullException(nameof(outputType));
+                outputTypeName = "`null`";
             }
+
             if (cultureInfo == null)
             {
                 cultureInfo = CultureInfo.CurrentCulture;
@@ -31,7 +45,6 @@ namespace blqw.Kanai
 
             var text = (origin as IConvertible)?.ToString(null)
                        ?? (origin as IFormattable)?.ToString(null, null);
-            var outputTypeName = outputType.GetFriendlyName();
             if (origin == null)
             {
                 text = SR.CANT_CONVERT.Localize(cultureInfo, "null", outputTypeName);
@@ -60,5 +73,6 @@ namespace blqw.Kanai
         /// 内部异常数
         /// </summary>
         public int ExceptionCount => (InnerExceptions?.Count ?? 0);
+
     }
 }
