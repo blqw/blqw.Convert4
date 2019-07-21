@@ -7,6 +7,7 @@ using System.Collections;
 using System.Data;
 using System.ComponentModel;
 using blqw.Kanai.Extensions;
+using blqw.Kanai.Froms;
 
 namespace blqw.Kanai.Convertors
 {

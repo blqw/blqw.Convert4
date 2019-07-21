@@ -68,6 +68,20 @@ namespace blqw.Kanai.Extensions
             return new InvalidCastException($"{SR.CONVERTOR_FAIL.Localize(cultureInfo, convertor.GetType().GetFriendlyName())}: {ex.Message}", ex);
         }
 
+        public static OverflowException Overflow<T>(this IConvertor<T> convertor, string message, CultureInfo cultureInfo)
+        {
+            if (convertor == null)
+            {
+                throw new ArgumentNullException(nameof(convertor));
+            }
+
+            if (cultureInfo == null)
+            {
+                cultureInfo = CultureInfo.CurrentCulture;
+            }
+
+            return new OverflowException($"{SR.VALUE_OVERFLOW.Localize(cultureInfo, convertor.GetType().GetFriendlyName())}: {message}");
+        }
 
 
         public static Exception GetRealException(this Exception exception)

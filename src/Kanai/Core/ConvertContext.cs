@@ -16,6 +16,7 @@ namespace blqw.Kanai
 
         public CultureInfo CultureInfo { get; }
         public IEnumerable<ITranslator> Translators { get; }
+        public NumberFormatInfo NumberFormatInfo { get; }
 
         public ConvertContext(ConvertSettings settings)
         {

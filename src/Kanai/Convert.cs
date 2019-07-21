@@ -7,7 +7,7 @@ namespace blqw.Kanai
     /// <summary>
     /// 超级转换器
     /// </summary>
-    public static partial class Convert
+    public static partial class Convert4
     {
         private readonly static ConcurrentDictionary<Type, Func<object, ConvertSettings, ConvertResult<object>>> _cache =
             new ConcurrentDictionary<Type, Func<object, ConvertSettings, ConvertResult<object>>>();

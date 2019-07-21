@@ -1,4 +1,5 @@
-﻿using blqw.Kanai.Factories;
+﻿using blqw.Convertors;
+using blqw.Kanai.Factories;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Linq;
@@ -13,7 +14,7 @@ namespace blqw.Kanai
             {
                 return services;
             }
-            var types = typeof(Convert).Assembly.SafeGetTypes();
+            var types = typeof(ServiceExtensions).Assembly.SafeGetTypes();
             foreach (var type in types.Where(x => x.IsClass && x.Instantiable()))
             {
                 if (typeof(IConvertorFactory).IsAssignableFrom(type))

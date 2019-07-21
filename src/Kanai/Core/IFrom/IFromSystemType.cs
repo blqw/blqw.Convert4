@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace blqw.Kanai
+namespace blqw.Kanai.Froms
 {
     /// <summary>
     /// 处理系统类型转换的接口

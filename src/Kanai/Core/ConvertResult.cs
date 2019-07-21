@@ -74,6 +74,8 @@ namespace blqw.Kanai
             return OutputValue;
         }
 
+        public static implicit operator ConvertResult<T>(T value) => new ConvertResult<T>(true, value, null);
+
         #endregion
     }
 }

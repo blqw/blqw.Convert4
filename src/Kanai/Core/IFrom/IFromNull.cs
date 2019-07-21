@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace blqw.Kanai
+namespace blqw.Kanai.Froms
 {
     /// <summary>
     /// 处理 <seealso cref="null"/> 和 <seealso cref="DBNull"/> 转换的接口

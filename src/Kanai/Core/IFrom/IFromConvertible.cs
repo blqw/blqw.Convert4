@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace blqw.Kanai
+namespace blqw.Kanai.Froms
 {
     /// <summary>
     /// 处理 <seealso cref="IConvertible"/> 类型的转换接口

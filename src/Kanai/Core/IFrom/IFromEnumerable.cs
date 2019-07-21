@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Specialized;
 using System.Data;
 
-namespace blqw.Kanai
+namespace blqw.Kanai.Froms
 {
     /// <summary>
     /// 处理枚举类型的转换接口

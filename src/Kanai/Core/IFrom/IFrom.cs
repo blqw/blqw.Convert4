@@ -1,4 +1,4 @@
-﻿namespace blqw.Kanai
+﻿namespace blqw.Kanai.Froms
 {
     /// <summary>
     /// 处理指定类型的转换接口

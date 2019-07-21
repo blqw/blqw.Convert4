@@ -80,6 +80,8 @@ namespace blqw
 
         public static readonly SR CONVERTOR_FAIL = "转换器{0} 转换失败";
 
+        public static readonly SR VALUE_OVERFLOW = "值超过限制";
+
         private readonly string _str;
         public SR(string str) => _str = str ?? throw new ArgumentNullException(nameof(str));
         /// <summary>

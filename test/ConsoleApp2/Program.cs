@@ -2,8 +2,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using blqw.DI;
-using System.Collections.Generic;
-using System.Linq;
 using System.Diagnostics;
 
 namespace ConsoleApp2
@@ -19,7 +17,13 @@ namespace ConsoleApp2
                 .Configure();
 
             //var x = "1".ChangeType<int>(null);
-            var y = "a".ChangeType<int>(null);
+            var y = (
+                "0xFF".ChangeType<double>(null),
+                "0xFF".ChangeType<float>(null),
+                "0b0101".ChangeType<double>(null),
+                "0b0101".ChangeType<float>(null),
+                "0xFF".ChangeType<decimal>(null),
+                "0b0101".ChangeType<decimal>(null));
             Debugger.Break();
             Console.WriteLine("1".ChangeType<int>(null));
 
