@@ -24,17 +24,14 @@ namespace blqw.Kanai
                 {
                     services.AddSingleton(typeof(ITranslator), type);
                 }
-                if (typeof(IConvertor).IsAssignableFrom(type))
+                var genericArguments = type.GetGenericArguments(typeof(IConvertor<>));
+                if (genericArguments != null)
                 {
-                    var genericArguments = type.GetGenericArguments(typeof(IConvertor<>));
-                    if (genericArguments != null)
-                    {
-                        var factoryType = typeof(InstantiatedConvertorFactory<>).MakeGenericType(genericArguments);
-                        services.AddSingleton(type, type);
-                        services.AddSingleton(typeof(IConvertorFactory), p =>
-                                ActivatorUtilities.CreateInstance(p, factoryType, p.GetService(type))
-                        );
-                    }
+                    var factoryType = typeof(InstantiatedConvertorFactory<>).MakeGenericType(genericArguments);
+                    services.AddSingleton(type, type);
+                    services.AddSingleton(typeof(IConvertorFactory), p =>
+                            ActivatorUtilities.CreateInstance(p, factoryType, p.GetService(type))
+                    );
                 }
             }
             services.AddSingleton<IConvertorSelector, ConvertorSelector>();

@@ -6,6 +6,7 @@ using System.Text;
 using System.Collections;
 using System.Data;
 using System.ComponentModel;
+using blqw.Kanai.Extensions;
 
 namespace blqw.Kanai.Convertors
 {
@@ -49,10 +50,6 @@ namespace blqw.Kanai.Convertors
         public virtual string TypeFriendlyName { get; }
 
 
-        private Exception Fail(ConvertContext context, object input, ExceptionCollection exceptions)
-            => exceptions == null ? ConvertException.InvalidCast(TypeFriendlyName, null, context.CultureInfo)
-                 : (Exception)exceptions?.ToConvertException(TypeFriendlyName, input, context.CultureInfo);
-
         ConvertResult<T> ChangeTypeImpl(ConvertContext context, object input)
         {
             if (input is T t)
@@ -82,7 +79,7 @@ namespace blqw.Kanai.Convertors
                     exceptions += e;
                 }
 
-                return Fail(context, input, exceptions);
+                return this.Fail(input, context.CultureInfo, exceptions);
             }
 
 
@@ -90,7 +87,7 @@ namespace blqw.Kanai.Convertors
             var invokers = GetInvokers(input.GetType());
             foreach (var invoker in invokers)
             {
-                var result = InvokeIForm(invoker, context, input);
+                var result = invoker(this, context, input);
                 if (result.Success)
                 {
                     return result;
@@ -105,44 +102,44 @@ namespace blqw.Kanai.Convertors
                 switch (v0.GetTypeCode())
                 {
                     case TypeCode.Boolean:
-                        return v0 is bool ? Fail(context, input, exceptions) : InvokeIForm(context, v0.ToBoolean(context.CultureInfo), exceptions);
+                        return v0 is bool ? this.Fail(input, context.CultureInfo, exceptions) : InvokeIForm(context, v0.ToBoolean(context.CultureInfo), exceptions);
                     case TypeCode.Byte:
-                        return v0 is byte ? Fail(context, input, exceptions) : InvokeIForm(context, v0.ToByte(context.CultureInfo), exceptions);
+                        return v0 is byte ? this.Fail(input, context.CultureInfo, exceptions) : InvokeIForm(context, v0.ToByte(context.CultureInfo), exceptions);
                     case TypeCode.Char:
-                        return v0 is char ? Fail(context, input, exceptions) : InvokeIForm(context, v0.ToChar(context.CultureInfo), exceptions);
+                        return v0 is char ? this.Fail(input, context.CultureInfo, exceptions) : InvokeIForm(context, v0.ToChar(context.CultureInfo), exceptions);
                     case TypeCode.DateTime:
-                        return v0 is DateTime ? Fail(context, input, exceptions) : InvokeIForm(context, v0.ToDateTime(context.CultureInfo), exceptions);
+                        return v0 is DateTime ? this.Fail(input, context.CultureInfo, exceptions) : InvokeIForm(context, v0.ToDateTime(context.CultureInfo), exceptions);
                     case TypeCode.Decimal:
-                        return v0 is decimal ? Fail(context, input, exceptions) : InvokeIForm(context, v0.ToDecimal(context.CultureInfo), exceptions);
+                        return v0 is decimal ? this.Fail(input, context.CultureInfo, exceptions) : InvokeIForm(context, v0.ToDecimal(context.CultureInfo), exceptions);
                     case TypeCode.Double:
-                        return v0 is double ? Fail(context, input, exceptions) : InvokeIForm(context, v0.ToDouble(context.CultureInfo), exceptions);
+                        return v0 is double ? this.Fail(input, context.CultureInfo, exceptions) : InvokeIForm(context, v0.ToDouble(context.CultureInfo), exceptions);
                     case TypeCode.Int16:
-                        return v0 is short ? Fail(context, input, exceptions) : InvokeIForm(context, v0.ToInt16(context.CultureInfo), exceptions);
+                        return v0 is short ? this.Fail(input, context.CultureInfo, exceptions) : InvokeIForm(context, v0.ToInt16(context.CultureInfo), exceptions);
                     case TypeCode.Int32:
-                        return v0 is int ? Fail(context, input, exceptions) : InvokeIForm(context, v0.ToInt32(context.CultureInfo), exceptions);
+                        return v0 is int ? this.Fail(input, context.CultureInfo, exceptions) : InvokeIForm(context, v0.ToInt32(context.CultureInfo), exceptions);
                     case TypeCode.Int64:
-                        return v0 is long ? Fail(context, input, exceptions) : InvokeIForm(context, v0.ToInt64(context.CultureInfo), exceptions);
+                        return v0 is long ? this.Fail(input, context.CultureInfo, exceptions) : InvokeIForm(context, v0.ToInt64(context.CultureInfo), exceptions);
                     case TypeCode.SByte:
-                        return v0 is sbyte ? Fail(context, input, exceptions) : InvokeIForm(context, v0.ToSByte(context.CultureInfo), exceptions);
+                        return v0 is sbyte ? this.Fail(input, context.CultureInfo, exceptions) : InvokeIForm(context, v0.ToSByte(context.CultureInfo), exceptions);
                     case TypeCode.Single:
-                        return v0 is float ? Fail(context, input, exceptions) : InvokeIForm(context, v0.ToSingle(context.CultureInfo), exceptions);
+                        return v0 is float ? this.Fail(input, context.CultureInfo, exceptions) : InvokeIForm(context, v0.ToSingle(context.CultureInfo), exceptions);
                     case TypeCode.UInt16:
-                        return v0 is ushort ? Fail(context, input, exceptions) : InvokeIForm(context, v0.ToUInt16(context.CultureInfo), exceptions);
+                        return v0 is ushort ? this.Fail(input, context.CultureInfo, exceptions) : InvokeIForm(context, v0.ToUInt16(context.CultureInfo), exceptions);
                     case TypeCode.UInt32:
-                        return v0 is uint ? Fail(context, input, exceptions) : InvokeIForm(context, v0.ToUInt32(context.CultureInfo), exceptions);
+                        return v0 is uint ? this.Fail(input, context.CultureInfo, exceptions) : InvokeIForm(context, v0.ToUInt32(context.CultureInfo), exceptions);
                     case TypeCode.UInt64:
-                        return v0 is ulong ? Fail(context, input, exceptions) : InvokeIForm(context, v0.ToUInt64(context.CultureInfo), exceptions);
+                        return v0 is ulong ? this.Fail(input, context.CultureInfo, exceptions) : InvokeIForm(context, v0.ToUInt64(context.CultureInfo), exceptions);
                     case TypeCode.DBNull:
-                        return Fail(context, input, exceptions);
+                        return this.Fail(input, context.CultureInfo, exceptions);
                     case TypeCode.String:
                         if (input is string)
                         {
-                            return Fail(context, input, exceptions);
+                            return this.Fail(input, context.CultureInfo, exceptions);
                         }
                         var s = v0.ToString(context.CultureInfo);
                         if (s == input as string)
                         {
-                            return Fail(context, input, exceptions);
+                            return this.Fail(input, context.CultureInfo, exceptions);
                         }
                         return InvokeIForm(context, s, exceptions);
                     default:
@@ -156,7 +153,7 @@ namespace blqw.Kanai.Convertors
                 var invokers0 = GetInvokers(value.GetType());
                 foreach (var invoker in invokers0)
                 {
-                    var result = InvokeIForm(invoker, context, value);
+                    var result = invoker(this, context, value);
                     if (result.Success)
                     {
                         return result;
@@ -180,18 +177,11 @@ namespace blqw.Kanai.Convertors
             ChangeTypeImpl(context, input);
 
         /// <summary>
-        /// 获取子转换器
-        /// </summary>
-        /// <param name="outputType">子转换器输出类型</param>
-        /// <returns></returns>
-        public virtual IConvertor GetConvertor(Type outputType) => null;
-
-        /// <summary>
         /// 优先级 默认0
         /// </summary>
         public virtual uint Priority { get; } = 0;
 
 
-        protected ConvertResult<T> Result(T value) => new ConvertResult<T>(value);
+        protected ConvertResult<T> Ok(T value) => new ConvertResult<T>(value);
     }
 }

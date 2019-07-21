@@ -14,56 +14,18 @@ namespace blqw.Kanai
     [Serializable]
     public class ConvertException : AggregateException
     {
-        public ConvertException(Type outputType, object origin, IEnumerable<Exception> exceptions, CultureInfo cultureInfo)
-            : base(GetMessage(outputType.GetFriendlyName(), origin, cultureInfo), exceptions)
-        {
-        }
-
-        public ConvertException(string outputTypeName, object origin, IEnumerable<Exception> exceptions, CultureInfo cultureInfo)
-            : base(GetMessage(outputTypeName, origin, cultureInfo), exceptions)
-        {
-        }
-
-        public static InvalidCastException InvalidCast(Type outputType, object origin, CultureInfo cultureInfo)
-            => new InvalidCastException(GetMessage(outputType.GetFriendlyName(), origin, cultureInfo));
-
-        public static InvalidCastException InvalidCast(string outputTypeName, object origin, CultureInfo cultureInfo)
-            => new InvalidCastException(GetMessage(outputTypeName, origin, cultureInfo));
-
-
-        private static string GetMessage(string outputTypeName, object origin, CultureInfo cultureInfo)
-        {
-            if (outputTypeName == null)
-            {
-                outputTypeName = "`null`";
-            }
-
-            if (cultureInfo == null)
-            {
-                cultureInfo = CultureInfo.CurrentCulture;
-            }
-
-            var text = (origin as IConvertible)?.ToString(null)
-                       ?? (origin as IFormattable)?.ToString(null, null);
-            if (origin == null)
-            {
-                text = SR.CANT_CONVERT.Localize(cultureInfo, "null", outputTypeName);
-            }
-            else if (text == null)
-            {
-                text = SR.CANT_CONVERT.Localize(cultureInfo, origin.GetType().GetFriendlyName(), outputTypeName);
-            }
-            else
-            {
-                text = SR.VALUE_CANT_CONVERT.Localize(cultureInfo, text, origin.GetType().GetFriendlyName(), outputTypeName);
-            }
-            return text;
-        }
-
+        private readonly string _message;
 
         protected ConvertException(
           System.Runtime.Serialization.SerializationInfo info,
           System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+
+        public ConvertException(string message, IEnumerable<Exception> innerExceptions) : base(message, innerExceptions)
+        {
+            _message = message;
+        }
+
+        public override string Message => _message;
 
         /// <summary>
         /// 完整的异常文本

@@ -4,6 +4,7 @@ using System;
 using blqw.DI;
 using System.Collections.Generic;
 using System.Linq;
+using System.Diagnostics;
 
 namespace ConsoleApp2
 {
@@ -11,19 +12,16 @@ namespace ConsoleApp2
     {
         static void Main(string[] args)
         {
-
-            var interfaceTypes = typeof(Dictionary<string, object>).GetInterfaces().ToList();
-
-            interfaceTypes.Sort((a, b) => a.IsAssignableFrom(b) ? 1 : b.IsAssignableFrom(a) ? -1 : 0);
-
-            Console.WriteLine(interfaceTypes);
             new ServiceCollection()
                 .AddKanai()
                 .ConfigureServices()
                 .BuildServiceProvider()
                 .Configure();
 
-            Console.WriteLine("1".Cast<int>(null));
+            //var x = "1".ChangeType<int>(null);
+            var y = "a".ChangeType<int>(null);
+            Debugger.Break();
+            Console.WriteLine("1".ChangeType<int>(null));
 
 
 

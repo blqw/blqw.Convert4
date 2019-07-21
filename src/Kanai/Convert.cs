@@ -21,7 +21,7 @@ namespace blqw.Kanai
             }
         }
 
-        public static ConvertResult<object> Cast(this object input, Type outputType, ConvertSettings settings)
+        public static ConvertResult<object> ChangeType(this object input, Type outputType, ConvertSettings settings)
         {
             using (var context = new ConvertContext(settings))
             {
@@ -35,7 +35,7 @@ namespace blqw.Kanai
             }
         }
 
-        public static ConvertResult<T> Cast<T>(this object input, ConvertSettings settings)
+        public static ConvertResult<T> ChangeType<T>(this object input, ConvertSettings settings)
         {
             using (var context = new ConvertContext(settings))
             {

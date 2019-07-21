@@ -4,13 +4,8 @@ using System.Text;
 
 namespace blqw.Kanai.Convertors
 {
-    class Int32Convertor : IConvertor<int>
+    class Int32Convertor : BaseConvertor<int>, IFrom<string, int>
     {
-        public uint Priority => 100;
-
-        public ConvertResult<int> ChangeType(ConvertContext context, object input)
-        {
-            throw new NotImplementedException();
-        }
+        public ConvertResult<int> From(ConvertContext context, string input) => throw new NotImplementedException();
     }
 }

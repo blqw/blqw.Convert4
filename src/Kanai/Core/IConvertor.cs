@@ -5,7 +5,8 @@ namespace blqw.Kanai
     /// <summary>
     /// 转换器接口
     /// </summary>
-    public interface IConvertor<T> : IConvertor
+    [Convertor]
+    public interface IConvertor<T>
     {
         /// <summary>
         /// 优先级
@@ -20,8 +21,8 @@ namespace blqw.Kanai
         ConvertResult<T> ChangeType(ConvertContext context, object input);
     }
 
-    public interface IConvertor
+    [System.AttributeUsage(AttributeTargets.Interface, Inherited = false, AllowMultiple = false)]
+    internal sealed class ConvertorAttribute : Attribute
     {
-
     }
 }

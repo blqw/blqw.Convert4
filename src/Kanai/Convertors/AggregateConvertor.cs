@@ -1,10 +1,11 @@
-﻿using System;
+﻿using blqw.Kanai.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace blqw.Kanai.Convertors
 {
-    internal sealed class AggregateConvertor<T> : Convertor, IConvertor<T>
+    internal sealed class AggregateConvertor<T> : IConvertor<T>
     {
         public AggregateConvertor(IEnumerable<IConvertor<T>> convertors)
         {
@@ -15,7 +16,7 @@ namespace blqw.Kanai.Convertors
 
             Convertors = convertors.Where(x => !(x is AggregateConvertor<T>)).Union(
                             convertors.OfType<AggregateConvertor<T>>().SelectMany(x => x.Convertors)
-                         ).OrderByDescending(x => x.Priority).ToList().AsReadOnly();
+                         ).OrderBy(x => x.Priority).ToList().AsReadOnly();
             if (Convertors.Count < 2)
             {
                 throw new ArgumentOutOfRangeException(nameof(convertors), "转换器必须大于1个");
@@ -38,20 +39,20 @@ namespace blqw.Kanai.Convertors
                 }
                 if (exceptions == null)
                 {
-                    exceptions = new List<Exception>();
+                    exceptions = new List<Exception>() { result.Exception };
                 }
                 else
                 {
                     exceptions.Add(result.Exception);
                 }
             }
-            return new ConvertException(typeof(T), input, exceptions, context.CultureInfo);
+            return this.Fail(input, context.CultureInfo, exceptions);
         }
 
-        protected override ConvertResult<object> ChangeType(ConvertContext context, object input)
-        {
-            var result = ChangeType(context, input);
-            return new ConvertResult<object>(result.Success, result.OutputValue, result.Exception);
-        }
+        //protected override ConvertResult<object> ChangeType(ConvertContext context, object input)
+        //{
+        //    var result = ChangeType(context, input);
+        //    return new ConvertResult<object>(result.Success, result.OutputValue, result.Exception);
+        //}
     }
 }

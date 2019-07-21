@@ -1,4 +1,5 @@
-﻿using System;
+﻿using blqw.Kanai.Extensions;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,53 +11,14 @@ namespace blqw.Kanai.Convertors
     {
 
         /// <summary>
-        /// 基础调用器接口
-        /// </summary>
-        protected interface IFromInvoker
-        {
-            /// <summary>
-            /// 调用转换方法
-            /// </summary>
-            /// <param name="ifrom">转换器</param>
-            /// <param name="context">转换上下文</param>
-            /// <param name="input">输入值</param>
-            ConvertResult<T> From(object ifrom, ConvertContext context, object input);
-            /// <summary>
-            /// 输入类型
-            /// </summary>
-            Type InputType { get; }
-        }
-
-        /// <summary>
-        /// 转换器泛型实现
-        /// </summary>
-        /// <typeparam name="TInput"></typeparam>
-        private class FromInvoker<TInput> : IFromInvoker
-        {
-            /// <summary>
-            /// 调用转换方法
-            /// </summary>
-            /// <param name="conv">转换器</param>
-            /// <param name="context">转换上下文</param>
-            /// <param name="input">输入值</param>
-            ConvertResult<T> IFromInvoker.From(object ifrom, ConvertContext context, object input)
-                => ((IFrom<TInput, T>)ifrom).From(context, (TInput)input);
-
-            /// <summary>
-            /// 输入类型
-            /// </summary>
-            public Type InputType => typeof(TInput);
-        }
-
-        /// <summary>
         /// 调用器字典
         /// </summary>
-        private readonly Dictionary<Type, IFromInvoker> _invokers = new Dictionary<Type, IFromInvoker>();
+        private readonly Dictionary<Type, InvokeIFormHandler> _invokers = new Dictionary<Type, InvokeIFormHandler>();
 
 
         private void InitInvokers()
         {
-            var _interfaceInvokers = new List<IFromInvoker>();
+            var method = ((Func<InvokeIFormHandler>)CreateInvoker<object>).Method.GetGenericMethodDefinition();
             foreach (var intf in GetType().GetInterfaces())
             {
                 if (intf.IsConstructedGenericType && intf.GetGenericTypeDefinition() == typeof(IFrom<,>))
@@ -64,14 +26,8 @@ namespace blqw.Kanai.Convertors
                     var args = intf.GetGenericArguments();
                     if (args[1] == typeof(T))
                     {
-                        args[1] = args[0];
-                        args[0] = typeof(T);
-                        var invoker = (IFromInvoker)Activator.CreateInstance(typeof(FromInvoker<>).MakeGenericType(args));
-                        _invokers.Add(invoker.InputType, invoker);
-                        if (invoker.InputType.IsInterface)
-                        {
-                            _interfaceInvokers.Add(invoker);
-                        }
+                        var invoker = (InvokeIFormHandler)method.MakeGenericMethod(args[0]).Invoke(null, null);
+                        _invokers.Add(args[0], invoker);
                     }
                 }
             }
@@ -83,8 +39,12 @@ namespace blqw.Kanai.Convertors
         /// </summary>
         /// <param name="inputType">指定输入类型</param>
         /// <returns></returns>
-        protected IEnumerable<IFromInvoker> GetInvokers(Type inputType)
+        protected IEnumerable<InvokeIFormHandler> GetInvokers(Type inputType)
         {
+            if (_invokers.Count == 0)
+            {
+                yield break;
+            }
             var invokers = _invokers;
             if (invokers.TryGetValue(inputType, out var invoker0))
             {
@@ -127,17 +87,21 @@ namespace blqw.Kanai.Convertors
 
         }
 
-        protected ConvertResult<T> InvokeIForm(IFromInvoker invoker, ConvertContext context, object input)
-        {
-            try
+
+        protected delegate ConvertResult<T> InvokeIFormHandler(BaseConvertor<T> convertor, ConvertContext context, object input);
+
+        private static InvokeIFormHandler CreateInvoker<TInput>()
+            => (convertor, context, input) =>
             {
-                return invoker.From(this, context, input);
-            }
-            catch (Exception e)
-            {
-                return e;
-            }
-        }
+                try
+                {
+                    return ((IFrom<TInput, T>)convertor).From(context, (TInput)input);
+                }
+                catch (Exception e)
+                {
+                    return convertor.Error(e, context.CultureInfo);
+                }
+            };
 
         /// <summary>
         /// 调用转换方法
@@ -163,10 +127,9 @@ namespace blqw.Kanai.Convertors
             }
             catch (Exception e)
             {
-                exceptions += e;
+                exceptions += this.Error(e, context.CultureInfo);
             }
-            return (Exception)exceptions?.ToConvertException(TypeFriendlyName, input, context.CultureInfo)
-                ?? ConvertException.InvalidCast(TypeFriendlyName, null, context.CultureInfo);
+            return this.Fail(null, context.CultureInfo, exceptions);
         }
 
     }

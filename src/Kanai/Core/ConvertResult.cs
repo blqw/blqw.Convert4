@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Diagnostics;
 using System.Runtime.Serialization;
 
 namespace blqw.Kanai
@@ -6,6 +9,7 @@ namespace blqw.Kanai
     /// <summary>
     /// 转换结果
     /// </summary>
+    [DebuggerDisplay("{Success} : {Success ? (object)OutputValue : Exception.Message}")]
     public struct ConvertResult<T> : IObjectReference
     {
         /// <summary>

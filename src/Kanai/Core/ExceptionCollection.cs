@@ -19,11 +19,5 @@ namespace blqw.Kanai
             ex1.Add(ex2);
             return ex1;
         }
-
-        public ConvertException ToConvertException(Type outputType, object origin, CultureInfo cultureInfo)
-            => new ConvertException(outputType, origin, this, cultureInfo);
-
-        public ConvertException ToConvertException(string outputTypeName, object origin, CultureInfo cultureInfo)
-            => new ConvertException(outputTypeName, origin, this, cultureInfo);
     }
 }
