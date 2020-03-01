@@ -1,4 +1,7 @@
-﻿using blqw.Kanai;using blqw.Kanai.Convertors;using blqw.Kanai.Extensions;using blqw.Kanai.Froms;
+﻿using blqw.Kanai;
+using blqw.Kanai.Convertors;
+using blqw.Kanai.Extensions;
+using blqw.Kanai.Froms;
 using System;
 using System.Globalization;
 using static System.SByte;
@@ -23,7 +26,7 @@ namespace blqw.Convertors
         {
             if (input > MaxValue)
             {
-                return this.Overflow($"{input} > {MaxValue}", context.CultureInfo);
+                return this.Overflow($"{input} > {MaxValue}", context);
             }
             return (sbyte)input;
         }
@@ -31,7 +34,7 @@ namespace blqw.Convertors
         {
             if ((input < MinValue) || (input > MaxValue))
             {
-                return this.Overflow(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}", context.CultureInfo);
+                return this.Overflow(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}", context);
             }
             return (sbyte)input;
         }
@@ -39,7 +42,7 @@ namespace blqw.Convertors
         {
             if (input > (int)MaxValue)
             {
-                return this.Overflow($"{input} > {MaxValue}", context.CultureInfo);
+                return this.Overflow($"{input} > {MaxValue}", context);
             }
             return (sbyte)input;
         }
@@ -47,7 +50,7 @@ namespace blqw.Convertors
         {
             if ((input < MinValue) || (input > MaxValue))
             {
-                return this.Overflow(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}", context.CultureInfo);
+                return this.Overflow(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}", context);
             }
             return (sbyte)input;
         }
@@ -55,7 +58,7 @@ namespace blqw.Convertors
         {
             if ((input < MinValue) || (input > MaxValue))
             {
-                return this.Overflow(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}", context.CultureInfo);
+                return this.Overflow(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}", context);
             }
             return (sbyte)input;
         }
@@ -63,11 +66,11 @@ namespace blqw.Convertors
         {
             if ((input < MinValue) || (input > MaxValue))
             {
-                return this.Overflow(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}", context.CultureInfo);
+                return this.Overflow(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}", context);
             }
             return decimal.ToSByte(input);
         }
-        public ConvertResult<sbyte> From(ConvertContext context, DateTime input) => this.Fail(input, context.CultureInfo);
+        public ConvertResult<sbyte> From(ConvertContext context, DateTime input) => this.Fail(input, context);
 
         public ConvertResult<sbyte> From(ConvertContext context, string input)
         {
@@ -97,7 +100,7 @@ namespace blqw.Convertors
                             }
                             catch (Exception e)
                             {
-                                return this.Error(e, context.CultureInfo);
+                                return this.Error(e, context);
                             }
                         default:
                             break;
@@ -111,8 +114,8 @@ namespace blqw.Convertors
                     }
                 }
             }
-            return this.Fail(input, context.CultureInfo);
+            return this.Fail(input, context);
         }
-        public ConvertResult<sbyte> From(ConvertContext context, object input) => this.Fail(input, context.CultureInfo);
+        public ConvertResult<sbyte> From(ConvertContext context, object input) => this.Fail(input, context);
     }
 }

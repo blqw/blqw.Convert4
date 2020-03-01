@@ -1,10 +1,8 @@
 ﻿using blqw.Kanai.Extensions;
+using blqw.Kanai.Froms;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using blqw.Kanai.Froms;
 
 namespace blqw.Kanai.Convertors
 {
@@ -100,7 +98,7 @@ namespace blqw.Kanai.Convertors
                 }
                 catch (Exception e)
                 {
-                    return convertor.Error(e, context.CultureInfo);
+                    return convertor.Error(e, context);
                 }
             };
 
@@ -128,9 +126,9 @@ namespace blqw.Kanai.Convertors
             }
             catch (Exception e)
             {
-                exceptions += this.Error(e, context.CultureInfo);
+                exceptions += this.Error(e, context);
             }
-            return this.Fail(null, context.CultureInfo, exceptions);
+            return this.Fail(null, context, exceptions);
         }
 
     }

@@ -26,7 +26,7 @@ namespace blqw.Convertors
         public ConvertResult<decimal> From(ConvertContext context, float input) => (decimal)input;
         public ConvertResult<decimal> From(ConvertContext context, double input) => (decimal)input;
         public ConvertResult<decimal> From(ConvertContext context, decimal input) => input;
-        public ConvertResult<decimal> From(ConvertContext context, DateTime input) => this.Fail(input, context.CultureInfo);
+        public ConvertResult<decimal> From(ConvertContext context, DateTime input) => this.Fail(input, context);
         public ConvertResult<decimal> From(ConvertContext context, string input)
         {
             var s = input?.Trim() ?? "";
@@ -55,7 +55,7 @@ namespace blqw.Convertors
                             }
                             catch (Exception e)
                             {
-                                return this.Error(e, context.CultureInfo);
+                                return this.Error(e, context);
                             }
                         default:
                             break;
@@ -69,14 +69,14 @@ namespace blqw.Convertors
                     }
                 }
             }
-            return this.Fail(input, context.CultureInfo);
+            return this.Fail(input, context);
         }
 
         public ConvertResult<decimal> From(ConvertContext context, byte[] input)
         {
             if (input == null || input.Length > sizeof(decimal))
             {
-                return this.Fail(input, context.CultureInfo);
+                return this.Fail(input, context);
             }
             var bytes = input.Slice(sizeof(decimal));
             var arr2 = new int[4];

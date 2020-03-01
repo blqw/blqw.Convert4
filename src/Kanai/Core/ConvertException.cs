@@ -1,10 +1,7 @@
 ﻿using blqw.Kanai.Extensions;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
-using System.Runtime.CompilerServices;
 
 namespace blqw.Kanai
 {
@@ -20,7 +17,7 @@ namespace blqw.Kanai
           System.Runtime.Serialization.SerializationInfo info,
           System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
 
-        public ConvertException(string message, IEnumerable<Exception> innerExceptions) : base(message, innerExceptions)
+        public ConvertException(string message, IEnumerable<Exception> innerExceptions) : base(message, innerExceptions.Select(x => x.GetRealException()))
         {
             _message = message;
         }

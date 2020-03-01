@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using blqw.Kanai;
 
 namespace blqw
 {
@@ -12,10 +10,10 @@ namespace blqw
         /// <summary>
         /// 编译转换器
         /// </summary>
-        IConvertor Build(Type type);
+        IConvertor<T> Build<T>();
         /// <summary>
         /// 判断是否可以构造指定类型的转换器
         /// </summary>
-        bool CanBuild(Type type);
+        bool CanBuild<T>();
     }
 }

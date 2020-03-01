@@ -1,10 +1,10 @@
-﻿using System;
-using System.Globalization;
-using static System.Double;
-using blqw.Kanai;
+﻿using blqw.Kanai;
 using blqw.Kanai.Convertors;
 using blqw.Kanai.Extensions;
 using blqw.Kanai.Froms;
+using System;
+using System.Globalization;
+using static System.Double;
 
 namespace blqw.Convertors
 {
@@ -26,7 +26,7 @@ namespace blqw.Convertors
         public ConvertResult<double> From(ConvertContext context, float input) => input;
         public ConvertResult<double> From(ConvertContext context, double input) => input;
         public ConvertResult<double> From(ConvertContext context, decimal input) => decimal.ToDouble(input);
-        public ConvertResult<double> From(ConvertContext context, DateTime input) => this.Fail(input, context.CultureInfo);
+        public ConvertResult<double> From(ConvertContext context, DateTime input) => this.Fail(input, context);
         public ConvertResult<double> From(ConvertContext context, string input)
         {
             var s = input?.Trim() ?? "";
@@ -55,7 +55,7 @@ namespace blqw.Convertors
                             }
                             catch (Exception e)
                             {
-                                return this.Error(e, context.CultureInfo);
+                                return this.Error(e, context);
                             }
                         default:
                             break;
@@ -69,13 +69,13 @@ namespace blqw.Convertors
                     }
                 }
             }
-            return this.Fail(input, context.CultureInfo);
+            return this.Fail(input, context);
         }
         public ConvertResult<double> From(ConvertContext context, byte[] input)
         {
             if (input == null || input.Length > sizeof(double))
             {
-                return this.Fail(input, context.CultureInfo);
+                return this.Fail(input, context);
             }
             return BitConverter.ToDouble(input.Slice(sizeof(double)), 0);
         }

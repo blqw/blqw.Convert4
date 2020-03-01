@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Data;
 using System.Diagnostics;
 using System.Runtime.Serialization;
 
@@ -17,6 +15,8 @@ namespace blqw.Kanai
         /// </summary>
         /// <param name="value">返回值</param>
         public ConvertResult(T value) : this(true, value, null) { }
+
+        public static explicit operator ConvertResult<T>(ConvertResult<object> v) => throw new NotImplementedException();
 
         /// <summary>
         /// 转换成功

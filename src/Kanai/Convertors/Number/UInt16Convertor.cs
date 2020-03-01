@@ -1,8 +1,10 @@
-﻿using System.Security.Cryptography;
+﻿using blqw.Kanai;
+using blqw.Kanai.Convertors;
+using blqw.Kanai.Extensions;
+using blqw.Kanai.Froms;
 using System;
 using System.Globalization;
 using static System.UInt16;
-using blqw.Kanai;using blqw.Kanai.Convertors;using blqw.Kanai.Extensions;using blqw.Kanai.Froms;
 
 namespace blqw.Convertors
 {
@@ -25,7 +27,7 @@ namespace blqw.Convertors
         {
             if (input > MaxValue)
             {
-                return this.Overflow($"{input} > {MaxValue}", context.CultureInfo);
+                return this.Overflow($"{input} > {MaxValue}", context);
             }
             return (ushort)input;
         }
@@ -33,7 +35,7 @@ namespace blqw.Convertors
         {
             if ((input < MinValue) || (input > MaxValue))
             {
-                return this.Overflow(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}", context.CultureInfo);
+                return this.Overflow(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}", context);
             }
             return (ushort)input;
         }
@@ -41,7 +43,7 @@ namespace blqw.Convertors
         {
             if (input > (int)MaxValue)
             {
-                return this.Overflow($"{input} > {MaxValue}", context.CultureInfo);
+                return this.Overflow($"{input} > {MaxValue}", context);
             }
             return (ushort)input;
         }
@@ -49,7 +51,7 @@ namespace blqw.Convertors
         {
             if ((input < MinValue) || (input > MaxValue))
             {
-                return this.Overflow(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}", context.CultureInfo);
+                return this.Overflow(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}", context);
             }
             return (ushort)input;
         }
@@ -57,7 +59,7 @@ namespace blqw.Convertors
         {
             if ((input < MinValue) || (input > MaxValue))
             {
-                return this.Overflow(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}", context.CultureInfo);
+                return this.Overflow(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}", context);
             }
             return (ushort)input;
         }
@@ -65,11 +67,11 @@ namespace blqw.Convertors
         {
             if ((input < MinValue) || (input > MaxValue))
             {
-                return this.Overflow(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}", context.CultureInfo);
+                return this.Overflow(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}", context);
             }
             return decimal.ToUInt16(input);
         }
-        public ConvertResult<ushort> From(ConvertContext context, DateTime input) => this.Fail(input, context.CultureInfo);
+        public ConvertResult<ushort> From(ConvertContext context, DateTime input) => this.Fail(input, context);
         public ConvertResult<ushort> From(ConvertContext context, string input)
         {
             var s = input?.Trim() ?? "";
@@ -98,7 +100,7 @@ namespace blqw.Convertors
                             }
                             catch (Exception e)
                             {
-                                return this.Error(e, context.CultureInfo);
+                                return this.Error(e, context);
                             }
                         default:
                             break;
@@ -112,14 +114,14 @@ namespace blqw.Convertors
                     }
                 }
             }
-            return this.Fail(input, context.CultureInfo);
+            return this.Fail(input, context);
         }
-        public ConvertResult<ushort> From(ConvertContext context, object input) => this.Fail(input, context.CultureInfo);
+        public ConvertResult<ushort> From(ConvertContext context, object input) => this.Fail(input, context);
         public ConvertResult<ushort> From(ConvertContext context, byte[] input)
         {
             if (input == null || input.Length > sizeof(ushort))
             {
-                return this.Fail(input, context.CultureInfo);
+                return this.Fail(input, context);
             }
             return BitConverter.ToUInt16(input.Slice(sizeof(ushort)), 0);
         }

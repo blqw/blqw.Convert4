@@ -1,15 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using blqw.Kanai;
+using System;
 
 namespace blqw.Convertors
 {
     public class InstantiatedConvertorFactory : IConvertorFactory
     {
-        private readonly IConvertor _convertor;
+        private readonly object _convertor;
 
-        public InstantiatedConvertorFactory(IConvertor convertor) => _convertor = convertor ?? throw new ArgumentNullException(nameof(convertor));
-        public IConvertor Build(Type type) => CanBuild(type) ? _convertor : null;
-        public bool CanBuild(Type type) => _convertor.OutputType?.IsAssignableFrom(type) == true;
+        public InstantiatedConvertorFactory(object convertor) => _convertor = convertor ?? throw new ArgumentNullException(nameof(convertor));
+        public IConvertor<T> Build<T>() => _convertor as IConvertor<T>;
+        public bool CanBuild<T>() => _convertor is IConvertor<T>;
     }
 }

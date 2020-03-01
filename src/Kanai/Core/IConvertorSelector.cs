@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace blqw.Kanai
+﻿namespace blqw.Kanai
 {
     /// <summary>
     /// 转换器选择器接口

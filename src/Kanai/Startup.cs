@@ -1,4 +1,4 @@
-﻿using blqw;
+﻿using blqw.DI;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
@@ -16,6 +16,6 @@ namespace blqw.Kanai
         /// <summary>
         /// 安装服务
         /// </summary>
-        public void Configure(IServiceProvider serviceProvider) => ConvertSettings.Injection(serviceProvider);
+        public void Configure(IServiceProvider serviceProvider) => ConvertSettings.Global = new ConvertSettings(serviceProvider);
     }
 }

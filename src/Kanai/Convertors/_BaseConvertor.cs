@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Runtime.Serialization;
-using System.Text;
-using System.Collections;
-using System.Data;
-using System.ComponentModel;
-using blqw.Kanai.Extensions;
+﻿using blqw.Kanai.Extensions;
 using blqw.Kanai.Froms;
+using System;
 
 namespace blqw.Kanai.Convertors
 {
@@ -80,7 +73,7 @@ namespace blqw.Kanai.Convertors
                     exceptions += e;
                 }
 
-                return this.Fail(input, context.CultureInfo, exceptions);
+                return this.Fail(input, context, exceptions);
             }
 
 
@@ -103,44 +96,44 @@ namespace blqw.Kanai.Convertors
                 switch (v0.GetTypeCode())
                 {
                     case TypeCode.Boolean:
-                        return v0 is bool ? this.Fail(input, context.CultureInfo, exceptions) : InvokeIForm(context, v0.ToBoolean(context.CultureInfo), exceptions);
+                        return v0 is bool ? this.Fail(input, context, exceptions) : InvokeIForm(context, v0.ToBoolean(context.CultureInfo), exceptions);
                     case TypeCode.Byte:
-                        return v0 is byte ? this.Fail(input, context.CultureInfo, exceptions) : InvokeIForm(context, v0.ToByte(context.CultureInfo), exceptions);
+                        return v0 is byte ? this.Fail(input, context, exceptions) : InvokeIForm(context, v0.ToByte(context.CultureInfo), exceptions);
                     case TypeCode.Char:
-                        return v0 is char ? this.Fail(input, context.CultureInfo, exceptions) : InvokeIForm(context, v0.ToChar(context.CultureInfo), exceptions);
+                        return v0 is char ? this.Fail(input, context, exceptions) : InvokeIForm(context, v0.ToChar(context.CultureInfo), exceptions);
                     case TypeCode.DateTime:
-                        return v0 is DateTime ? this.Fail(input, context.CultureInfo, exceptions) : InvokeIForm(context, v0.ToDateTime(context.CultureInfo), exceptions);
+                        return v0 is DateTime ? this.Fail(input, context, exceptions) : InvokeIForm(context, v0.ToDateTime(context.CultureInfo), exceptions);
                     case TypeCode.Decimal:
-                        return v0 is decimal ? this.Fail(input, context.CultureInfo, exceptions) : InvokeIForm(context, v0.ToDecimal(context.CultureInfo), exceptions);
+                        return v0 is decimal ? this.Fail(input, context, exceptions) : InvokeIForm(context, v0.ToDecimal(context.CultureInfo), exceptions);
                     case TypeCode.Double:
-                        return v0 is double ? this.Fail(input, context.CultureInfo, exceptions) : InvokeIForm(context, v0.ToDouble(context.CultureInfo), exceptions);
+                        return v0 is double ? this.Fail(input, context, exceptions) : InvokeIForm(context, v0.ToDouble(context.CultureInfo), exceptions);
                     case TypeCode.Int16:
-                        return v0 is short ? this.Fail(input, context.CultureInfo, exceptions) : InvokeIForm(context, v0.ToInt16(context.CultureInfo), exceptions);
+                        return v0 is short ? this.Fail(input, context, exceptions) : InvokeIForm(context, v0.ToInt16(context.CultureInfo), exceptions);
                     case TypeCode.Int32:
-                        return v0 is int ? this.Fail(input, context.CultureInfo, exceptions) : InvokeIForm(context, v0.ToInt32(context.CultureInfo), exceptions);
+                        return v0 is int ? this.Fail(input, context, exceptions) : InvokeIForm(context, v0.ToInt32(context.CultureInfo), exceptions);
                     case TypeCode.Int64:
-                        return v0 is long ? this.Fail(input, context.CultureInfo, exceptions) : InvokeIForm(context, v0.ToInt64(context.CultureInfo), exceptions);
+                        return v0 is long ? this.Fail(input, context, exceptions) : InvokeIForm(context, v0.ToInt64(context.CultureInfo), exceptions);
                     case TypeCode.SByte:
-                        return v0 is sbyte ? this.Fail(input, context.CultureInfo, exceptions) : InvokeIForm(context, v0.ToSByte(context.CultureInfo), exceptions);
+                        return v0 is sbyte ? this.Fail(input, context, exceptions) : InvokeIForm(context, v0.ToSByte(context.CultureInfo), exceptions);
                     case TypeCode.Single:
-                        return v0 is float ? this.Fail(input, context.CultureInfo, exceptions) : InvokeIForm(context, v0.ToSingle(context.CultureInfo), exceptions);
+                        return v0 is float ? this.Fail(input, context, exceptions) : InvokeIForm(context, v0.ToSingle(context.CultureInfo), exceptions);
                     case TypeCode.UInt16:
-                        return v0 is ushort ? this.Fail(input, context.CultureInfo, exceptions) : InvokeIForm(context, v0.ToUInt16(context.CultureInfo), exceptions);
+                        return v0 is ushort ? this.Fail(input, context, exceptions) : InvokeIForm(context, v0.ToUInt16(context.CultureInfo), exceptions);
                     case TypeCode.UInt32:
-                        return v0 is uint ? this.Fail(input, context.CultureInfo, exceptions) : InvokeIForm(context, v0.ToUInt32(context.CultureInfo), exceptions);
+                        return v0 is uint ? this.Fail(input, context, exceptions) : InvokeIForm(context, v0.ToUInt32(context.CultureInfo), exceptions);
                     case TypeCode.UInt64:
-                        return v0 is ulong ? this.Fail(input, context.CultureInfo, exceptions) : InvokeIForm(context, v0.ToUInt64(context.CultureInfo), exceptions);
+                        return v0 is ulong ? this.Fail(input, context, exceptions) : InvokeIForm(context, v0.ToUInt64(context.CultureInfo), exceptions);
                     case TypeCode.DBNull:
-                        return this.Fail(input, context.CultureInfo, exceptions);
+                        return this.Fail(input, context, exceptions);
                     case TypeCode.String:
                         if (input is string)
                         {
-                            return this.Fail(input, context.CultureInfo, exceptions);
+                            return this.Fail(input, context, exceptions);
                         }
                         var s = v0.ToString(context.CultureInfo);
                         if (s == input as string)
                         {
-                            return this.Fail(input, context.CultureInfo, exceptions);
+                            return this.Fail(input, context, exceptions);
                         }
                         return InvokeIForm(context, s, exceptions);
                     default:

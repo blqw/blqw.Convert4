@@ -1,7 +1,7 @@
-﻿using blqw.Kanai;
+﻿using blqw.DI;
+using blqw.Kanai;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using blqw.DI;
 using System.Diagnostics;
 
 namespace ConsoleApp2
@@ -16,7 +16,7 @@ namespace ConsoleApp2
                 .BuildServiceProvider()
                 .Configure();
 
-            //var x = "1".ChangeType<int>(null);
+            var x = "1".ChangeType<int>(null);
             var y = (
                 "0xFF".ChangeType<double>(null),
                 "0xFF".ChangeType<float>(null),

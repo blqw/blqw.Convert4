@@ -1,4 +1,7 @@
-﻿using blqw.Kanai;using blqw.Kanai.Convertors;using blqw.Kanai.Extensions;using blqw.Kanai.Froms;
+﻿using blqw.Kanai;
+using blqw.Kanai.Convertors;
+using blqw.Kanai.Extensions;
+using blqw.Kanai.Froms;
 using System;
 using System.Globalization;
 using static System.UInt32;
@@ -24,7 +27,7 @@ namespace blqw.Convertors
         {
             if (input > MaxValue)
             {
-                return this.Overflow($"{input} > {MaxValue}", context.CultureInfo);
+                return this.Overflow($"{input} > {MaxValue}", context);
             }
             return (uint)input;
         }
@@ -32,7 +35,7 @@ namespace blqw.Convertors
         {
             if ((input < MinValue) || (input > MaxValue))
             {
-                return this.Overflow(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}", context.CultureInfo);
+                return this.Overflow(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}", context);
             }
             return (uint)input;
         }
@@ -40,7 +43,7 @@ namespace blqw.Convertors
         {
             if (input > MaxValue)
             {
-                return this.Overflow($"{input} > {MaxValue}", context.CultureInfo);
+                return this.Overflow($"{input} > {MaxValue}", context);
             }
             return (uint)input;
         }
@@ -48,7 +51,7 @@ namespace blqw.Convertors
         {
             if ((input < MinValue) || (input > MaxValue))
             {
-                return this.Overflow(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}", context.CultureInfo);
+                return this.Overflow(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}", context);
             }
             return (uint)input;
         }
@@ -56,7 +59,7 @@ namespace blqw.Convertors
         {
             if ((input < MinValue) || (input > MaxValue))
             {
-                return this.Overflow(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}", context.CultureInfo);
+                return this.Overflow(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}", context);
             }
             return (uint)input;
         }
@@ -64,11 +67,11 @@ namespace blqw.Convertors
         {
             if ((input < MinValue) || (input > MaxValue))
             {
-                return this.Overflow(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}", context.CultureInfo);
+                return this.Overflow(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}", context);
             }
             return decimal.ToUInt32(input);
         }
-        public ConvertResult<uint> From(ConvertContext context, DateTime input) => this.Fail(input, context.CultureInfo);
+        public ConvertResult<uint> From(ConvertContext context, DateTime input) => this.Fail(input, context);
         public ConvertResult<uint> From(ConvertContext context, string input)
         {
             var s = input?.Trim() ?? "";
@@ -97,7 +100,7 @@ namespace blqw.Convertors
                             }
                             catch (Exception e)
                             {
-                                return this.Error(e, context.CultureInfo);
+                                return this.Error(e, context);
                             }
                         default:
                             break;
@@ -111,14 +114,14 @@ namespace blqw.Convertors
                     }
                 }
             }
-            return this.Fail(input, context.CultureInfo);
+            return this.Fail(input, context);
         }
-        public ConvertResult<uint> From(ConvertContext context, object input) => this.Fail(input, context.CultureInfo);
+        public ConvertResult<uint> From(ConvertContext context, object input) => this.Fail(input, context);
         public ConvertResult<uint> From(ConvertContext context, byte[] input)
         {
             if (input == null || input.Length > sizeof(uint))
             {
-                return this.Fail(input, context.CultureInfo);
+                return this.Fail(input, context);
             }
             return BitConverter.ToUInt32(input.Slice(sizeof(uint)), 0);
         }

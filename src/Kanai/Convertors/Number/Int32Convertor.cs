@@ -21,7 +21,7 @@ namespace blqw.Convertors
         {
             if (input > MaxValue)
             {
-                return this.Overflow($"{input} > {MaxValue}", context.CultureInfo);
+                return this.Overflow($"{input} > {MaxValue}", context);
             }
             return (int)input;
         }
@@ -30,7 +30,7 @@ namespace blqw.Convertors
         {
             if ((input < MinValue) || (input > MaxValue))
             {
-                return this.Overflow(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}", context.CultureInfo);
+                return this.Overflow(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}", context);
             }
             return (int)input;
         }
@@ -39,7 +39,7 @@ namespace blqw.Convertors
         {
             if (input > MaxValue)
             {
-                return this.Overflow($"{input} > {MaxValue}", context.CultureInfo);
+                return this.Overflow($"{input} > {MaxValue}", context);
             }
             return (int)input;
         }
@@ -47,7 +47,7 @@ namespace blqw.Convertors
         {
             if ((input < MinValue) || (input > MaxValue))
             {
-                return this.Overflow(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}", context.CultureInfo);
+                return this.Overflow(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}", context);
             }
             return (int)input;
         }
@@ -55,7 +55,7 @@ namespace blqw.Convertors
         {
             if ((input < MinValue) || (input > MaxValue))
             {
-                return this.Overflow(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}", context.CultureInfo);
+                return this.Overflow(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}", context);
             }
             return (int)input;
         }
@@ -63,11 +63,11 @@ namespace blqw.Convertors
         {
             if ((input < MinValue) || (input > MaxValue))
             {
-                return this.Overflow(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}", context.CultureInfo);
+                return this.Overflow(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}", context);
             }
             return decimal.ToInt32(input);
         }
-        public ConvertResult<int> From(ConvertContext context, DateTime input) => this.Fail(input, context.CultureInfo);
+        public ConvertResult<int> From(ConvertContext context, DateTime input) => this.Fail(input, context);
         public ConvertResult<int> From(ConvertContext context, string input)
         {
             var s = input?.Trim() ?? "";
@@ -96,7 +96,7 @@ namespace blqw.Convertors
                             }
                             catch (Exception e)
                             {
-                                return this.Error(e, context.CultureInfo);
+                                return this.Error(e, context);
                             }
                         default:
                             break;
@@ -110,14 +110,14 @@ namespace blqw.Convertors
                     }
                 }
             }
-            return this.Fail(input, context.CultureInfo);
+            return this.Fail(input, context);
         }
         public ConvertResult<int> From(ConvertContext context, object input) => input?.GetHashCode() ?? default;
         public ConvertResult<int> From(ConvertContext context, byte[] input)
         {
             if (input == null || input.Length > sizeof(int))
             {
-                return this.Fail(input, context.CultureInfo);
+                return this.Fail(input, context);
             }
             return BitConverter.ToInt32(input.Slice(sizeof(int)), 0);
         }

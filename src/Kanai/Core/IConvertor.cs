@@ -1,5 +1,3 @@
-using System;
-
 namespace blqw.Kanai
 {
     /// <summary>
@@ -19,10 +17,5 @@ namespace blqw.Kanai
         /// <param name="context"> 上下文 </param>
         /// <param name="input"> 需要转换类型的对象 </param>
         ConvertResult<T> ChangeType(ConvertContext context, object input);
-    }
-
-    [System.AttributeUsage(AttributeTargets.Interface, Inherited = false, AllowMultiple = false)]
-    internal sealed class ConvertorAttribute : Attribute
-    {
     }
 }

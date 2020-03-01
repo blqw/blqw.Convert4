@@ -29,7 +29,7 @@ namespace blqw.Convertors
         {
             if (input > MaxValue)
             {
-                return this.Overflow($"{input} > {MaxValue}", context.CultureInfo);
+                return this.Overflow($"{input} > {MaxValue}", context);
             }
             return (long)input;
         }
@@ -37,7 +37,7 @@ namespace blqw.Convertors
         {
             if ((input < MinValue) || (input > MaxValue))
             {
-                return this.Overflow(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}", context.CultureInfo);
+                return this.Overflow(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}", context);
             }
             return (long)input;
         }
@@ -45,7 +45,7 @@ namespace blqw.Convertors
         {
             if ((input < MinValue) || (input > MaxValue))
             {
-                return this.Overflow(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}", context.CultureInfo);
+                return this.Overflow(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}", context);
             }
             return (long)input;
         }
@@ -53,11 +53,11 @@ namespace blqw.Convertors
         {
             if ((input < MinValue) || (input > MaxValue))
             {
-                return this.Overflow(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}", context.CultureInfo);
+                return this.Overflow(input < MinValue ? $"{input} < {MinValue}" : $"{input} > {MaxValue}", context);
             }
             return decimal.ToInt64(input);
         }
-        public ConvertResult<long> From(ConvertContext context, DateTime input) => this.Fail(input, context.CultureInfo);
+        public ConvertResult<long> From(ConvertContext context, DateTime input) => this.Fail(input, context);
         public ConvertResult<long> From(ConvertContext context, string input)
         {
             var s = input?.Trim() ?? "";
@@ -86,7 +86,7 @@ namespace blqw.Convertors
                             }
                             catch (Exception e)
                             {
-                                return this.Error(e, context.CultureInfo);
+                                return this.Error(e, context);
                             }
                         default:
                             break;
@@ -100,14 +100,14 @@ namespace blqw.Convertors
                     }
                 }
             }
-            return this.Fail(input, context.CultureInfo);
+            return this.Fail(input, context);
         }
-        public ConvertResult<long> From(ConvertContext context, object input) => this.Fail(input, context.CultureInfo);
+        public ConvertResult<long> From(ConvertContext context, object input) => this.Fail(input, context);
         public ConvertResult<long> From(ConvertContext context, byte[] input)
         {
             if (input == null || input.Length > sizeof(long))
             {
-                return this.Fail(input, context.CultureInfo);
+                return this.Fail(input, context);
             }
             return BitConverter.ToInt64(input.Slice(sizeof(long)), 0);
         }

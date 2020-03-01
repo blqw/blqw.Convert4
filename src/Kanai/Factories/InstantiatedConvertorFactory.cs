@@ -1,24 +1,29 @@
-﻿using System;
+﻿using blqw.Kanai.Convertors;
+using System;
 
 namespace blqw.Kanai.Factories
 {
-    public sealed class InstantiatedConvertorFactory<outputT> : IConvertorFactory
+    public sealed class InstantiatedConvertorFactory<T> : IConvertorFactory
     {
-        private readonly IConvertor<outputT> _convertor;
+        private readonly IConvertor<T> _convertor;
 
-        public InstantiatedConvertorFactory(IConvertor<outputT> convertor) => 
+        public InstantiatedConvertorFactory(IConvertor<T> convertor) =>
             _convertor = convertor ?? throw new ArgumentNullException(nameof(convertor));
 
-        public IConvertor<T> Build<T>()
+        public IConvertor<TOutput> Build<TOutput>()
         {
+            if (_convertor is IConvertor<TOutput> conv)
+            {
+                return conv;
+            }
             if (!CanBuild<T>())
             {
-                throw new NotSupportedException(SR.CANT_BUILD_CONVERTOR.Localize(null, typeof(T).GetFriendlyName()));
+                return null;
             }
-            return (IConvertor<T>)_convertor;
+            return new ProxyConvertor<T, TOutput>(_convertor);
         }
 
-        public bool CanBuild<T>() =>
-            typeof(outputT).IsAssignableFrom(typeof(T));
+        public bool CanBuild<TOutput>() =>
+            typeof(T).IsAssignableFrom(typeof(TOutput));
     }
 }

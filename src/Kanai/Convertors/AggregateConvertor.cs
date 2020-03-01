@@ -46,7 +46,7 @@ namespace blqw.Kanai.Convertors
                     exceptions.Add(result.Exception);
                 }
             }
-            return this.Fail(input, context.CultureInfo, exceptions);
+            return this.Fail(input, context, exceptions);
         }
 
         //protected override ConvertResult<object> ChangeType(ConvertContext context, object input)

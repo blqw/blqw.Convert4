@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace blqw.Kanai
+﻿namespace blqw.Kanai
 {
     public interface IConvertorFactory
     {

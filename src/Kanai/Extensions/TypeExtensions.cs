@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Data;
+using System.Linq;
 using System.Reflection;
-using System.Runtime.Serialization;
 
 namespace blqw.Kanai
 {
@@ -177,8 +176,7 @@ namespace blqw.Kanai
                 string[] generic;
                 if (t.IsGenericTypeDefinition) //泛型定义
                 {
-                    var args = t.GetGenericArguments();
-                    generic = new string[args.Length];
+                    generic = t.GetGenericArguments().Select(x => x.Name).ToArray();
                 }
                 else
                 {
