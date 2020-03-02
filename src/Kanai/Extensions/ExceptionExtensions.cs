@@ -35,7 +35,7 @@ namespace blqw.Kanai.Extensions
 
             if (exceptions == null)
             {
-                return new InvalidCastException(string.Format(rs.CONVERTOR_FAIL, convertor.GetType().GetFriendlyName(), text));
+                return new InvalidCastException(string.Format(rs.CONVERTOR_CAST_FAIL, convertor.GetType().GetFriendlyName(), text));
             }
             else if (exceptions.Count == 1)
             {
@@ -43,7 +43,7 @@ namespace blqw.Kanai.Extensions
             }
             else
             {
-                return new ConvertException(string.Format(rs.CONVERTOR_FAIL, convertor.GetType().GetFriendlyName(), text), exceptions);
+                return new ConvertException(string.Format(rs.CONVERTOR_CAST_FAIL, convertor.GetType().GetFriendlyName(), text), exceptions);
             }
         }
 
@@ -56,7 +56,7 @@ namespace blqw.Kanai.Extensions
             ex = ex.GetRealException();
             var rs = context.ResourceStrings ?? ResourceStringManager.ZH_CN;
 
-            return new InvalidCastException(string.Format(rs.CONVERTOR_FAIL, convertor.GetType().GetFriendlyName(), ex.Message), ex);
+            return new InvalidCastException(string.Format(rs.CONVERTOR_CAST_FAIL, convertor.GetType().GetFriendlyName(), ex.Message), ex);
         }
 
         public static OverflowException Overflow<T>(this IConvertor<T> convertor, string message, ConvertContext context)

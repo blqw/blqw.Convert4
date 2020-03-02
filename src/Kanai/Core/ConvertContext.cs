@@ -10,14 +10,16 @@ namespace blqw.Kanai
     /// <summary>
     /// 转换操作上下文
     /// </summary>
-    public struct ConvertContext : IDisposable
+    public struct ConvertContext
     {
+        public Type OutputType { get; }
 
         public ConvertSettings Settings { get; set; }
 
-        public ConvertContext(ConvertSettings settings)
+        public ConvertContext(Type outputType, ConvertSettings settings)
         {
-            Settings = settings ?? ConvertSettings.Global ?? new ConvertSettings();
+            OutputType = outputType ?? throw new ArgumentNullException(nameof(outputType));
+            Settings = settings ?? ConvertSettings.Global ?? ConvertSettings.Default;
             ServiceProvider = Settings.ServiceProvider;
             Encoding = Settings.Encoding;
             CultureInfo = Settings.CultureInfo;
@@ -29,12 +31,12 @@ namespace blqw.Kanai
             ConvertorSelector = Settings.ConvertorSelector;
             ResourceStrings = Settings.ResourceStrings;
             StringSeparators = Settings.StringSeparators;
+            StringSplitOptions = Settings.StringSplitOptions;
+            FormatString = Settings.GetFormatString(outputType);
         }
 
-        public void Dispose()
-        {
-            Settings = null;
-        }
+        public ConvertContext NewContext(Type outputType)
+            => new ConvertContext(outputType, Settings);
 
         /// <summary>
         /// 字符串序列化组件
@@ -75,6 +77,7 @@ namespace blqw.Kanai
         /// </summary>
         public string DateTimeFormatString { get; set; }
 
+        public string FormatString { get; set; }
 
         /// <summary>
         /// 转换器选择器
@@ -139,20 +142,22 @@ namespace blqw.Kanai
             var outputType = typeof(T);
             if (outputType.IsGenericTypeDefinition)
             {
-                //return new NotSupportedException(Localize($"{"无法为"}{"泛型定义类型"}`{outputType.GetFriendlyName():!}`{"提供转换器"}"));
+                return new NotSupportedException(string.Format(ResourceStrings.CANT_BUILD_CONVERTOR_BECAUSE_GENERIC_DEFINITION_TYPE, outputType.GetFriendlyName()));
             }
             if (outputType.IsAbstract && outputType.IsSealed)
             {
-                //return new NotSupportedException(Localize($"{"无法为"}{"静态类型"}`{outputType.GetFriendlyName():!}`{"提供转换器"}"));
+                return new NotSupportedException(string.Format(ResourceStrings.CANT_BUILD_CONVERTOR_BECAUSE_STATIC_TYPE, outputType.GetFriendlyName()));
             }
 
-            var selector = (IConvertorSelector)Settings.ServiceProvider.GetService(typeof(IConvertorSelector));
+            var selector = Settings.ConvertorSelector;
             var convertor = selector.GetConvertor<T>(this);
             if (convertor == null)
             {
-                //return new EntryPointNotFoundException(Localize($"未找到适合的转换器"));
+                return new NotSupportedException(string.Format(ResourceStrings.CANT_BUILD_CONVERTOR_BECAUSE_NOTFOUND, outputType.GetFriendlyName()));
             }
             return convertor.ChangeType(this, input);
         }
+
+        public StringSplitOptions StringSplitOptions { get; set; }
     }
 }

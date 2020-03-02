@@ -3,7 +3,6 @@ namespace blqw.Kanai
     /// <summary>
     /// 转换器接口
     /// </summary>
-    [Convertor]
     public interface IConvertor<T>
     {
         /// <summary>

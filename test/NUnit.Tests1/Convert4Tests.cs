@@ -1,19 +1,14 @@
-﻿using System.Security.AccessControl;
-using blqw.ConvertServices;
-using System.Collections;
-using blqw;
+﻿using blqw.Core;
+using blqw.Kanai;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Globalization;
-using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Specialized;
 using System.Data;
-using System.Diagnostics;
-using Newtonsoft.Json;
+using System.Globalization;
+using System.Linq;
 
 namespace NUnit.Tests1
 {
@@ -36,7 +31,7 @@ namespace NUnit.Tests1
         [Test]
         public void 测试JSON转换()
         {
-            ConvertSettings.Global.SetSerializer(JsonConvert.SerializeObject, JsonConvert.DeserializeObject);
+            ConvertSettings.Global.StringSerializer = new StringSerializer("json", JsonConvert.SerializeObject, JsonConvert.DeserializeObject);
 
             var my = "{\"ID\":1,\"Name\":\"blqw\"}".To<MyClass>();
             Assert.IsNotNull(my);
@@ -115,16 +110,18 @@ namespace NUnit.Tests1
         [Test]
         public void 自定义转换参数()
         {
-            var list = "1;2;3;;4".Convert<List<int>>(new ConvertSettings().SetStringSeparator(";")).OutputValue;
+            var list = "1;2;3;;4".Convert<List<int>>(new ConvertSettings().Option(x => x.StringSeparators = ";")).OutputValue;
             Assert.AreEqual(list?.Count, 5);
             Assert.AreEqual(list[0], 1);
             Assert.AreEqual(list[1], 2);
             Assert.AreEqual(list[2], 3);
             Assert.AreEqual(list[3], 0);
             Assert.AreEqual(list[4], 4);
-            list = "1;2;3;;4".Convert<List<int>>(new ConvertSettings()
-                                                .SetStringSeparator(";")
-                                                .SetStringSplitOptions(StringSplitOptions.RemoveEmptyEntries)).OutputValue;
+            list = "1;2;3;;4".Convert<List<int>>(new ConvertSettings().Option(x =>
+            {
+                x.StringSeparators = ";";
+                x.StringSplitOptions = StringSplitOptions.RemoveEmptyEntries;
+            })).OutputValue;
             Assert.AreEqual(list?.Count, 4);
             Assert.AreEqual(list[0], 1);
             Assert.AreEqual(list[1], 2);
@@ -144,10 +141,10 @@ namespace NUnit.Tests1
             var enUSResult = time.ToString(enUS);
             var urPKResult = time.ToString(urPK);
 
-            var formatTest = time.Convert<string>(new ConvertSettings().SetFormat(typeof(DateTime), format)).OutputValue;
-            var enUSTest = time.Convert<string>(new ConvertSettings().SetCultureInfo(enUS)).OutputValue;
-            var urPKTest = time.Convert<string>(new ConvertSettings().SetCultureInfo(typeof(DateTime), urPK)).OutputValue;
-            var urPKTest2 = time.Convert<string>(new ConvertSettings().SetCultureInfo(typeof(int), urPK)).OutputValue;
+            var formatTest = time.Convert<string>(new ConvertSettings().Option(x => x.DateTimeFormatString = format)).OutputValue;
+            var enUSTest = time.Convert<string>(new ConvertSettings().Option(x => x.CultureInfo = enUS)).OutputValue;
+            var urPKTest = time.Convert<string>(new ConvertSettings().Option(x => x.CultureInfo = urPK)).OutputValue;
+            var urPKTest2 = time.Convert<string>(new ConvertSettings().Option(x => x.CultureInfo = urPK)).OutputValue;
 
             Assert.AreEqual(formatTest, formatResult);
             Assert.AreEqual(enUSTest, enUSResult);
@@ -532,7 +529,7 @@ namespace NUnit.Tests1
             }
             catch (ConvertException ex)
             {
-                Assert.Pass(Environment.NewLine + ex.Messages);
+                Assert.Pass(Environment.NewLine + ex.FullMessage);
             }
         }
 
@@ -544,7 +541,7 @@ namespace NUnit.Tests1
 
             try
             {
-                var a = test.ChangeType(typeof(Convert));
+                var a = test.Convert(typeof(Convert));
                 Assert.Fail();
             }
             catch (ConvertException ex)
@@ -554,13 +551,13 @@ namespace NUnit.Tests1
                 {
                     Assert.Fail(ex.Message);
                 }
-                Assert.Pass(Environment.NewLine + ex.Messages);
+                Assert.Pass(Environment.NewLine + ex.FullMessage);
             }
 
 
             try
             {
-                var a = test.ChangeType(typeof(List<>));
+                var a = test.Convert(typeof(List<>));
                 Assert.Fail();
             }
             catch (AggregateException ex)

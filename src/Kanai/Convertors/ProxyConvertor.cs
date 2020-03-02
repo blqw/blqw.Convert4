@@ -8,7 +8,7 @@ namespace blqw.Kanai.Convertors
     /// <remarks>
     /// 转换器输出类型可兼容,但不可直接协变时, 可使用代理方式执行
     /// </remarks>
-    internal sealed class ProxyConvertor<TProxy, TOutput> : BaseConvertor<TOutput>
+    public sealed class ProxyConvertor<TProxy, TOutput> : BaseConvertor<TOutput>
     {
         public ProxyConvertor(IConvertor<TProxy> convertor)
         {

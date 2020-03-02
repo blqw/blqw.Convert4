@@ -5,7 +5,14 @@ using System.Linq;
 
 namespace blqw.Kanai.Convertors
 {
-    internal sealed class AggregateConvertor<T> : IConvertor<T>
+    /// <summary>
+    /// 聚合转换器
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <remarks>
+    /// 如果转换失败,会继续尝试下一个转换器,直到成功或全部失败
+    /// </remarks>
+    public sealed class AggregateConvertor<T> : IConvertor<T>
     {
         public AggregateConvertor(IEnumerable<IConvertor<T>> convertors)
         {
@@ -48,11 +55,5 @@ namespace blqw.Kanai.Convertors
             }
             return this.Fail(input, context, exceptions);
         }
-
-        //protected override ConvertResult<object> ChangeType(ConvertContext context, object input)
-        //{
-        //    var result = ChangeType(context, input);
-        //    return new ConvertResult<object>(result.Success, result.OutputValue, result.Exception);
-        //}
     }
 }

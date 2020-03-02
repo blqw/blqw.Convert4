@@ -25,7 +25,19 @@
         /// <summary>
         /// 转换器{0} 转换失败: {1}
         /// </summary>
-        public string CONVERTOR_FAIL { get; private set; } = "转换器{0} 转换失败: {1}";
+        public string CONVERTOR_CAST_FAIL { get; private set; } = "转换器{0} 转换失败: {1}";
+
+        /// <summary>
+        /// 类型: {0} 属性: {1} 转换失败
+        /// </summary>
+        public string PROPERTY_CAST_FAIL { get; private set; } = "属性: {0}.{1} 转换失败";
+
+
+        /// <summary>
+        /// 类型: {0} 属性: {1} 设置失败, 值: {2}
+        /// </summary>
+        public string PROPERTY_SET_FAIL { get; private set; } = "属性: {0}.{1} 设置失败, 值: {2}";
+
         /// <summary>
         /// 对于{0}类型, 值 {1} 超过限制
         /// </summary>

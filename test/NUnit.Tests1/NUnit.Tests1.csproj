@@ -47,12 +47,6 @@
     <Compile Include="2018.06.14-dynamic转换bug.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Convert4\Convert4.csproj">
-      <Project>{CAD184E4-32F3-4AAE-9B5D-61FD4CFE6ECA}</Project>
-      <Name>Convert4</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <ItemGroup>
@@ -77,6 +71,12 @@
     <PackageReference Include="NUnit3TestAdapter">
       <Version>3.10.0</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Kanai\Kanai.csproj">
+      <Project>{ed41a365-5cb2-4dc3-adcb-2294e1c8917b}</Project>
+      <Name>Kanai</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
