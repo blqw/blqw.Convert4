@@ -1,12 +1,10 @@
-﻿using blqw.Kanai;
-using blqw.Kanai.Convertors;
-using blqw.Kanai.Extensions;
-using blqw.Kanai.Froms;
+﻿using blqw.Kanai.Extensions;
+using blqw.Kanai.Interface.From;
 using System;
 using System.Globalization;
 using static System.UInt16;
 
-namespace blqw.Convertors
+namespace blqw.Kanai.Convertors
 {
     /// <summary>
     /// <seealso cref="ushort"/> 转换器
@@ -16,6 +14,10 @@ namespace blqw.Convertors
                                 , IFrom<object, ushort>
                                 , IFrom<byte[], ushort>
     {
+        public UInt16Convertor(IServiceProvider serviceProvider) : base(serviceProvider)
+        {
+        }
+
         public ConvertResult<ushort> From(ConvertContext context, bool input) => input ? (ushort)1 : (ushort)0;
         public ConvertResult<ushort> From(ConvertContext context, char input) => (ushort)input;
         public ConvertResult<ushort> From(ConvertContext context, sbyte input) => (ushort)input;
@@ -71,7 +73,7 @@ namespace blqw.Convertors
             }
             return decimal.ToUInt16(input);
         }
-        public ConvertResult<ushort> From(ConvertContext context, DateTime input) => this.Fail(input, context);
+        public ConvertResult<ushort> From(ConvertContext context, DateTime input) => this.Fail(context, input);
         public ConvertResult<ushort> From(ConvertContext context, string input)
         {
             var s = input?.Trim() ?? "";
@@ -114,14 +116,14 @@ namespace blqw.Convertors
                     }
                 }
             }
-            return this.Fail(input, context);
+            return this.Fail(context, input);
         }
-        public ConvertResult<ushort> From(ConvertContext context, object input) => this.Fail(input, context);
+        public ConvertResult<ushort> From(ConvertContext context, object input) => this.Fail(context, input);
         public ConvertResult<ushort> From(ConvertContext context, byte[] input)
         {
             if (input == null || input.Length > sizeof(ushort))
             {
-                return this.Fail(input, context);
+                return this.Fail(context, input);
             }
             return BitConverter.ToUInt16(input.Slice(sizeof(ushort)), 0);
         }

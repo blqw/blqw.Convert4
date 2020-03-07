@@ -1,4 +1,4 @@
-﻿namespace blqw.Kanai
+﻿namespace blqw.Kanai.Interface
 {
     /// <summary>
     /// 转换器选择器接口

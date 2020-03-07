@@ -1,12 +1,10 @@
-﻿using blqw.Kanai;
-using blqw.Kanai.Convertors;
-using blqw.Kanai.Extensions;
-using blqw.Kanai.Froms;
+﻿using blqw.Kanai.Extensions;
+using blqw.Kanai.Interface.From;
 using System;
 using System.Globalization;
 using static System.Int64;
 
-namespace blqw.Convertors
+namespace blqw.Kanai.Convertors
 {
     /// <summary>
     /// <seealso cref="long"/> 转换器
@@ -16,6 +14,10 @@ namespace blqw.Convertors
                                 , IFrom<object, long>
                                 , IFrom<byte[], long>
     {
+        public Int64Convertor(IServiceProvider serviceProvider) : base(serviceProvider)
+        {
+        }
+
         public ConvertResult<long> From(ConvertContext context, bool input) => input ? (long)1 : (long)0;
         public ConvertResult<long> From(ConvertContext context, char input) => (long)input;
         public ConvertResult<long> From(ConvertContext context, sbyte input) => (long)input;
@@ -57,7 +59,7 @@ namespace blqw.Convertors
             }
             return decimal.ToInt64(input);
         }
-        public ConvertResult<long> From(ConvertContext context, DateTime input) => this.Fail(input, context);
+        public ConvertResult<long> From(ConvertContext context, DateTime input) => this.Fail(context, input);
         public ConvertResult<long> From(ConvertContext context, string input)
         {
             var s = input?.Trim() ?? "";
@@ -100,14 +102,14 @@ namespace blqw.Convertors
                     }
                 }
             }
-            return this.Fail(input, context);
+            return this.Fail(context, input);
         }
-        public ConvertResult<long> From(ConvertContext context, object input) => this.Fail(input, context);
+        public ConvertResult<long> From(ConvertContext context, object input) => this.Fail(context, input);
         public ConvertResult<long> From(ConvertContext context, byte[] input)
         {
             if (input == null || input.Length > sizeof(long))
             {
-                return this.Fail(input, context);
+                return this.Fail(context, input);
             }
             return BitConverter.ToInt64(input.Slice(sizeof(long)), 0);
         }

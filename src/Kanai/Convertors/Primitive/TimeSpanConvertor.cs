@@ -1,10 +1,8 @@
-﻿using blqw.Kanai;
-using blqw.Kanai.Convertors;
-using blqw.Kanai.Extensions;
-using blqw.Kanai.Froms;
+﻿using blqw.Kanai.Extensions;
+using blqw.Kanai.Interface.From;
 using System;
 
-namespace blqw.Convertors
+namespace blqw.Kanai.Convertors
 {
     /// <summary>
     /// <seealso cref="TimeSpan" /> 转换器
@@ -24,6 +22,10 @@ namespace blqw.Convertors
             "hh:mm:ss.ffffff",
         };
 
+        public TimeSpanConvertor(IServiceProvider serviceProvider) : base(serviceProvider)
+        {
+        }
+
         public ConvertResult<TimeSpan> From(ConvertContext context, string input)
         {
             var s = input?.Trim() ?? "";
@@ -42,7 +44,7 @@ namespace blqw.Convertors
                     break;
                 }
             }
-            return this.Fail(input, context);
+            return this.Fail(context, input);
         }
 
         public ConvertResult<TimeSpan> From(ConvertContext context, IConvertible input)
@@ -52,7 +54,7 @@ namespace blqw.Convertors
                 var time = input.ToDateTime(context.FormatProvider);
                 return new TimeSpan(time.Hour, time.Minute, time.Second, time.Millisecond);
             }
-            return this.Fail(input, context);
+            return this.Fail(context, input);
         }
     }
 }

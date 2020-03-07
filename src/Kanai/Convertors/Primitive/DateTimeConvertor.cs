@@ -1,11 +1,9 @@
-﻿using blqw.Kanai;
-using blqw.Kanai.Convertors;
-using blqw.Kanai.Extensions;
-using blqw.Kanai.Froms;
+﻿using blqw.Kanai.Extensions;
+using blqw.Kanai.Interface.From;
 using System;
 using System.Globalization;
 
-namespace blqw.Convertors
+namespace blqw.Kanai.Convertors
 {
     /// <summary>
     /// <seealso cref="DateTime" /> 转换器
@@ -32,13 +30,17 @@ namespace blqw.Convertors
             "yyyy-MM-dd HH:mm:ss:ffffff" ,
             "yyyy-MM-dd HH:mm:ss.ffffff" , };
 
+        public DateTimeConvertor(IServiceProvider serviceProvider) : base(serviceProvider)
+        {
+        }
+
         public ConvertResult<DateTime> From(ConvertContext context, IConvertible input)
         {
             if (input?.GetTypeCode() == TypeCode.DateTime)
             {
                 return input.ToDateTime(context.FormatProvider);
             }
-            return this.Fail(input, context);
+            return this.Fail(context, input);
         }
 
         public ConvertResult<DateTime> From(ConvertContext context, string input)
@@ -59,7 +61,7 @@ namespace blqw.Convertors
                     break;
                 }
             }
-            return this.Fail(input, context);
+            return this.Fail(context, input);
         }
     }
 }

@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Convertors\Genericity\DictionaryConvertorFactory.cs" />
+    <Compile Remove="Convertors\Genericity\EnumConvertorFactory.cs" />
+    <Compile Remove="Convertors\Genericity\ObjectConvertor.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="blqw.DI.StartupAttribute" Version="1.0.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.0.0" />
   </ItemGroup>

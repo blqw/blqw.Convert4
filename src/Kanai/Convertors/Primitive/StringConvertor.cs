@@ -1,14 +1,11 @@
-﻿using blqw.Kanai;
-using blqw.Kanai.Convertors;
-using blqw.Kanai.Froms;
+﻿using blqw.Kanai.Interface.From;
 using System;
 using System.Collections;
 using System.Data;
-using System.Linq;
 using System.Net;
 using System.Text;
 
-namespace blqw.Convertors
+namespace blqw.Kanai.Convertors
 {
     class StringConvertor : BaseConvertor<string>,
         IFrom<Type, string>,
@@ -27,6 +24,10 @@ namespace blqw.Convertors
         IFrom<IEnumerable, string>,
         IFromNull<string>
     {
+        public StringConvertor(IServiceProvider serviceProvider) : base(serviceProvider)
+        {
+        }
+
         public ConvertResult<string> From(ConvertContext context, Type input) =>
             input.GetFriendlyName();
         public ConvertResult<string> FromNull(ConvertContext context) => default;
@@ -76,15 +77,11 @@ namespace blqw.Convertors
             {
                 return s;
             }
-            var separator = context.StringSeparators?.FirstOrDefault();
-            if (separator == default)
-            {
-                separator = ',';
-            }
+
             var sb = new StringBuilder(s.OutputValue);
             do
             {
-                sb.Append(separator);
+                sb.Append(context.StringSeparators.FirstChar);
                 s = context.Convert<string>(input.Current);
                 if (!s.Success)
                 {

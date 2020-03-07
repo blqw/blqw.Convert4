@@ -7,6 +7,10 @@ namespace blqw.Kanai.Core
 {
     internal class SimpleServiceCollection : List<ServiceDescriptor>, IServiceCollection, IServiceProvider
     {
+        public SimpleServiceCollection()
+        {
+            this.AddSingleton(typeof(IServiceProvider), this);
+        }
         public object GetService(Type serviceType)
         {
             foreach (var descriptor in this)

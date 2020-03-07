@@ -1,15 +1,17 @@
-﻿using blqw.Kanai;
-using blqw.Kanai.Convertors;
-using blqw.Kanai.Extensions;
-using blqw.Kanai.Froms;
+﻿using blqw.Kanai.Extensions;
+using blqw.Kanai.Interface.From;
 using System;
 using System.Globalization;
 using static System.Int32;
 
-namespace blqw.Convertors
+namespace blqw.Kanai.Convertors
 {
     class Int32Convertor : BaseConvertor<int>, IFromConvertible<int>, IFrom<object, int>, IFrom<byte[], int>
     {
+        public Int32Convertor(IServiceProvider serviceProvider) : base(serviceProvider)
+        {
+        }
+
         public ConvertResult<int> From(ConvertContext context, bool input) => input ? 1 : 0;
         public ConvertResult<int> From(ConvertContext context, char input) => input;
         public ConvertResult<int> From(ConvertContext context, sbyte input) => input;
@@ -67,7 +69,7 @@ namespace blqw.Convertors
             }
             return decimal.ToInt32(input);
         }
-        public ConvertResult<int> From(ConvertContext context, DateTime input) => this.Fail(input, context);
+        public ConvertResult<int> From(ConvertContext context, DateTime input) => this.Fail(context, input);
         public ConvertResult<int> From(ConvertContext context, string input)
         {
             var s = input?.Trim() ?? "";
@@ -110,14 +112,14 @@ namespace blqw.Convertors
                     }
                 }
             }
-            return this.Fail(input, context);
+            return this.Fail(context, input);
         }
         public ConvertResult<int> From(ConvertContext context, object input) => input?.GetHashCode() ?? default;
         public ConvertResult<int> From(ConvertContext context, byte[] input)
         {
             if (input == null || input.Length > sizeof(int))
             {
-                return this.Fail(input, context);
+                return this.Fail(context, input);
             }
             return BitConverter.ToInt32(input.Slice(sizeof(int)), 0);
         }

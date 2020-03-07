@@ -1,5 +1,5 @@
-﻿using blqw.Core;
-using blqw.Kanai.Core;
+﻿using blqw.Kanai.Core;
+using blqw.Kanai.Interface;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -29,7 +29,7 @@ namespace blqw.Kanai
             StringSerializer = Settings.StringSerializer;
             DateTimeFormatString = Settings.DateTimeFormatString;
             ConvertorSelector = Settings.ConvertorSelector;
-            ResourceStrings = Settings.ResourceStrings;
+            ResourceStrings = Settings.ResourceStrings ?? ResourceStringManager.ZH_CN;
             StringSeparators = Settings.StringSeparators;
             StringSplitOptions = Settings.StringSplitOptions;
             FormatString = Settings.GetFormatString(outputType);
@@ -88,10 +88,11 @@ namespace blqw.Kanai
         /// 字符串资源
         /// </summary>
         public ResourceStrings ResourceStrings { get; set; }
+
         /// <summary>
         /// 字符串分隔符
         /// </summary>
-        public IEnumerable<char> StringSeparators { get; set; }
+        public StringSeparator StringSeparators { get; set; }
 
         /// <summary>
         /// 获取指定类型的转换器
@@ -129,9 +130,9 @@ namespace blqw.Kanai
             {
                 foreach (var translator in Settings.Translators)
                 {
-                    if (translator.InputType.IsAssignableFrom(type))
+                    if (translator.CanTranslate(type))
                     {
-                        yield return translator.Translate(input);
+                        yield return translator.Translate(this, input);
                     }
                 }
             }

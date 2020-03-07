@@ -1,4 +1,5 @@
 ﻿using blqw.Kanai.Factories;
+using blqw.Kanai.Interface;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;

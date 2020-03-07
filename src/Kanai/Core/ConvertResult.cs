@@ -16,8 +16,6 @@ namespace blqw.Kanai
         /// <param name="value">返回值</param>
         public ConvertResult(T value) : this(true, value, null) { }
 
-        public static explicit operator ConvertResult<T>(ConvertResult<object> v) => throw new NotImplementedException();
-
         /// <summary>
         /// 转换成功
         /// </summary>

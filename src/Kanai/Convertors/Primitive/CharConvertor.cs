@@ -1,24 +1,26 @@
-﻿using blqw.Kanai;
-using blqw.Kanai.Convertors;
-using blqw.Kanai.Extensions;
-using blqw.Kanai.Froms;
+﻿using blqw.Kanai.Extensions;
+using blqw.Kanai.Interface.From;
 using System;
 using static System.Char;
 
-namespace blqw.Convertors
+namespace blqw.Kanai.Convertors
 {
     /// <summary>
     /// <seealso cref="char" /> 转换器
     /// </summary>
     public class CharConvertor : BaseConvertor<char>, IFromConvertible<char>, IFrom<byte[], char>
     {
+        public CharConvertor(IServiceProvider serviceProvider) : base(serviceProvider)
+        {
+        }
+
         public ConvertResult<char> From(ConvertContext context, bool input) => input ? 'Y' : 'N';
         public ConvertResult<char> From(ConvertContext context, char input) => input;
         public ConvertResult<char> From(ConvertContext context, sbyte input)
         {
             if (input < MinValue)
             {
-                return this.Fail(input, context);
+                return this.Fail(context, input);
             }
             return (char)input;
         }
@@ -27,7 +29,7 @@ namespace blqw.Convertors
         {
             if (input < MinValue)
             {
-                return this.Fail(input, context);
+                return this.Fail(context, input);
             }
             return (char)input;
         }
@@ -35,7 +37,7 @@ namespace blqw.Convertors
         {
             if (input < MinValue || input > MaxValue)
             {
-                return this.Fail(input, context);
+                return this.Fail(context, input);
             }
             return (char)input;
         }
@@ -43,7 +45,7 @@ namespace blqw.Convertors
         {
             if (input < MinValue || input > MaxValue)
             {
-                return this.Fail(input, context);
+                return this.Fail(context, input);
             }
             return (char)input;
         }
@@ -51,7 +53,7 @@ namespace blqw.Convertors
         {
             if (input < MinValue || input > MaxValue)
             {
-                return this.Fail(input, context);
+                return this.Fail(context, input);
             }
             return (char)input;
         }
@@ -59,7 +61,7 @@ namespace blqw.Convertors
         {
             if (input < MinValue || input > MaxValue)
             {
-                return this.Fail(input, context);
+                return this.Fail(context, input);
             }
             return (char)input;
         }
@@ -67,7 +69,7 @@ namespace blqw.Convertors
         {
             if (input < MinValue || input > MaxValue)
             {
-                return this.Fail(input, context);
+                return this.Fail(context, input);
             }
             return (char)input;
         }
@@ -75,7 +77,7 @@ namespace blqw.Convertors
         {
             if (input < MinValue || input > MaxValue)
             {
-                return this.Fail(input, context);
+                return this.Fail(context, input);
             }
             return (char)input;
         }
@@ -83,7 +85,7 @@ namespace blqw.Convertors
         {
             if (input < MinValue || input > MaxValue)
             {
-                return this.Fail(input, context);
+                return this.Fail(context, input);
             }
             return (char)input;
         }
@@ -91,25 +93,25 @@ namespace blqw.Convertors
         {
             if (input < MinValue || input > MaxValue)
             {
-                return this.Fail(input, context);
+                return this.Fail(context, input);
             }
             return (char)input;
         }
-        public ConvertResult<char> From(ConvertContext context, DateTime input) => this.Fail(input, context);
+        public ConvertResult<char> From(ConvertContext context, DateTime input) => this.Fail(context, input);
         public ConvertResult<char> From(ConvertContext context, string input)
         {
             if (input?.Length == 1)
             {
                 return input[0];
             }
-            return this.Fail(input, context);
+            return this.Fail(context, input);
         }
 
         public ConvertResult<char> From(ConvertContext context, byte[] input)
         {
             if (input == null || input.Length > sizeof(char))
             {
-                return this.Fail(input, context);
+                return this.Fail(context, input);
             }
             return BitConverter.ToChar(input.Slice(sizeof(char)), 0);
         }

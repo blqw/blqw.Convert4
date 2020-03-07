@@ -1,15 +1,17 @@
-﻿using blqw.Kanai;
-using blqw.Kanai.Convertors;
-using blqw.Kanai.Froms;
+﻿using blqw.Kanai.Interface.From;
 using System;
 
-namespace blqw.Convertors
+namespace blqw.Kanai.Convertors
 {
     class UIntPtrConvertor : BaseConvertor<UIntPtr>
                                  , IFrom<uint, UIntPtr>
                                  , IFrom<ulong, UIntPtr>
                                  , IFrom<object, UIntPtr>
     {
+        public UIntPtrConvertor(IServiceProvider serviceProvider) : base(serviceProvider)
+        {
+        }
+
         public ConvertResult<UIntPtr> From(ConvertContext context, ulong input) => new UIntPtr(input);
         public ConvertResult<UIntPtr> From(ConvertContext context, uint input) => new UIntPtr(input);
         public ConvertResult<UIntPtr> From(ConvertContext context, object input)

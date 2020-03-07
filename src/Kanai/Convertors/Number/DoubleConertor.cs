@@ -1,18 +1,20 @@
-﻿using blqw.Kanai;
-using blqw.Kanai.Convertors;
-using blqw.Kanai.Extensions;
-using blqw.Kanai.Froms;
+﻿using blqw.Kanai.Extensions;
+using blqw.Kanai.Interface.From;
 using System;
 using System.Globalization;
 using static System.Double;
 
-namespace blqw.Convertors
+namespace blqw.Kanai.Convertors
 {
     /// <summary>
     /// <seealso cref="double" /> 转换器
     /// </summary>
     public class DoubleConertor : BaseConvertor<double>, IFromConvertible<double>, IFrom<byte[], double>
     {
+        public DoubleConertor(IServiceProvider serviceProvider) : base(serviceProvider)
+        {
+        }
+
         public ConvertResult<double> From(ConvertContext context, bool input) => input ? 1 : 0;
         public ConvertResult<double> From(ConvertContext context, char input) => input;
         public ConvertResult<double> From(ConvertContext context, sbyte input) => input;
@@ -26,7 +28,7 @@ namespace blqw.Convertors
         public ConvertResult<double> From(ConvertContext context, float input) => input;
         public ConvertResult<double> From(ConvertContext context, double input) => input;
         public ConvertResult<double> From(ConvertContext context, decimal input) => decimal.ToDouble(input);
-        public ConvertResult<double> From(ConvertContext context, DateTime input) => this.Fail(input, context);
+        public ConvertResult<double> From(ConvertContext context, DateTime input) => this.Fail(context, input);
         public ConvertResult<double> From(ConvertContext context, string input)
         {
             var s = input?.Trim() ?? "";
@@ -69,13 +71,13 @@ namespace blqw.Convertors
                     }
                 }
             }
-            return this.Fail(input, context);
+            return this.Fail(context, input);
         }
         public ConvertResult<double> From(ConvertContext context, byte[] input)
         {
             if (input == null || input.Length > sizeof(double))
             {
-                return this.Fail(input, context);
+                return this.Fail(context, input);
             }
             return BitConverter.ToDouble(input.Slice(sizeof(double)), 0);
         }

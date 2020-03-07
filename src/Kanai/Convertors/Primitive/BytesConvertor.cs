@@ -1,16 +1,18 @@
-﻿using blqw.Kanai;
-using blqw.Kanai.Convertors;
-using blqw.Kanai.Extensions;
-using blqw.Kanai.Froms;
+﻿using blqw.Kanai.Extensions;
+using blqw.Kanai.Interface.From;
 using System;
 
-namespace blqw.Convertors
+namespace blqw.Kanai.Convertors
 {
     /// <summary>
     /// <seealso cref="byte" /> 数组转换器
     /// </summary>
     public class BytesConvertor : BaseConvertor<byte[]>, IFromConvertible<byte[]>, IFrom<Guid, byte[]>
     {
+        public BytesConvertor(IServiceProvider serviceProvider) : base(serviceProvider)
+        {
+        }
+
         public ConvertResult<byte[]> From(ConvertContext context, string input) => input == null ? null : input.Length == 0 ? Array.Empty<byte>() : context.Encoding.GetBytes(input);
         public ConvertResult<byte[]> From(ConvertContext context, bool input) => BitConverter.GetBytes(input);
         public ConvertResult<byte[]> From(ConvertContext context, char input) => BitConverter.GetBytes(input);
@@ -32,7 +34,7 @@ namespace blqw.Convertors
             return bytes;
         }
 
-        public ConvertResult<byte[]> From(ConvertContext context, DateTime input) => this.Fail(input, context);
+        public ConvertResult<byte[]> From(ConvertContext context, DateTime input) => this.Fail(context, input);
 
         public ConvertResult<byte[]> From(ConvertContext context, Guid input) => input.ToByteArray();
 

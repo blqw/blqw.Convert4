@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace blqw.Kanai.Froms
+namespace blqw.Kanai.Interface.From
 {
     /// <summary>
     /// 处理值类型的转换接口

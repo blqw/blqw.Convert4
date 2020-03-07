@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace blqw.Core
+namespace blqw.Kanai.Interface
 {
     /// <summary>
     /// 字符串序列化组件

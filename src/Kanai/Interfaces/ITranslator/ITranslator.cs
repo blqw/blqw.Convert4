@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace blqw.Kanai
+namespace blqw.Kanai.Interface
 {
     /// <summary>
     /// 翻译器
@@ -8,13 +8,13 @@ namespace blqw.Kanai
     public interface ITranslator
     {
         /// <summary>
-        /// 输入类型
+        /// 是否可翻译
         /// </summary>
-        Type InputType { get; }
+        bool CanTranslate(Type type);
 
         /// <summary>
         /// 翻译
         /// </summary>
-        object Translate(object input);
+        object Translate(ConvertContext context, object input);
     }
 }

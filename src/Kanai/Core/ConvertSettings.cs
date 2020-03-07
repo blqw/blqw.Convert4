@@ -1,5 +1,5 @@
-﻿using blqw.Core;
-using blqw.Kanai.Core;
+﻿using blqw.Kanai.Core;
+using blqw.Kanai.Interface;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -11,7 +11,7 @@ namespace blqw.Kanai
     /// <summary>
     /// 转换器设置参数
     /// </summary>
-    public sealed class ConvertSettings : IConvertSettings
+    public sealed class ConvertSettings
     {
         /// <summary>
         /// 全局设置
@@ -83,7 +83,7 @@ namespace blqw.Kanai
         /// <summary>
         /// 字符串分隔符
         /// </summary>
-        public IEnumerable<char> StringSeparators { get; set; } = ",; \n\t|，；";
+        public StringSeparator StringSeparators { get; set; } = ",; \n\t|，；";
         /// <summary>
         /// 字符串分割选项
         /// </summary>

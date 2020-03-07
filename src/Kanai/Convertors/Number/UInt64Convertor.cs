@@ -1,12 +1,10 @@
-﻿using blqw.Kanai;
-using blqw.Kanai.Convertors;
-using blqw.Kanai.Extensions;
-using blqw.Kanai.Froms;
+﻿using blqw.Kanai.Extensions;
+using blqw.Kanai.Interface.From;
 using System;
 using System.Globalization;
 using static System.UInt64;
 
-namespace blqw.Convertors
+namespace blqw.Kanai.Convertors
 {
     /// <summary>
     /// <seealso cref="ulong"/> 转换器
@@ -16,6 +14,10 @@ namespace blqw.Convertors
                                 , IFrom<object, ulong>
                                 , IFrom<byte[], ulong>
     {
+        public UInt64Convertor(IServiceProvider serviceProvider) : base(serviceProvider)
+        {
+        }
+
         public ConvertResult<ulong> From(ConvertContext context, bool input) => input ? (ulong)1 : (ulong)0;
         public ConvertResult<ulong> From(ConvertContext context, char input) => (ulong)input;
         public ConvertResult<ulong> From(ConvertContext context, sbyte input) => (ulong)input;
@@ -57,7 +59,7 @@ namespace blqw.Convertors
             }
             return decimal.ToUInt64(input);
         }
-        public ConvertResult<ulong> From(ConvertContext context, DateTime input) => this.Fail(input, context);
+        public ConvertResult<ulong> From(ConvertContext context, DateTime input) => this.Fail(context, input);
         public ConvertResult<ulong> From(ConvertContext context, string input)
         {
             var s = input?.Trim() ?? "";
@@ -100,14 +102,14 @@ namespace blqw.Convertors
                     }
                 }
             }
-            return this.Fail(input, context);
+            return this.Fail(context, input);
         }
-        public ConvertResult<ulong> From(ConvertContext context, object input) => this.Fail(input, context);
+        public ConvertResult<ulong> From(ConvertContext context, object input) => this.Fail(context, input);
         public ConvertResult<ulong> From(ConvertContext context, byte[] input)
         {
             if (input == null || input.Length > sizeof(ulong))
             {
-                return this.Fail(input, context);
+                return this.Fail(context, input);
             }
             return BitConverter.ToUInt64(input.Slice(sizeof(ulong)), 0);
         }

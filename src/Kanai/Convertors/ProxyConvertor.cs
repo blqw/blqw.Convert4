@@ -1,4 +1,5 @@
-﻿using System;
+﻿using blqw.Kanai.Interface;
+using System;
 
 namespace blqw.Kanai.Convertors
 {
@@ -10,7 +11,8 @@ namespace blqw.Kanai.Convertors
     /// </remarks>
     public sealed class ProxyConvertor<TProxy, TOutput> : BaseConvertor<TOutput>
     {
-        public ProxyConvertor(IConvertor<TProxy> convertor)
+        public ProxyConvertor(IServiceProvider serviceProvider, IConvertor<TProxy> convertor)
+             : base(serviceProvider)
         {
             _innerConvertor = convertor ?? throw new ArgumentNullException(nameof(convertor));
         }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using blqw.Kanai.Interface;
+using System;
 using System.Collections;
 using System.ComponentModel;
 using System.Data;
@@ -7,9 +8,16 @@ namespace blqw.Kanai
 {
     class EnumeratorTranslator : ITranslator
     {
-        public Type InputType { get; } = typeof(IEnumerator);
 
-        public object Translate(object input)
+        public bool CanTranslate(Type type) =>
+            typeof(IEnumerable).IsAssignableFrom(type)
+                || typeof(DataTable) == type
+                || typeof(DataRow) == type
+                || typeof(DataRowView) == type
+                || typeof(IListSource) == type
+                || type.IsArray;
+
+        public object Translate(ConvertContext context, object input)
             => (input as IEnumerable)?.GetEnumerator()
                             ?? input as IEnumerator
                             ?? (input as DataTable)?.Rows?.GetEnumerator()
@@ -17,5 +25,6 @@ namespace blqw.Kanai
                             ?? (input as DataRowView)?.Row?.ItemArray?.GetEnumerator()
                             ?? (input as IListSource)?.GetList()?.GetEnumerator()
                             ?? new object[] { input }.GetEnumerator();
+
     }
 }

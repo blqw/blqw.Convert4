@@ -1,12 +1,10 @@
-﻿using blqw.Kanai;
-using blqw.Kanai.Convertors;
-using blqw.Kanai.Extensions;
-using blqw.Kanai.Froms;
+﻿using blqw.Kanai.Extensions;
+using blqw.Kanai.Interface.From;
 using System;
 using System.Globalization;
 using static System.UInt32;
 
-namespace blqw.Convertors
+namespace blqw.Kanai.Convertors
 {
     /// <summary>
     /// <seealso cref="uint"/> 转换器
@@ -16,6 +14,10 @@ namespace blqw.Convertors
                                 , IFrom<object, uint>
                                 , IFrom<byte[], uint>
     {
+        public UInt32Convertor(IServiceProvider serviceProvider) : base(serviceProvider)
+        {
+        }
+
         public ConvertResult<uint> From(ConvertContext context, bool input) => input ? (uint)1 : (uint)0;
         public ConvertResult<uint> From(ConvertContext context, char input) => (uint)input;
         public ConvertResult<uint> From(ConvertContext context, sbyte input) => (uint)input;
@@ -71,7 +73,7 @@ namespace blqw.Convertors
             }
             return decimal.ToUInt32(input);
         }
-        public ConvertResult<uint> From(ConvertContext context, DateTime input) => this.Fail(input, context);
+        public ConvertResult<uint> From(ConvertContext context, DateTime input) => this.Fail(context, input);
         public ConvertResult<uint> From(ConvertContext context, string input)
         {
             var s = input?.Trim() ?? "";
@@ -114,14 +116,14 @@ namespace blqw.Convertors
                     }
                 }
             }
-            return this.Fail(input, context);
+            return this.Fail(context, input);
         }
-        public ConvertResult<uint> From(ConvertContext context, object input) => this.Fail(input, context);
+        public ConvertResult<uint> From(ConvertContext context, object input) => this.Fail(context, input);
         public ConvertResult<uint> From(ConvertContext context, byte[] input)
         {
             if (input == null || input.Length > sizeof(uint))
             {
-                return this.Fail(input, context);
+                return this.Fail(context, input);
             }
             return BitConverter.ToUInt32(input.Slice(sizeof(uint)), 0);
         }

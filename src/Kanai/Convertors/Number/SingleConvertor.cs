@@ -1,12 +1,10 @@
-﻿using blqw.Kanai;
-using blqw.Kanai.Convertors;
-using blqw.Kanai.Extensions;
-using blqw.Kanai.Froms;
+﻿using blqw.Kanai.Extensions;
+using blqw.Kanai.Interface.From;
 using System;
 using System.Globalization;
 using static System.Single;
 
-namespace blqw.Convertors
+namespace blqw.Kanai.Convertors
 {
     /// <summary>
     /// <seealso cref="float"/> 转换器
@@ -16,6 +14,10 @@ namespace blqw.Convertors
                                 , IFrom<object, float>
                                 , IFrom<byte[], float>
     {
+        public SingleConvertor(IServiceProvider serviceProvider) : base(serviceProvider)
+        {
+        }
+
         public ConvertResult<float> From(ConvertContext context, bool input) => input ? (float)1 : (float)0;
         public ConvertResult<float> From(ConvertContext context, char input) => (float)input;
         public ConvertResult<float> From(ConvertContext context, sbyte input) => (float)input;
@@ -65,7 +67,7 @@ namespace blqw.Convertors
             return (float)input;
         }
         public ConvertResult<float> From(ConvertContext context, decimal input) => decimal.ToSingle(input);
-        public ConvertResult<float> From(ConvertContext context, DateTime input) => this.Fail(input, context);
+        public ConvertResult<float> From(ConvertContext context, DateTime input) => this.Fail(context, input);
         public ConvertResult<float> From(ConvertContext context, string input)
         {
             var s = input?.Trim() ?? "";
@@ -108,16 +110,16 @@ namespace blqw.Convertors
                     }
                 }
             }
-            return this.Fail(input, context);
+            return this.Fail(context, input);
         }
 
-        public ConvertResult<float> From(ConvertContext context, object input) => this.Fail(input, context);
+        public ConvertResult<float> From(ConvertContext context, object input) => this.Fail(context, input);
 
         public ConvertResult<float> From(ConvertContext context, byte[] input)
         {
             if (input == null || input.Length > sizeof(float))
             {
-                return this.Fail(input, context);
+                return this.Fail(context, input);
             }
             return BitConverter.ToSingle(input.Slice(sizeof(float)), 0);
         }

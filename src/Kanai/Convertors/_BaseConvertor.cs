@@ -1,5 +1,6 @@
 ﻿using blqw.Kanai.Extensions;
-using blqw.Kanai.Froms;
+using blqw.Kanai.Interface;
+using blqw.Kanai.Interface.From;
 using System;
 
 namespace blqw.Kanai.Convertors
@@ -11,13 +12,20 @@ namespace blqw.Kanai.Convertors
     public abstract partial class BaseConvertor<T> : IConvertor<T>
     {
 
+        protected BaseConvertor(IServiceProvider serviceProvider)
+            : this(typeof(T))
+        {
+            //typeof(T).GetConstructor
+            ServiceProvider = serviceProvider;
+        }
+
         /// <summary>
         /// 构造函数, 根据实际类型的 <seealso cref="IFrom{TOutput, TInput}"/> 接口情况, 按照 TInput 类型缓存调用器
         /// </summary>
-        public BaseConvertor()
-            : this(typeof(T))
-        {
-        }
+        //public BaseConvertor()
+        //    : this(typeof(T))
+        //{
+        //}
 
         protected BaseConvertor(Type outputType)
         {
@@ -26,6 +34,7 @@ namespace blqw.Kanai.Convertors
             TypeName = OutputType.FullName;
             TypeFriendlyName = OutputType.GetFriendlyName();
         }
+
 
 
         /// <summary>
@@ -44,15 +53,8 @@ namespace blqw.Kanai.Convertors
         public virtual string TypeFriendlyName { get; }
 
 
-        ConvertResult<T> ChangeTypeImpl(ConvertContext context, object input)
+        private ConvertResult<T> TryFrom(ConvertContext context, object input, ref ExceptionCollection exceptions)
         {
-            if (input is T t)
-            {
-                return new ConvertResult<T>(t);
-            }
-
-            ExceptionCollection exceptions = null;
-
             //空值转换
             if (input == null)
             {
@@ -73,9 +75,9 @@ namespace blqw.Kanai.Convertors
                     exceptions += e;
                 }
 
-                return this.Fail(input, context, exceptions);
-            }
+                return new ConvertResult<T>(false, default, null);
 
+            }
 
             //获取指定输入类型的转换方法调用器
             var invokers = GetInvokers(input.GetType());
@@ -90,91 +92,181 @@ namespace blqw.Kanai.Convertors
                 exceptions += result.Exception;
             }
 
-            // 转为各种基本类型进行转换, 这里也可以使用翻译器来做, 但是考虑值类型装箱拆箱引起的性能问题, 决定写死
-            if (input is IConvertible v0)
-            {
-                switch (v0.GetTypeCode())
-                {
-                    case TypeCode.Boolean:
-                        return v0 is bool ? this.Fail(input, context, exceptions) : InvokeIForm(context, v0.ToBoolean(context.CultureInfo), exceptions);
-                    case TypeCode.Byte:
-                        return v0 is byte ? this.Fail(input, context, exceptions) : InvokeIForm(context, v0.ToByte(context.CultureInfo), exceptions);
-                    case TypeCode.Char:
-                        return v0 is char ? this.Fail(input, context, exceptions) : InvokeIForm(context, v0.ToChar(context.CultureInfo), exceptions);
-                    case TypeCode.DateTime:
-                        return v0 is DateTime ? this.Fail(input, context, exceptions) : InvokeIForm(context, v0.ToDateTime(context.CultureInfo), exceptions);
-                    case TypeCode.Decimal:
-                        return v0 is decimal ? this.Fail(input, context, exceptions) : InvokeIForm(context, v0.ToDecimal(context.CultureInfo), exceptions);
-                    case TypeCode.Double:
-                        return v0 is double ? this.Fail(input, context, exceptions) : InvokeIForm(context, v0.ToDouble(context.CultureInfo), exceptions);
-                    case TypeCode.Int16:
-                        return v0 is short ? this.Fail(input, context, exceptions) : InvokeIForm(context, v0.ToInt16(context.CultureInfo), exceptions);
-                    case TypeCode.Int32:
-                        return v0 is int ? this.Fail(input, context, exceptions) : InvokeIForm(context, v0.ToInt32(context.CultureInfo), exceptions);
-                    case TypeCode.Int64:
-                        return v0 is long ? this.Fail(input, context, exceptions) : InvokeIForm(context, v0.ToInt64(context.CultureInfo), exceptions);
-                    case TypeCode.SByte:
-                        return v0 is sbyte ? this.Fail(input, context, exceptions) : InvokeIForm(context, v0.ToSByte(context.CultureInfo), exceptions);
-                    case TypeCode.Single:
-                        return v0 is float ? this.Fail(input, context, exceptions) : InvokeIForm(context, v0.ToSingle(context.CultureInfo), exceptions);
-                    case TypeCode.UInt16:
-                        return v0 is ushort ? this.Fail(input, context, exceptions) : InvokeIForm(context, v0.ToUInt16(context.CultureInfo), exceptions);
-                    case TypeCode.UInt32:
-                        return v0 is uint ? this.Fail(input, context, exceptions) : InvokeIForm(context, v0.ToUInt32(context.CultureInfo), exceptions);
-                    case TypeCode.UInt64:
-                        return v0 is ulong ? this.Fail(input, context, exceptions) : InvokeIForm(context, v0.ToUInt64(context.CultureInfo), exceptions);
-                    case TypeCode.DBNull:
-                        return this.Fail(input, context, exceptions);
-                    case TypeCode.String:
-                        if (input is string)
-                        {
-                            return this.Fail(input, context, exceptions);
-                        }
-                        var s = v0.ToString(context.CultureInfo);
-                        if (s == input as string)
-                        {
-                            return this.Fail(input, context, exceptions);
-                        }
-                        return InvokeIForm(context, s, exceptions);
-                    default:
-                        break;
-                }
-            }
-
-            // 使用翻译器转换为其他类型后尝试转型
-            foreach (var value in context.Translate(input))
-            {
-                var invokers0 = GetInvokers(value.GetType());
-                foreach (var invoker in invokers0)
-                {
-                    var result = invoker(this, context, value);
-                    if (result.Success)
-                    {
-                        return result;
-                    }
-                    //如果异常,下面还可以尝试其他方案
-                    exceptions += result.Exception;
-                }
-            }
-
-            return InvokeIForm(context, input, exceptions);
+            return TryFromGeneric<object>(context, input, ref exceptions);
 
         }
 
+
+        private ConvertResult<T> TryStringSerializer(ConvertContext context, object input, ref ExceptionCollection exceptions)
+        {
+            //字符串类型的序列化器
+            if (input is string str)
+            {
+                var serializer = context.StringSerializer;
+                if (serializer != null)
+                {
+                    try
+                    {
+                        return (T)serializer.ToObject(str, typeof(T));
+                    }
+                    catch (Exception ex)
+                    {
+                        exceptions += ex;
+                    }
+                }
+            }
+            else if (typeof(T) == typeof(string))
+            {
+                var serializer = context.StringSerializer;
+                if (serializer != null)
+                {
+                    try
+                    {
+                        return (T)(object)serializer.ToString(input);
+                    }
+                    catch (Exception ex)
+                    {
+                        exceptions += ex;
+                    }
+                }
+            }
+            return new ConvertResult<T>(false, default, null);
+        }
         /// <summary>
         /// 转换转换方法
         /// </summary>
         /// <param name="context"></param>
         /// <param name="input"></param>
         /// <returns></returns>
-        public virtual ConvertResult<T> ChangeType(ConvertContext context, object input) =>
-            ChangeTypeImpl(context, input);
+        public virtual ConvertResult<T> ChangeType(ConvertContext context, object input)
+        {
+            if (input is T t)
+            {
+                return Ok(t);
+            }
+
+            ExceptionCollection exceptions = null;
+            var result = TryStringSerializer(context, input, ref exceptions);
+            if (result.Success)
+            {
+                return result;
+            }
+            result = TryFrom(context, input, ref exceptions);
+            if (result.Success)
+            {
+                return result;
+            }
+
+            result = TryConvertible(context, input, ref exceptions);
+            if (result.Success)
+            {
+                return result;
+            }
+            result = TryTranslate(context, input, ref exceptions);
+            if (result.Success)
+            {
+                return result;
+            }
+
+            return InvokeIForm(context, input, exceptions);
+        }
+
+        private ConvertResult<T> TryConvertible(ConvertContext context, object input, ref ExceptionCollection exceptions)
+        {
+            var fail = new ConvertResult<T>(false, default, null);
+            // 转为各种基本类型进行转换, 这里也可以使用翻译器来做, 但是考虑值类型装箱拆箱引起的性能问题, 决定写死
+            if (input is IConvertible v0)
+            {
+                switch (v0.GetTypeCode())
+                {
+                    case TypeCode.Boolean:
+                        return v0 is bool ? fail : TryFromGeneric(context, v0.ToBoolean(context.CultureInfo), ref exceptions);
+                    case TypeCode.Byte:
+                        return v0 is byte ? fail : TryFromGeneric(context, v0.ToByte(context.CultureInfo), ref exceptions);
+                    case TypeCode.Char:
+                        return v0 is char ? fail : TryFromGeneric(context, v0.ToChar(context.CultureInfo), ref exceptions);
+                    case TypeCode.DateTime:
+                        return v0 is DateTime ? fail : TryFromGeneric(context, v0.ToDateTime(context.CultureInfo), ref exceptions);
+                    case TypeCode.Decimal:
+                        return v0 is decimal ? fail : TryFromGeneric(context, v0.ToDecimal(context.CultureInfo), ref exceptions);
+                    case TypeCode.Double:
+                        return v0 is double ? fail : TryFromGeneric(context, v0.ToDouble(context.CultureInfo), ref exceptions);
+                    case TypeCode.Int16:
+                        return v0 is short ? fail : TryFromGeneric(context, v0.ToInt16(context.CultureInfo), ref exceptions);
+                    case TypeCode.Int32:
+                        return v0 is int ? fail : TryFromGeneric(context, v0.ToInt32(context.CultureInfo), ref exceptions);
+                    case TypeCode.Int64:
+                        return v0 is long ? fail : TryFromGeneric(context, v0.ToInt64(context.CultureInfo), ref exceptions);
+                    case TypeCode.SByte:
+                        return v0 is sbyte ? fail : TryFromGeneric(context, v0.ToSByte(context.CultureInfo), ref exceptions);
+                    case TypeCode.Single:
+                        return v0 is float ? fail : TryFromGeneric(context, v0.ToSingle(context.CultureInfo), ref exceptions);
+                    case TypeCode.UInt16:
+                        return v0 is ushort ? fail : TryFromGeneric(context, v0.ToUInt16(context.CultureInfo), ref exceptions);
+                    case TypeCode.UInt32:
+                        return v0 is uint ? fail : TryFromGeneric(context, v0.ToUInt32(context.CultureInfo), ref exceptions);
+                    case TypeCode.UInt64:
+                        return v0 is ulong ? fail : TryFromGeneric(context, v0.ToUInt64(context.CultureInfo), ref exceptions);
+                    case TypeCode.DBNull:
+                        return InvokeIForm(context, DBNull.Value, exceptions); ;
+                    case TypeCode.String:
+                        var s = v0.ToString(context.CultureInfo);
+                        if (s == input as string)
+                        {
+                            return fail;
+                        }
+                        return InvokeIForm(context, s, exceptions);
+                    default:
+                        return fail;
+                }
+            }
+            return fail;
+        }
+
+
+        private ConvertResult<T> TryFromGeneric<TInput>(ConvertContext context, TInput input, ref ExceptionCollection exceptions)
+        {
+            try
+            {
+                if (this is IFrom<TInput, T> from)
+                {
+                    var result = from.From(context, input);
+                    if (result.Success)
+                    {
+                        return result;
+                    }
+                    exceptions += result.Exception;
+                }
+            }
+            catch (Exception e)
+            {
+                exceptions += this.Error(e, context);
+            }
+            return new ConvertResult<T>(false, default, null);
+        }
+
+        /// <summary>
+        /// 使用翻译器转换为其他类型后尝试转型
+        /// </summary>
+        /// <returns></returns>
+        private ConvertResult<T> TryTranslate(ConvertContext context, object input, ref ExceptionCollection exceptions)
+        {
+            foreach (var value in context.Translate(input))
+            {
+                var result = TryFrom(context, value, ref exceptions);
+                if (result.Success)
+                {
+                    return result;
+                }
+            }
+            return this.Fail(context, input, exceptions);
+        }
 
         /// <summary>
         /// 优先级 默认0
         /// </summary>
         public virtual uint Priority { get; } = 0;
-
+        public IServiceProvider ServiceProvider { get; }
 
         protected ConvertResult<T> Ok(T value) => new ConvertResult<T>(value);
     }

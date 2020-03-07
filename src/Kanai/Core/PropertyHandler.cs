@@ -1,5 +1,6 @@
 ﻿using blqw.Kanai;
 using blqw.Kanai.Core;
+using blqw.Kanai.Extensions;
 using System;
 using System.Reflection;
 
@@ -57,16 +58,14 @@ namespace blqw
         /// <param name="target">属性实例对象</param>
         /// <param name="value">属性值</param>
         /// <returns></returns>
-        public ConvertException SetValue(ConvertSettings settings, object target, object value)
+        public Exception SetValue(ConvertSettings settings, object target, object value)
         {
             var context = new ConvertContext(PropertyType, settings);
             var result = Cube.Convert(value, PropertyType, context);
             if (result.Success == false)
             {
-                var rs = context.ResourceStrings ?? ResourceStringManager.ZH_CN;
-                ExceptionCollection exceptions = null;
-                exceptions += result.Exception;
-                return new ConvertException(string.Format(rs.PROPERTY_CAST_FAIL, Property.DeclaringType.GetFriendlyName(), Property.Name), exceptions);
+                var message = string.Format(context.ResourceStrings.PROPERTY_CAST_FAIL, Property.DeclaringType.GetFriendlyName(), Property.Name);
+                return context.Fail(message, result.Exception);
             }
             try
             {

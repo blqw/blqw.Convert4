@@ -1,16 +1,18 @@
-﻿using blqw.Kanai;
-using blqw.Kanai.Convertors;
-using blqw.Kanai.Extensions;
-using blqw.Kanai.Froms;
+﻿using blqw.Kanai.Extensions;
+using blqw.Kanai.Interface.From;
 using System;
 
-namespace blqw.Convertors
+namespace blqw.Kanai.Convertors
 {
     /// <summary>
     /// 布尔值转换器
     /// </summary>
     public class BooleanConvertor : BaseConvertor<bool>, IFromConvertible<bool>, IFrom<object, bool>
     {
+        public BooleanConvertor(IServiceProvider serviceProvider) : base(serviceProvider)
+        {
+        }
+
         public ConvertResult<bool> From(ConvertContext context, bool input) => input;
         public ConvertResult<bool> From(ConvertContext context, char input) => input != 0;
         public ConvertResult<bool> From(ConvertContext context, sbyte input) => input != 0;
@@ -75,9 +77,9 @@ namespace blqw.Convertors
                 default:
                     break;
             }
-            return this.Fail(input, context);
+            return this.Fail(context, input);
         }
-        public ConvertResult<bool> From(ConvertContext context, object input) => this.Fail(input, context);
-        public ConvertResult<bool> From(ConvertContext context, DateTime input) => this.Fail(input, context);
+        public ConvertResult<bool> From(ConvertContext context, object input) => this.Fail(context, input);
+        public ConvertResult<bool> From(ConvertContext context, DateTime input) => this.Fail(context, input);
     }
 }

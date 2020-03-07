@@ -1,5 +1,5 @@
-﻿using blqw.Kanai.Convertors;
-using blqw.Kanai.Core;
+﻿using blqw.Kanai.Core;
+using blqw.Kanai.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +9,21 @@ namespace blqw.Kanai.Extensions
 {
     static class ExceptionExtensions
     {
-        public static Exception Fail<T>(this IConvertor<T> convertor, object origin, ConvertContext context, ICollection<Exception> exceptions = null)
+        public static Exception Fail<T>(this IConvertor<T> convertor, ConvertContext context, object origin, Exception exception)
+        {
+            ExceptionCollection exceptions = null;
+            exceptions += exception;
+            return Fail(convertor, context, origin, exceptions);
+        }
+
+        public static Exception Fail(this ConvertContext context, string message, Exception exception)
+        {
+            ExceptionCollection exceptions = null;
+            exceptions += exception;
+            return new ConvertException(message, exceptions);
+        }
+
+        public static Exception Fail<T>(this IConvertor<T> convertor, ConvertContext context, object origin, ICollection<Exception> exceptions = null)
         {
             if (convertor == null)
             {
@@ -18,19 +32,19 @@ namespace blqw.Kanai.Extensions
 
             var text = (origin as IConvertible)?.ToString(null)
                        ?? (origin as IFormattable)?.ToString(null, null);
-            var outputTypeName = (convertor as BaseConvertor<T>)?.TypeFriendlyName ?? typeof(T).GetFriendlyName();
+            var outputTypeName = context.OutputType.GetFriendlyName();
             var rs = context.ResourceStrings ?? ResourceStringManager.ZH_CN;
             if (origin == null)
             {
-                text = string.Format(rs.CANT_CONVERT, "null", outputTypeName);
+                text = string.Format(rs.CANT_CONVERT, "null", "null", outputTypeName);
             }
             else if (text == null)
             {
-                text = string.Format(rs.CANT_CONVERT, origin.GetType().GetFriendlyName(), outputTypeName);
+                text = string.Format(rs.CANT_CONVERT, "", origin.GetType().GetFriendlyName(), outputTypeName);
             }
             else
             {
-                text = string.Format(rs.VALUE_CANT_CONVERT, text, origin.GetType().GetFriendlyName(), outputTypeName);
+                text = string.Format(rs.CANT_CONVERT, text, origin.GetType().GetFriendlyName(), outputTypeName);
             }
 
             if (exceptions == null)

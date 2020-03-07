@@ -1,12 +1,10 @@
-﻿using blqw.Kanai;
-using blqw.Kanai.Convertors;
-using blqw.Kanai.Extensions;
-using blqw.Kanai.Froms;
+﻿using blqw.Kanai.Extensions;
+using blqw.Kanai.Interface.From;
 using System;
 using System.Globalization;
 using static System.SByte;
 
-namespace blqw.Convertors
+namespace blqw.Kanai.Convertors
 {
     /// <summary>
     /// <seealso cref="sbyte"/> 转换器
@@ -15,6 +13,10 @@ namespace blqw.Convertors
                                 , IFromConvertible<sbyte>
                                 , IFrom<object, sbyte>
     {
+        public SBtyeConvertor(IServiceProvider serviceProvider) : base(serviceProvider)
+        {
+        }
+
         public ConvertResult<sbyte> From(ConvertContext context, bool input) => input ? (sbyte)1 : (sbyte)0;
         public ConvertResult<sbyte> From(ConvertContext context, char input) => (sbyte)input;
         public ConvertResult<sbyte> From(ConvertContext context, sbyte input) => (sbyte)input;
@@ -70,7 +72,7 @@ namespace blqw.Convertors
             }
             return decimal.ToSByte(input);
         }
-        public ConvertResult<sbyte> From(ConvertContext context, DateTime input) => this.Fail(input, context);
+        public ConvertResult<sbyte> From(ConvertContext context, DateTime input) => this.Fail(context, input);
 
         public ConvertResult<sbyte> From(ConvertContext context, string input)
         {
@@ -114,8 +116,8 @@ namespace blqw.Convertors
                     }
                 }
             }
-            return this.Fail(input, context);
+            return this.Fail(context, input);
         }
-        public ConvertResult<sbyte> From(ConvertContext context, object input) => this.Fail(input, context);
+        public ConvertResult<sbyte> From(ConvertContext context, object input) => this.Fail(context, input);
     }
 }

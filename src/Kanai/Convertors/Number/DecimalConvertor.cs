@@ -1,18 +1,20 @@
-﻿using blqw.Kanai;
-using blqw.Kanai.Convertors;
-using blqw.Kanai.Extensions;
-using blqw.Kanai.Froms;
+﻿using blqw.Kanai.Extensions;
+using blqw.Kanai.Interface.From;
 using System;
 using System.Globalization;
 using static System.Decimal;
 
-namespace blqw.Convertors
+namespace blqw.Kanai.Convertors
 {
     /// <summary>
     /// <seealso cref="decimal" /> 转换器
     /// </summary>
     public class DecimalConvertor : BaseConvertor<decimal>, IFromConvertible<decimal>, IFrom<byte[], decimal>, IFrom<Guid, decimal>
     {
+        public DecimalConvertor(IServiceProvider serviceProvider) : base(serviceProvider)
+        {
+        }
+
         public ConvertResult<decimal> From(ConvertContext context, bool input) => input ? One : Zero;
         public ConvertResult<decimal> From(ConvertContext context, char input) => input;
         public ConvertResult<decimal> From(ConvertContext context, sbyte input) => input;
@@ -26,7 +28,7 @@ namespace blqw.Convertors
         public ConvertResult<decimal> From(ConvertContext context, float input) => (decimal)input;
         public ConvertResult<decimal> From(ConvertContext context, double input) => (decimal)input;
         public ConvertResult<decimal> From(ConvertContext context, decimal input) => input;
-        public ConvertResult<decimal> From(ConvertContext context, DateTime input) => this.Fail(input, context);
+        public ConvertResult<decimal> From(ConvertContext context, DateTime input) => this.Fail(context, input);
         public ConvertResult<decimal> From(ConvertContext context, string input)
         {
             var s = input?.Trim() ?? "";
@@ -69,14 +71,14 @@ namespace blqw.Convertors
                     }
                 }
             }
-            return this.Fail(input, context);
+            return this.Fail(context, input);
         }
 
         public ConvertResult<decimal> From(ConvertContext context, byte[] input)
         {
             if (input == null || input.Length > sizeof(decimal))
             {
-                return this.Fail(input, context);
+                return this.Fail(context, input);
             }
             var bytes = input.Slice(sizeof(decimal));
             var arr2 = new int[4];
