@@ -527,9 +527,9 @@ namespace NUnit.Tests1
                 dataset.To<Dictionary<string, List<user>>>();
                 Assert.Fail();
             }
-            catch (ConvertException ex)
+            catch (Exception ex)
             {
-                Assert.Pass(Environment.NewLine + ex.FullMessage);
+                Assert.Pass(ex.Message);
             }
         }
 
@@ -538,39 +538,16 @@ namespace NUnit.Tests1
         public void 优化错误信息()
         {
             var test = 123456;
-
-            try
+            var a = test.Convert(typeof(Convert));
+            if (a.Success || !a.Exception.Message.Contains("静态类型"))
             {
-                var a = test.Convert(typeof(Convert));
                 Assert.Fail();
             }
-            catch (ConvertException ex)
-            {
-                if (ex.Message?.StartsWith("无法为静态类型") != true &&
-                    ex.Message?.EndsWith("提供转换器") != true)
-                {
-                    Assert.Fail(ex.Message);
-                }
-                Assert.Pass(Environment.NewLine + ex.FullMessage);
-            }
 
-
-            try
+            var b = test.Convert(typeof(List<>));
+            if (b.Success || !b.Exception.Message.Contains("泛型定义类型"))
             {
-                var a = test.Convert(typeof(List<>));
                 Assert.Fail();
-            }
-            catch (AggregateException ex)
-            {
-                if (ex.Message?.StartsWith("无法为泛型定义类型") != true &&
-                    ex.Message?.EndsWith("提供转换器") != true)
-                {
-                    Assert.Fail(ex.Message);
-                }
-                var messages = ex.InnerExceptions.Select(x => x.Message).ToList();
-                messages.Add("-----------------------------");
-                messages.Add(ex.ToString());
-                Assert.Pass(string.Join(Environment.NewLine, messages.ToArray()));
             }
         }
 

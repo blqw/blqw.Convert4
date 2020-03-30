@@ -104,11 +104,6 @@ namespace blqw.Kanai
         public ConvertResult<T> Convert<T>(object input)
         {
             var outputType = typeof(T);
-            if (outputType.IsGenericTypeDefinition)
-            {
-                var text = string.Format(ResourceStrings.CANT_BUILD_CONVERTOR_BECAUSE_GENERIC_DEFINITION_TYPE, outputType.GetFriendlyName());
-                return new NotSupportedException(text);
-            }
             if (outputType.IsAbstract && outputType.IsSealed)
             {
                 var text = string.Format(ResourceStrings.CANT_BUILD_CONVERTOR_BECAUSE_STATIC_TYPE, outputType.GetFriendlyName());
@@ -120,7 +115,7 @@ namespace blqw.Kanai
                 var text = string.Format(ResourceStrings.CANT_BUILD_CONVERTOR_BECAUSE_NOTFOUND, outputType.GetFriendlyName());
                 return new EntryPointNotFoundException(text);
             }
-            return conv.ChangeType(this, input);
+            return conv.Convert(this, input);
         }
 
         public IEnumerable<object> Translate(object input)
@@ -136,27 +131,6 @@ namespace blqw.Kanai
                     }
                 }
             }
-        }
-
-        public ConvertResult<T> ChangeType<T>(object input)
-        {
-            var outputType = typeof(T);
-            if (outputType.IsGenericTypeDefinition)
-            {
-                return new NotSupportedException(string.Format(ResourceStrings.CANT_BUILD_CONVERTOR_BECAUSE_GENERIC_DEFINITION_TYPE, outputType.GetFriendlyName()));
-            }
-            if (outputType.IsAbstract && outputType.IsSealed)
-            {
-                return new NotSupportedException(string.Format(ResourceStrings.CANT_BUILD_CONVERTOR_BECAUSE_STATIC_TYPE, outputType.GetFriendlyName()));
-            }
-
-            var selector = Settings.ConvertorSelector;
-            var convertor = selector.GetConvertor<T>(this);
-            if (convertor == null)
-            {
-                return new NotSupportedException(string.Format(ResourceStrings.CANT_BUILD_CONVERTOR_BECAUSE_NOTFOUND, outputType.GetFriendlyName()));
-            }
-            return convertor.ChangeType(this, input);
         }
 
         public StringSplitOptions StringSplitOptions { get; set; }

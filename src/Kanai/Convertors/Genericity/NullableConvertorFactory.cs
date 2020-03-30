@@ -29,7 +29,7 @@ namespace blqw.Kanai.Convertors
             {
             }
 
-            public override ConvertResult<TValue?> ChangeType(ConvertContext context, object input)
+            public override ConvertResult<TValue?> Convert(ConvertContext context, object input)
             {
                 if (input == null || input is DBNull || (input is string s && string.IsNullOrWhiteSpace(s)))
                 {

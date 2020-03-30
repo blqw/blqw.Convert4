@@ -126,7 +126,7 @@ namespace blqw.Kanai.Convertors
                         case 'B':
                             try
                             {
-                                return Convert.ToByte(s.Substring(2), 2);
+                                return System.Convert.ToByte(s.Substring(2), 2);
                             }
                             catch (Exception e)
                             {

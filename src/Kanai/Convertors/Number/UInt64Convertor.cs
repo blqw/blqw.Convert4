@@ -84,7 +84,7 @@ namespace blqw.Kanai.Convertors
                         case 'B':
                             try
                             {
-                                return Convert.ToUInt64(s.Substring(2), 2);
+                                return System.Convert.ToUInt64(s.Substring(2), 2);
                             }
                             catch (Exception e)
                             {

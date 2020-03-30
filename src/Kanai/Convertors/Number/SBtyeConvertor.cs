@@ -98,7 +98,7 @@ namespace blqw.Kanai.Convertors
                         case 'B':
                             try
                             {
-                                return Convert.ToSByte(s.Substring(2), 2);
+                                return System.Convert.ToSByte(s.Substring(2), 2);
                             }
                             catch (Exception e)
                             {

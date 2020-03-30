@@ -98,7 +98,7 @@ namespace blqw.Kanai.Convertors
                         case 'B':
                             try
                             {
-                                return Convert.ToUInt16(s.Substring(2), 2);
+                                return System.Convert.ToUInt16(s.Substring(2), 2);
                             }
                             catch (Exception e)
                             {

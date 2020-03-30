@@ -15,6 +15,6 @@ namespace blqw.Kanai.Interface
         /// </summary>
         /// <param name="context"> 上下文 </param>
         /// <param name="input"> 需要转换类型的对象 </param>
-        ConvertResult<T> ChangeType(ConvertContext context, object input);
+        ConvertResult<T> Convert(ConvertContext context, object input);
     }
 }

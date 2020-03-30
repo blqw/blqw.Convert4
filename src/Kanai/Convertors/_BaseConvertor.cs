@@ -138,7 +138,7 @@ namespace blqw.Kanai.Convertors
         /// <param name="context"></param>
         /// <param name="input"></param>
         /// <returns></returns>
-        public virtual ConvertResult<T> ChangeType(ConvertContext context, object input)
+        public virtual ConvertResult<T> Convert(ConvertContext context, object input)
         {
             if (input is T t)
             {

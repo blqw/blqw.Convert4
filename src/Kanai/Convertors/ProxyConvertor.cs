@@ -17,9 +17,9 @@ namespace blqw.Kanai.Convertors
             _innerConvertor = convertor ?? throw new ArgumentNullException(nameof(convertor));
         }
 
-        public override ConvertResult<TOutput> ChangeType(ConvertContext context, object input)
+        public override ConvertResult<TOutput> Convert(ConvertContext context, object input)
         {
-            var result = _innerConvertor.ChangeType(context, input);
+            var result = _innerConvertor.Convert(context, input);
             if (!result.Success)
             {
                 return result.Exception;

@@ -35,12 +35,12 @@ namespace blqw.Kanai.Convertors
 
         public IReadOnlyCollection<IConvertor<T>> Convertors { get; }
 
-        ConvertResult<T> IConvertor<T>.ChangeType(ConvertContext context, object input)
+        ConvertResult<T> IConvertor<T>.Convert(ConvertContext context, object input)
         {
             List<Exception> exceptions = null;
             foreach (var convertor in Convertors)
             {
-                var result = convertor.ChangeType(context, input);
+                var result = convertor.Convert(context, input);
                 if (result.Success)
                 {
                     return result;

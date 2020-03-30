@@ -94,7 +94,7 @@ namespace blqw.Kanai.Convertors
                         case 'B':
                             try
                             {
-                                return Convert.ToInt32(s.Substring(2), 2);
+                                return System.Convert.ToInt32(s.Substring(2), 2);
                             }
                             catch (Exception e)
                             {

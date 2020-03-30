@@ -16,6 +16,25 @@ namespace blqw.Kanai
 
         private static Func<object, ConvertContext, ConvertResult<object>> BuildCastDelegate(Type outputType)
         {
+            if (outputType is null)
+            {
+                throw new ArgumentNullException(nameof(outputType));
+            }
+
+            if (!outputType.IsConstructedGenericType)
+            {
+                return (object input, ConvertContext context) =>
+                {
+                    if (context.OutputType.IsAbstract && context.OutputType.IsSealed)
+                    {
+                        var text = string.Format(context.ResourceStrings.CANT_BUILD_CONVERTOR_BECAUSE_STATIC_TYPE, context.OutputType.GetFriendlyName());
+                        return new NotSupportedException(text);
+                    }
+                    var text2 = string.Format(context.ResourceStrings.CANT_BUILD_CONVERTOR_BECAUSE_GENERIC_DEFINITION_TYPE, context.OutputType.GetFriendlyName());
+                    return new NotSupportedException(text2);
+                };
+            }
+
             var method = ((Func<object, ConvertContext, ConvertResult<object>>)CastToObject<object>);
             var def = method.Method.GetGenericMethodDefinition();
             var make = def.MakeGenericMethod(outputType);
@@ -25,7 +44,7 @@ namespace blqw.Kanai
 
             ConvertResult<object> CastToObject<T>(object input, ConvertContext context)
             {
-                var result = context.ChangeType<T>(input);
+                var result = context.Convert<T>(input);
                 return new ConvertResult<object>(result.Success, result.OutputValue, result.Exception);
             }
         }
@@ -44,12 +63,12 @@ namespace blqw.Kanai
             => Convert(input, outputType, null);
 
         public static ConvertResult<T> Convert<T>(this object input, ConvertContext context)
-            => context.ChangeType<T>(input);
+            => context.Convert<T>(input);
 
         public static ConvertResult<T> Convert<T>(this object input, ConvertSettings settings)
         {
             var context = new ConvertContext(typeof(T), settings);
-            return context.ChangeType<T>(input);
+            return context.Convert<T>(input);
         }
 
         public static ConvertResult<T> Convert<T>(this object input) => Convert<T>(input, null);
