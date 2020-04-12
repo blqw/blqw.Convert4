@@ -13,13 +13,13 @@ namespace blqw
     /// </summary>
     public struct Mapper : IDictionaryEnumerator
     {
-        private DataReaderEnumerator _reader;
-        private NameValueEnumerator _nv;
-        private DataRowEnumerator _row;
-        private DataSetEnumerator _dataSet;
+        private readonly DataReaderEnumerator _reader;
+        private readonly NameValueEnumerator _nv;
+        private readonly DataRowEnumerator _row;
+        private readonly DataSetEnumerator _dataSet;
         private readonly IDictionaryEnumerator _enumerator;
-        private PairEnumerator _pair;
-        private PropertyEnumerator _property;
+        private readonly PairEnumerator _pair;
+        private readonly PropertyEnumerator _property;
         private readonly int _index;
         /// <summary>
         /// 初始化
@@ -209,17 +209,8 @@ namespace blqw
             }
         }
 
-        internal static Exception Build(ConvertContext context,
-                                    object input,
-                                    bool created,
-                                    Func<ConvertContext, object, object, Exception> add)
+        internal static Exception Build(object input, Func<ConvertContext, object, object, Exception> add)
         {
-            if (created == false)
-            {
-                var message = string.Format(context.ResourceStrings.INSTANTIATION_FAIL, context.OutputType.GetFriendlyName());
-                return new ConvertException(message, null);
-            }
-
             var mapper = new Mapper(input);
 
             if (mapper.Error != null)

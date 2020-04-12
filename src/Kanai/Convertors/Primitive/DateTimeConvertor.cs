@@ -8,7 +8,7 @@ namespace blqw.Kanai.Convertors
     /// <summary>
     /// <seealso cref="DateTime" /> 转换器
     /// </summary>
-    public class DateTimeConvertor : BaseConvertor<DateTime>, IFrom<string, DateTime>, IFrom<IConvertible, DateTime>
+    public class DateTimeConvertor : BaseConvertor<DateTime>, IFrom<string, DateTime>
     {
         /// <summary>
         /// 日期格式化字符
@@ -34,18 +34,9 @@ namespace blqw.Kanai.Convertors
         {
         }
 
-        public ConvertResult<DateTime> From(ConvertContext context, IConvertible input)
-        {
-            if (input?.GetTypeCode() == TypeCode.DateTime)
-            {
-                return input.ToDateTime(context.FormatProvider);
-            }
-            return this.Fail(context, input);
-        }
-
         public ConvertResult<DateTime> From(ConvertContext context, string input)
         {
-            var s = input?.Trim() ?? "";
+            var s = input?.ToString(context.FormatProvider)?.Trim() ?? "";
             if (DateTime.TryParse(s, out var result))
             {
                 return result;
@@ -54,7 +45,7 @@ namespace blqw.Kanai.Convertors
             {
                 if (s.Length == format.Length)
                 {
-                    if (DateTime.TryParseExact(input, format, null, DateTimeStyles.None, out result))
+                    if (DateTime.TryParseExact(s, format, null, DateTimeStyles.None, out result))
                     {
                         return result;
                     }

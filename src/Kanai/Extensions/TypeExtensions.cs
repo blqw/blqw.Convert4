@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Reflection;
 
@@ -261,7 +260,14 @@ namespace blqw.Kanai
                         name = t.Name;
                         break;
                     default:
-                        name = $"{t.Namespace}.{t.Name}";
+                        if (t.Namespace.StartsWith("blqw.Kanai", StringComparison.Ordinal))
+                        {
+                            name = t.Name;
+                        }
+                        else
+                        {
+                            name = $"{t.Namespace}.{t.Name}";
+                        }
                         break;
                 }
             }
@@ -275,6 +281,24 @@ namespace blqw.Kanai
                 name = name.Remove(index);
             }
             return name;
+        }
+
+        public static bool IsMetaType(this Type type)
+        {
+            if (type is null)
+            {
+                return false;
+            }
+            if (type.IsPrimitive)
+            {
+                return true;
+            }
+            return type == typeof(string)
+                || type == typeof(DateTime)
+                || type == typeof(Guid)
+                || type == typeof(TimeSpan)
+                || type == typeof(decimal)
+                || type == typeof(DBNull);
         }
     }
 }

@@ -21,16 +21,16 @@ namespace blqw.Kanai
                 throw new ArgumentNullException(nameof(outputType));
             }
 
-            if (!outputType.IsConstructedGenericType)
+            if (outputType.IsGenericType && !outputType.IsConstructedGenericType)
             {
                 return (object input, ConvertContext context) =>
                 {
-                    if (context.OutputType.IsAbstract && context.OutputType.IsSealed)
+                    if (outputType.IsAbstract && outputType.IsSealed)
                     {
-                        var text = string.Format(context.ResourceStrings.CANT_BUILD_CONVERTOR_BECAUSE_STATIC_TYPE, context.OutputType.GetFriendlyName());
+                        var text = string.Format(context.ResourceStrings.CANT_BUILD_CONVERTOR_BECAUSE_STATIC_TYPE, outputType.GetFriendlyName());
                         return new NotSupportedException(text);
                     }
-                    var text2 = string.Format(context.ResourceStrings.CANT_BUILD_CONVERTOR_BECAUSE_GENERIC_DEFINITION_TYPE, context.OutputType.GetFriendlyName());
+                    var text2 = string.Format(context.ResourceStrings.CANT_BUILD_CONVERTOR_BECAUSE_GENERIC_DEFINITION_TYPE, outputType.GetFriendlyName());
                     return new NotSupportedException(text2);
                 };
             }

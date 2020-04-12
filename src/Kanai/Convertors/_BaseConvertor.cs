@@ -2,6 +2,8 @@
 using blqw.Kanai.Interface;
 using blqw.Kanai.Interface.From;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace blqw.Kanai.Convertors
 {
@@ -11,6 +13,13 @@ namespace blqw.Kanai.Convertors
     /// <typeparam name="T">输出类型</typeparam>
     public abstract partial class BaseConvertor<T> : IConvertor<T>
     {
+
+        /// <summary>
+        /// 调用器字典
+        /// </summary>
+        private readonly Dictionary<Type, InvokeIFormHandler> _invokers;
+        private readonly Type[] _invokerTypes;
+
 
         protected BaseConvertor(IServiceProvider serviceProvider)
             : this(typeof(T))
@@ -29,7 +38,9 @@ namespace blqw.Kanai.Convertors
 
         protected BaseConvertor(Type outputType)
         {
-            InitInvokers();
+            _invokers = InitInvokers();
+            _invokerTypes = _invokers.Keys.ToArray();
+            Array.Sort(_invokerTypes, (a, b) => a.IsAssignableFrom(b) ? 1 : b.IsAssignableFrom(a) ? -1 : 0);
             OutputType = outputType;
             TypeName = OutputType.FullName;
             TypeFriendlyName = OutputType.GetFriendlyName();
@@ -53,7 +64,7 @@ namespace blqw.Kanai.Convertors
         public virtual string TypeFriendlyName { get; }
 
 
-        private ConvertResult<T> TryFrom(ConvertContext context, object input, ref ExceptionCollection exceptions)
+        private ConvertResult<T> TryFrom(ConvertContext context, object input, bool translation, ref ExceptionCollection exceptions)
         {
             //空值转换
             if (input == null)
@@ -79,10 +90,46 @@ namespace blqw.Kanai.Convertors
 
             }
 
+            // 精确匹配
+
+            var invoker0 = GetInvoker(input.GetType());
+            if (invoker0 != null)
+            {
+                var result = invoker0(this, context, input);
+                if (result.Success)
+                {
+                    return result;
+                }
+                exceptions += result.Exception;
+            }
+
+
+            if (translation)
+            {
+                foreach (var value in context.Translate(input))
+                {
+                    if (input != value)
+                    {
+                        var result = TryFrom(context, value, false, ref exceptions);
+                        if (result.Success)
+                        {
+                            return result;
+                        }
+                        //如果异常,下面还可以尝试其他方案
+                        exceptions += result.Exception;
+                    }
+                }
+            }
+
+
             //获取指定输入类型的转换方法调用器
             var invokers = GetInvokers(input.GetType());
             foreach (var invoker in invokers)
             {
+                if (invoker == invoker0)
+                {
+                    continue;
+                }
                 var result = invoker(this, context, input);
                 if (result.Success)
                 {
@@ -92,7 +139,7 @@ namespace blqw.Kanai.Convertors
                 exceptions += result.Exception;
             }
 
-            return TryFromGeneric<object>(context, input, ref exceptions);
+            return new ConvertResult<T>(false, default, null);
 
         }
 
@@ -151,7 +198,7 @@ namespace blqw.Kanai.Convertors
             {
                 return result;
             }
-            result = TryFrom(context, input, ref exceptions);
+            result = TryFrom(context, input, true, ref exceptions);
             if (result.Success)
             {
                 return result;
@@ -162,13 +209,7 @@ namespace blqw.Kanai.Convertors
             {
                 return result;
             }
-            result = TryTranslate(context, input, ref exceptions);
-            if (result.Success)
-            {
-                return result;
-            }
-
-            return InvokeIForm(context, input, exceptions);
+            return this.Fail(context, input, exceptions);
         }
 
         private ConvertResult<T> TryConvertible(ConvertContext context, object input, ref ExceptionCollection exceptions)
@@ -243,23 +284,6 @@ namespace blqw.Kanai.Convertors
                 exceptions += this.Error(e, context);
             }
             return new ConvertResult<T>(false, default, null);
-        }
-
-        /// <summary>
-        /// 使用翻译器转换为其他类型后尝试转型
-        /// </summary>
-        /// <returns></returns>
-        private ConvertResult<T> TryTranslate(ConvertContext context, object input, ref ExceptionCollection exceptions)
-        {
-            foreach (var value in context.Translate(input))
-            {
-                var result = TryFrom(context, value, ref exceptions);
-                if (result.Success)
-                {
-                    return result;
-                }
-            }
-            return this.Fail(context, input, exceptions);
         }
 
         /// <summary>

@@ -115,7 +115,11 @@ namespace blqw.Kanai
                 var text = string.Format(ResourceStrings.CANT_BUILD_CONVERTOR_BECAUSE_NOTFOUND, outputType.GetFriendlyName());
                 return new EntryPointNotFoundException(text);
             }
-            return conv.Convert(this, input);
+            if (outputType == OutputType)
+            {
+                return conv.Convert(this, input);
+            }
+            return conv.Convert(NewContext(outputType), input);
         }
 
         public IEnumerable<object> Translate(object input)

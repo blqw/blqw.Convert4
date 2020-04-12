@@ -73,24 +73,46 @@ namespace NUnit.Tests1
             Assert.AreEqual(list[1], 2);
             Assert.AreEqual(list[2], 3);
             Assert.AreEqual(list[3], 4);
+
+            var table = new DataTable("b");
+            table.Columns.Add("id", typeof(int));
+            table.Columns.Add("date", typeof(string));
+            table.Rows.Add(1, "2016-04-20");
+            table.Rows.Add(2, "2016-04-21");
+            table.Rows.Add(3, "2016-04-22");
+            table.Rows.Add(4, "2016-04-23");
+            var dataset = new DataSet();
+            dataset.Tables.Add(table);
+            var dict = dataset.To<Dictionary<string, List<user>>>();
+
+            Assert.AreEqual(dict?.Count, 1);
+            Assert.AreEqual(dict["b"].Count, 4);
+            Assert.AreEqual(dict["b"][0].id, 1L);
+            Assert.AreEqual(dict["b"][1].id, 2L);
+            Assert.AreEqual(dict["b"][2].id, 3L);
+            Assert.AreEqual(dict["b"][3].id, 4L);
+            Assert.AreEqual(dict["b"][0].date, DateTime.Parse("2016-04-20"));
+            Assert.AreEqual(dict["b"][1].date, DateTime.Parse("2016-04-21"));
+            Assert.AreEqual(dict["b"][2].date, DateTime.Parse("2016-04-22"));
+            Assert.AreEqual(dict["b"][3].date, DateTime.Parse("2016-04-23"));
         }
 
         [Test]
         public void 接口转换测试()
         {
-            //var list1 = "1,2,3,4".To<IList<int>>();
-            //Assert.AreEqual(list1?.Count, 4);
-            //Assert.AreEqual(list1[0], 1);
-            //Assert.AreEqual(list1[1], 2);
-            //Assert.AreEqual(list1[2], 3);
-            //Assert.AreEqual(list1[3], 4);
+            var list1 = "1,2,3,4".To<IList<int>>();
+            Assert.AreEqual(list1?.Count, 4);
+            Assert.AreEqual(list1[0], 1);
+            Assert.AreEqual(list1[1], 2);
+            Assert.AreEqual(list1[2], 3);
+            Assert.AreEqual(list1[3], 4);
 
-            //var list11 = new object[] { "1", 2, 3, "4" }.To<IList<int>>();
-            //Assert.AreEqual(list11?.Count, 4);
-            //Assert.AreEqual(list11[0], 1);
-            //Assert.AreEqual(list11[1], 2);
-            //Assert.AreEqual(list11[2], 3);
-            //Assert.AreEqual(list11[3], 4);
+            var list11 = new object[] { "1", 2, 3, "4" }.To<IList<int>>();
+            Assert.AreEqual(list11?.Count, 4);
+            Assert.AreEqual(list11[0], 1);
+            Assert.AreEqual(list11[1], 2);
+            Assert.AreEqual(list11[2], 3);
+            Assert.AreEqual(list11[3], 4);
 
             var list3 = "1,2,3,4".To<IEnumerable>().Cast<object>().ToList();
             Assert.AreEqual(list3?.Count, 4);
@@ -494,7 +516,7 @@ namespace NUnit.Tests1
 
         class user
         {
-            public int id { get; set; }
+            public long id { get; set; }
             public string name { get; set; }
             public DateTime date { get; set; }
         }
@@ -529,7 +551,7 @@ namespace NUnit.Tests1
             }
             catch (Exception ex)
             {
-                Assert.Pass(ex.Message);
+                Assert.Pass(ex.ToString());
             }
         }
 

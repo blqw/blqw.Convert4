@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 
 namespace blqw.Kanai.Extensions
 {
@@ -23,6 +24,20 @@ namespace blqw.Kanai.Extensions
             var bs = new byte[size];
             Array.Copy(bytes, 0, bs, 0, size);
             return bs;
+        }
+
+        public static T TryReset<T>(this T enumerator)
+            where T : IEnumerator
+        {
+            try
+            {
+                enumerator?.Reset();
+                return enumerator;
+            }
+            catch (Exception)
+            {
+                return default;
+            }
         }
     }
 }

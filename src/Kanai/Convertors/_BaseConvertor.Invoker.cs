@@ -3,21 +3,16 @@ using blqw.Kanai.Interface;
 using blqw.Kanai.Interface.From;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace blqw.Kanai.Convertors
 {
     public abstract partial class BaseConvertor<T> : IConvertor<T>
     {
 
-        /// <summary>
-        /// 调用器字典
-        /// </summary>
-        private readonly Dictionary<Type, InvokeIFormHandler> _invokers = new Dictionary<Type, InvokeIFormHandler>();
 
-
-        private void InitInvokers()
+        private Dictionary<Type, InvokeIFormHandler> InitInvokers()
         {
+            var invokers = new Dictionary<Type, InvokeIFormHandler>();
             var method = ((Func<InvokeIFormHandler>)CreateInvoker<object>).Method.GetGenericMethodDefinition();
             foreach (var intf in GetType().GetInterfaces())
             {
@@ -27,12 +22,24 @@ namespace blqw.Kanai.Convertors
                     if (args[1] == typeof(T))
                     {
                         var invoker = (InvokeIFormHandler)method.MakeGenericMethod(args[0]).Invoke(null, null);
-                        _invokers.Add(args[0], invoker);
+                        invokers.Add(args[0], invoker);
                     }
                 }
             }
+            return invokers;
         }
 
+        /// <summary>
+        /// 精确匹配调度器
+        /// </summary>
+        protected InvokeIFormHandler GetInvoker(Type inputType)
+        {
+            if (_invokers.TryGetValue(inputType, out var invoker0))
+            {
+                return invoker0;
+            }
+            return null;
+        }
 
         /// <summary>
         /// 获取指定输入类型的调用器
@@ -46,45 +53,14 @@ namespace blqw.Kanai.Convertors
                 yield break;
             }
             var invokers = _invokers;
-            if (invokers.TryGetValue(inputType, out var invoker0))
-            {
-                yield return invoker0;
-                yield break;
-            }
 
-            var interfaceTypes = inputType.GetInterfaces().ToList();
-
-            if (!inputType.IsInterface)
+            foreach (var type in _invokerTypes)
             {
-                foreach (var baseType in inputType.EnumerateBaseTypes())
+                if (type.IsAssignableFrom(inputType))
                 {
-                    if (invokers.TryGetValue(baseType, out var invoker))
-                    {
-                        yield return invoker;
-                        foreach (var i in baseType.GetInterfaces())
-                        {
-                            interfaceTypes.Remove(i);
-                        }
-                        break;
-                    }
+                    yield return invokers[type];
                 }
             }
-
-            interfaceTypes.Sort((a, b) => a.IsAssignableFrom(b) ? 1 : b.IsAssignableFrom(a) ? -1 : 0);
-
-            for (var i = 0; i < interfaceTypes.Count; i++)
-            {
-                var interfaceType = interfaceTypes[i];
-                if (invokers.TryGetValue(interfaceType, out var invoker))
-                {
-                    yield return invoker;
-                    foreach (var j in interfaceType.GetInterfaces())
-                    {
-                        interfaceTypes.Remove(j);
-                    }
-                }
-            }
-
         }
 
 

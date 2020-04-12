@@ -90,6 +90,10 @@ namespace blqw.Kanai.Extensions
             {
                 return null;
             }
+            if (exception is ConvertException)
+            {
+                return exception;
+            }
             var baseException = exception.GetBaseException();
             if (baseException != null && baseException != exception)
             {
